@@ -29,11 +29,11 @@ def initialize(settings):
     )
 
     motor_client = MotorClient(mongo_url)
-
-    settings['database']= motor_client.elastickube
+    settings['database'] = motor_client.elastickube
 
     initialize_database(settings['database'])
     IOLoop.current().add_callback(watch.start_monitor,  motor_client)
+
 
 class SecureWebSocketHandler(WebSocketHandler):
 

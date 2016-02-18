@@ -8,6 +8,7 @@ from tornado.httpclient import HTTPError, AsyncHTTPClient
 
 from api.db.query import Query
 
+
 class AuthTests(testing.AsyncTestCase):
 
     def setUp(self):

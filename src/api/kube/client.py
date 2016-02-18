@@ -26,18 +26,15 @@ class HTTPClient(object):
         self.version = version
 
         self._client = self.build_client()
-        self._base_url = 'http://10.5.10.6:8080/api/{1}'.format(self.server, self.version)
+        self._base_url = 'https://{0}/api/{1}'.format(self.server, self.version)
 
     def build_client(self):
         defaults = dict(validate_cert=False)
-
-        if self.token:
-            defaults['headers'] = {'Authorization': 'Bearer {0}'.format(self.token)}
-        elif self.username and self.password:
+        if self.username and self.password:
             defaults['auth_username'] = self.username
             defaults['auth_password'] = self.password
 
-        return AsyncHTTPClient(force_instance=False, defaults=defaults)
+        return AsyncHTTPClient(force_instance=True, defaults=defaults)
 
     def build_url(self, url_path, **kwargs):
         if url_path.startswith('/'):
@@ -68,12 +65,19 @@ class HTTPClient(object):
 
         return kwargs
 
+    def build_headers(self, content_type=None):
+        headers = {'Authorization': 'Bearer {0}'.format(self.token)}
+        if content_type:
+            headers['Content-type'] = content_type
+
+        return headers
+
     @coroutine
     def get(self, url_path, **kwargs):
         params = self.build_params(url_path, **kwargs)
         url = url_concat(self.build_url(url_path, **kwargs), params)
 
-        result = yield self._client.fetch(url, method='GET')
+        result = yield self._client.fetch(url, method='GET', headers=self.build_headers())
         raise Return(result)
 
     @coroutine
@@ -84,7 +88,7 @@ class HTTPClient(object):
         result = yield self._client.fetch(
             url,
             method='POST',
-            headers={'Content-type': 'application/json'},
+            headers=self.build_headers('application/json'),
             **params)
 
         raise Return(result)
@@ -97,14 +101,17 @@ class HTTPClient(object):
         result = yield self._client.fetch(
             url,
             method='PUT',
-            headers={'Content-type': 'application/json'},
+            headers=self.build_headers('application/json'),
             **params)
 
         raise Return(result)
 
     @coroutine
     def delete(self, url_path, **kwargs):
-        response = yield self._client.fetch(self.build_url(url_path, **kwargs), method='DELETE')
+        response = yield self._client.fetch(
+            self.build_url(url_path, **kwargs),
+            method='DELETE',
+            headers=self.build_headers())
         raise Return(response)
 
     @coroutine
@@ -115,7 +122,7 @@ class HTTPClient(object):
         result = yield self._client.fetch(
             url,
             method='PATCH',
-            headers={'Content-Type': 'application/merge-patch+json'},
+            headers=self.build_headers('application/merge-patch+json'),
             **params)
 
         raise Return(result)
@@ -134,7 +141,13 @@ class HTTPClient(object):
         params = self.build_params(url_path, **kwargs)
         url = url_concat(self.build_url(url_path, **kwargs), params)
 
-        request = HTTPRequest(url=url, method='GET', request_timeout=3600, streaming_callback=data_callback)
+        request = HTTPRequest(
+            url=url,
+            method='GET',
+            headers=self.build_headers(),
+            request_timeout=3600,
+            streaming_callback=data_callback)
+
         future = WatchFuture()
         chain_future(self._client.fetch(request), future)
 
