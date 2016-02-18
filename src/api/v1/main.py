@@ -1,12 +1,13 @@
 import logging
 
+from bson.json_util import loads
+from tornado.gen import coroutine, Return
+
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.namespaces import NamespacesWatcher
 from api.v1.watchers.instances import InstancesWatcher
 from api.v1.watchers.users import UsersWatcher
 from api.v1.actions.user import UserActions
-from bson.json_util import loads
-from tornado.gen import coroutine, sleep
 
 action_lookup = dict(
     users=UserActions
@@ -45,7 +46,11 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
     @coroutine
     def on_message(self, message):
-        document = loads(message)
+        try:
+            document = loads(message)
+        except ValueError:
+            self.write_message({"error": {"message": "Message %s cannot be deserialized" % message}})
+            raise Return()
 
         if 'action' in document:
             action_cls = action_lookup.get(document['action'], None)

@@ -14,13 +14,13 @@ class UserActions(object):
     @coroutine
     def create(self, document):
         logging.info("Creating user")
-        user = yield self.database.Users.insert(document)
 
+        user = yield self.database.Users.insert(document)
         raise Return(user)
 
     @coroutine
     def update(self, document):
-        logging.info("Closing UsersWatcher")
+        logging.info("Updating userr")
 
         user = yield Query(self.database, "Users").find_one(document['_id'])
         user['firstname'] = document['firstname']
@@ -32,7 +32,7 @@ class UserActions(object):
 
     @coroutine
     def delete(self):
-        logging.info("Closing UsersWatcher")
+        logging.info("Deleting userr")
 
         user = yield Query(self.database, "Users").find_one(document['_id'])
         user['deleted'] = datetime.now()

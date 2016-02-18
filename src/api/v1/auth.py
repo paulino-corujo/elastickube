@@ -33,7 +33,6 @@ class AuthHandler(RequestHandler):
 
         token = jwt.encode(token, self.settings['secret'], algorithm='HS256')
         self.set_cookie(ELASTICKUBE_TOKEN_HEADER, token)
-        self.redirect('/')
 
         logging.info("User '%s' authenticated." % user["username"])
         raise Return(token)
@@ -98,7 +97,9 @@ class SignupHandler(AuthHandler):
             )
 
             signup_user = yield Query(self.settings["database"], "Users").insert(user)
-            yield self.authenticate_user(signup_user)
+            token = yield self.authenticate_user(signup_user)
+            self.write(token)
+            self.flush()
 
 
 class PasswordHandler(AuthHandler):
@@ -127,7 +128,7 @@ class PasswordHandler(AuthHandler):
             self.write(token)
             self.flush()
         else:
-            logging.info("Invalid password for user '%'." % username)
+            logging.info("Invalid password for user '%s'." % username)
             raise HTTPError(401, reason="Invalid username or password.")
 
 
@@ -157,6 +158,7 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
 
                 if user:
                     yield self.authenticate_user(user)
+                    self.redirect('/')
                 else:
                     logging.debug("User '%s' not found" % auth_user["email"])
                     raise HTTPError(400, "Invalid authentication request.")
