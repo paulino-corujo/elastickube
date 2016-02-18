@@ -8,7 +8,7 @@
          layout="row" layout-align="start">
         <a ng-repeat="section in ctrl.sections track by section.name"
            ng-click="ctrl.goToSection(section)"
-           ng-class="{ 'ek-header__sections__section--selected': ctrl.selectedState === section.name }"
+           ng-class="{ 'ek-header__sections__section--selected': ctrl.selectedState === section }"
            class="ek-header__sections__section">{{:: section.data.header.name }}
         </a>
     </div>
