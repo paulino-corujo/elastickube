@@ -1,13 +1,13 @@
-import { EventEmitter } from 'events';
+import AbstractStore from './abstract-store';
 import constants from './constants';
 
 const NAMESPACE_UPDATED_EVENT = 'namespace.change';
 
-class SessionStoreService extends EventEmitter {
-    constructor(actions, dispatcher, session) {
+class SessionStoreService extends AbstractStore {
+    constructor(session, actions, dispatcher) {
         'ngInject';
 
-        super();
+        super(session);
 
         this._actions = actions;
         this._session = session;
@@ -22,6 +22,9 @@ class SessionStoreService extends EventEmitter {
                 default:
             }
         });
+    }
+
+    destroy() {
     }
 
     getActiveNamespace() {

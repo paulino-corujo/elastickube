@@ -18,6 +18,8 @@ import NamespacesActionCreatorService from './dataflow/namespaces-action-creator
 import NamespacesStoreService from './dataflow/namespaces-store.service.js';
 import SessionActionCreatorService from './dataflow/session-action-creator.service';
 import SessionStoreService from './dataflow/session-store.service.js';
+import PrincipalActionCreatorService from './dataflow/principal-action-creator.service';
+import PrincipalStoreService from './dataflow/principal-store.service.js';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
 import MultiTranscludeService from './services/multi-transclude.service';
@@ -47,6 +49,9 @@ angular
     .service('namespacesStore', NamespacesStoreService)
 
     .service('sessionActionCreator', SessionActionCreatorService)
-    .service('sessionStore', SessionStoreService);
+    .service('sessionStore', SessionStoreService)
+
+    .service('principalActionCreator', PrincipalActionCreatorService)
+    .service('principalStore', PrincipalStoreService);
 
 export default moduleName;

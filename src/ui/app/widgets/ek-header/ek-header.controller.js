@@ -1,27 +1,34 @@
-import constants from 'constants';
-import mockWorkspaces from 'mocks/workspaces';
-
 class HeaderController {
-    constructor($rootScope, $scope, auth, routerHelper, sessionStore) {
+    constructor($rootScope, $scope, auth, routerHelper, sessionStore, principalActionCreator, principalStore) {
         'ngInject';
         const watches = [];
+        const onChange = () => this.workspace = this._principalStore.getPrincipal();
 
         this._$rootScope = $rootScope;
         this._auth = auth;
-        this._sessionStoreService = sessionStore;
+        this._routerHelper = routerHelper;
+        this._sessionStore = sessionStore;
+        this._principalActionCreator = principalActionCreator;
+        this._principalStore = principalStore;
 
         this.sections = getSections(auth, routerHelper);
-        this.workspace = _.find(mockWorkspaces, { id: 'alberto' });
+        this.workspace = this._principalStore.getPrincipal();
+
+        this._principalStore.addPrincipalChangeListener(onChange);
 
         watches.concat([
             $rootScope.$on('$stateChangeSuccess', (event, toState) => this.selectedState = toState.name)
         ]);
 
-        $scope.$on('$destroy', () => watches.forEach((x) => x()));
+        $scope.$on('$destroy', () => {
+            this._principalStore.removePrincipalChangeListener(onChange);
+            watches.forEach((x) => x());
+        });
     }
 
     goToSection(section) {
-        this._$rootScope.$emit(constants.NAVIGATE_TO, section);
+        const namespace = this._sessionStore.getActiveNamespace();
+        this._routerHelper.changeToState(section.name, { namespace });
     }
 
     isLoggedIn() {
@@ -29,7 +36,10 @@ class HeaderController {
     }
 
     logout() {
-        return this._auth.logout();
+        this._principalActionCreator.logout()
+            .then(() => {
+                this._auth.logout();
+            });
     }
 }
 

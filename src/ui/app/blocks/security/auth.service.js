@@ -3,11 +3,12 @@ import profiles from './profiles';
 const ELASTICKUBE_TOKEN = 'ElasticKube-Token';
 
 class AuthService {
-    constructor($rootScope, $cookies, routerHelper, session) {
+    constructor($rootScope, $cookies, routerHelper, session, principalStore) {
         'ngInject';
 
         this._$rootScope = $rootScope;
         this._$cookies = $cookies;
+        this._principalStore = principalStore;
         this._routerHelper = routerHelper;
         this._session = session;
 
@@ -54,11 +55,11 @@ class AuthService {
     }
 
     isLoggedIn() {
-        return this._loggedIn;
+        return !_.isUndefined(this._principalStore.getPrincipal());
     }
 
     isAdmin() {
-        return false;
+        return this._principalStore.isAdmin();
     }
 
     logout() {

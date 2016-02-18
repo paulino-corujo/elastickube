@@ -1,6 +1,12 @@
-class SessionService {
+import { EventEmitter } from 'events';
+
+const SESSION_DESTROY_EVENT = 'session.destroy';
+
+class SessionService extends EventEmitter {
     constructor($q, storage) {
         'ngInject';
+
+        super();
 
         this._$q = $q;
         this._storage = storage;
@@ -27,9 +33,18 @@ class SessionService {
         this._storage.removeItem(key);
     }
 
+    addSessionDestroyListener(callback) {
+        this.on(SESSION_DESTROY_EVENT, callback);
+    }
+
+    removeSessionDestroyListenerListener(callback) {
+        this.removeListener(SESSION_DESTROY_EVENT, callback);
+    }
+
     destroy() {
         this._session = {};
         this._storage.clear();
+        this.emit(SESSION_DESTROY_EVENT);
     }
 }
 
