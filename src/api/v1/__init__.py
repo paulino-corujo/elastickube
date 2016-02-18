@@ -10,6 +10,7 @@ from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, HTTPError
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
+from api.v1.sync import sync_namespaces
 from api.db import watch, init as initialize_database
 from api.kube import client
 
@@ -32,6 +33,7 @@ def initialize(settings):
     settings['database'] = motor_client.elastickube
 
     initialize_database(mongo_url)
+    sync_namespaces(settings)
     IOLoop.current().add_callback(watch.start_monitor,  motor_client)
 
 

@@ -34,9 +34,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         logging.info("Initializing NamespacesHandler")
 
         try:
-            yield super(MainWebSocketHandler, self).open()
+            #yield super(MainWebSocketHandler, self).open()
 
-            ns_watcher = NamespacesWatcher(None, self.settings, self.write_message)
+            ns_watcher = NamespacesWatcher(self.settings, None, self.write_message)
             self.global_watchers.append(ns_watcher)
 
         except Exception as e:

@@ -1,50 +1,25 @@
 import logging
 
-from api.kube.exceptions import WatchDisconnectedException
+from api.db.watch import add_callback, remove_callback
+from tornado.gen import coroutine, Return
 
 
 class NamespacesWatcher(object):
 
-    def __init__(self, message, settings, callback):
+    def __init__(self, settings, message, callback):
         logging.info("Initializing NamespacesWatcher")
 
-        self.watcher = None
         self.callback = callback
-        self.version = None
-        self.connected = True
+        add_callback('Namespaces', self.data_callback)
 
-        def done_callback(future):
-            logging.warn("Disconnected from kubeclient.")
+    @coroutine
+    def data_callback(self, document):
+        logging.debug("Namespace '%(name)s' saved", document['metadata'])
+        self.callback(document)
 
-            if future.exception():
-                error = future.exception()
-                logging.exception(error)
-
-            if self.connected and isinstance(future.exception(), WatchDisconnectedException):
-                self.watcher = settings["kube"].namespaces.watch(
-                    on_data=self.data_callback, resource_version=self.version)
-                self.watcher.add_done_callback(done_callback)
-
-        try:
-            self.watcher = settings["kube"].namespaces.watch(on_data=self.data_callback)
-            self.watcher.add_done_callback(done_callback)
-
-        except Exception as e:
-            logging.exception(e)
-            if self.connected:
-                self.callback({"error": {"message": "Failed to connect to event source."}})
-
-    def data_callback(self, data):
-        if 'object' in data:
-            self.version = data['object']['metadata']['resourceVersion']
-        else:
-            self.version = data['metadata']['resourceVersion']
-
-        self.callback(data)
+        raise Return()
 
     def close(self):
         logging.info("Closing NamespacesWatcher")
-        self.connected = False
+        remove_callback(self.data_callback)
 
-        if self.watcher:
-            self.watcher.cancel()

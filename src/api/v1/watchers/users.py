@@ -15,7 +15,7 @@ class UsersWatcher(object):
 
     @coroutine
     def data_callback(self, document):
-        logging.info("Data")
+        logging.debug("User '%(username)' saved", document)
         self.callback(document)
 
         raise Return()
