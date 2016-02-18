@@ -68,10 +68,40 @@ class AuthTests(testing.AsyncTestCase):
         except HTTPError as e:
             error = e
 
-        self.assertIsNotNone(error, "No error raise calling /api/v1/auth/signup")
+        self.assertIsNotNone(error, "No error raised calling /api/v1/auth/signup")
         self.assertEquals(error.code, 403, "/api/v1/auth/signup raised %d instead of 403" % error.code)
 
         logging.debug("Completed test_signup_disabled")
+
+    @testing.gen_test
+    def test_login_success(self):
+        logging.debug("Start test_login_success")
+
+        response = yield AsyncHTTPClient(self.io_loop).fetch(
+            "http://localhost/api/v1/auth/login",
+            method='POST',
+            body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube")))
+
+        self.assertTrue(response.body, "Token not included in response body")
+        logging.debug("Completed test_login_success")
+
+    @testing.gen_test
+    def test_login_wrong_password(self):
+        logging.debug("Start test_login_wrong_password")
+
+        error = None
+        try:
+            yield AsyncHTTPClient(self.io_loop).fetch(
+                "http://localhost/api/v1/auth/login",
+                method='POST',
+                body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube2")))
+        except HTTPError as e:
+            error = e
+
+        self.assertIsNotNone(error, "No error raised calling /api/v1/auth/login")
+        self.assertEquals(error.code, 401, "/api/v1/auth/login raised %d instead of 401" % error.code)
+
+        logging.debug("Completed test_login_wrong_password")
 
 if __name__ == '__main__':
     testing.main()

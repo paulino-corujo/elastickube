@@ -38,7 +38,11 @@ class InstancesWatcher(object):
                 self.callback({"error": {"message": "Failed to connect to event source."}})
 
     def data_callback(self, data):
-        self.version = data['metadata']['resourceVersion']
+        if 'object' in data:
+            self.version = data['object']['metadata']['resourceVersion']
+        else:
+            self.version = data['metadata']['resourceVersion']
+
         self.callback(data)
 
     def close(self):

@@ -132,8 +132,8 @@ class HTTPClient(object):
         class WatchFuture(Future):
 
             def cancel(self):
-                # close client connection
-                pass
+                self._client.close()
+                logging.debug("Closing http connection")
 
         def data_callback(data):
             on_data(json.loads(data))

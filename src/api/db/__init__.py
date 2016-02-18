@@ -7,9 +7,10 @@ PASSWORD_REGEX = "^(([a-zA-Z]+\d+)|(\d+[a-zA-Z]+))[a-zA-Z0-9]*$"
 SCHEMA_VERSION = 1
 
 
-def init(database):
+def init(mongo_url):
     logging.info("Initializing database...")
 
+    database = MongoClient(mongo_url).elastickube
     settings = database.Settings.find_one({"deleted": None})
 
     if not settings:
@@ -27,7 +28,7 @@ def init(database):
         })
 
         logging.debug("Initial Settings document created, %s", result)
-
+    else:
         if settings["schema_version"] != SCHEMA_VERSION:
             migrate(settings["schema_version"])
 
