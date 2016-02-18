@@ -19,7 +19,7 @@ RESPONSE_TIMEOUT = timedelta(seconds=5)
 ELASTICKUBE_TOKEN_HEADER = "ElasticKube-Token"
 
 
-def initialize(settings):
+def configure(settings):
     if os.path.exists('/var/run/secrets/kubernetes.io/serviceaccount/token'):
         with open('/var/run/secrets/kubernetes.io/serviceaccount/token') as token:
             settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'), token=token.read())
@@ -29,12 +29,14 @@ def initialize(settings):
         os.getenv('ELASTICKUBE_MONGO_SERVICE_PORT', 27017)
     )
 
-    motor_client = MotorClient(mongo_url)
-    settings['database'] = motor_client.elastickube
+    settings['motor'] = MotorClient(mongo_url)
+    settings['database'] = settings['motor'].elastickube
 
-    initialize_database(mongo_url)
-    sync_namespaces(settings)
-    IOLoop.current().add_callback(watch.start_monitor,  motor_client)
+
+@coroutine
+def initialize(settings):
+    yield initialize_database(settings['database'])
+    yield watch.start_monitor(settings['motor'])
 
 
 class SecureWebSocketHandler(WebSocketHandler):

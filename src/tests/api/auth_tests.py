@@ -1,31 +1,17 @@
 import json
 import logging
 
-from motor.motor_tornado import MotorClient
 from tornado import testing
-from tornado.gen import coroutine
 from tornado.httpclient import HTTPError, AsyncHTTPClient
-
-from api.db.query import Query
 
 
 class AuthTests(testing.AsyncTestCase):
 
-    def setUp(self):
-        super(AuthTests, self).setUp()
-
-        self.database = MotorClient("mongodb://localhost:27017/").elastickube
-        self.existing_users = []
-
-    @coroutine
-    def tearDown(self):
-        for existing_user in self.existing_users:
-            existing_user['deleted'] = None
-            yield self.database['Users'].update({"_id": existing_user['_id']}, existing_user)
+    _multiprocess_can_split_ = True
 
     @testing.gen_test
-    def test_auth_providers(self):
-        logging.debug("Start test_auth_providers")
+    def auth_providers_test(self):
+        logging.debug("Start auth_providers_test")
 
         response = yield AsyncHTTPClient(self.io_loop).fetch("http://localhost/api/v1/auth/providers")
         auth_providers = json.loads(response.body)
@@ -37,26 +23,11 @@ class AuthTests(testing.AsyncTestCase):
                 "Missing property 'regex' in auth password method %s" % auth_providers
             )
 
-        logging.debug("Completed test_auth_providers")
+        logging.debug("Completed auth_providers_test")
 
     @testing.gen_test
-    def test_no_auth_providers(self):
-        logging.debug("Start test_no_auth_providers")
-
-        self.existing_users = yield Query(self.database, "Users").find()
-        for existing_user in self.existing_users:
-            existing_user['deleted'] = 'deleted'
-            yield Query(self.database, "Users").update(existing_user)
-
-        response = yield AsyncHTTPClient(self.io_loop).fetch("http://localhost/api/v1/auth/providers")
-        auth_providers = json.loads(response.body)
-        self.assertTrue(len(auth_providers.keys()) == 0, "Auth methods enabled %s" % auth_providers)
-
-        logging.debug("Completed test_no_auth_providers")
-
-    @testing.gen_test
-    def test_signup_disabled(self):
-        logging.debug("Start test_signup_disabled")
+    def signup_disabled_test(self):
+        logging.debug("Start signup_disabled_test")
 
         error = None
         try:
@@ -71,11 +42,11 @@ class AuthTests(testing.AsyncTestCase):
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/signup")
         self.assertEquals(error.code, 403, "/api/v1/auth/signup raised %d instead of 403" % error.code)
 
-        logging.debug("Completed test_signup_disabled")
+        logging.debug("Completed signup_disabled_test")
 
     @testing.gen_test
-    def test_login_success(self):
-        logging.debug("Start test_login_success")
+    def login_success_test(self):
+        logging.debug("Start login_success_test")
 
         response = yield AsyncHTTPClient(self.io_loop).fetch(
             "http://localhost/api/v1/auth/login",
@@ -83,11 +54,11 @@ class AuthTests(testing.AsyncTestCase):
             body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube")))
 
         self.assertTrue(response.body, "Token not included in response body")
-        logging.debug("Completed test_login_success")
+        logging.debug("Completed login_success_test")
 
     @testing.gen_test
-    def test_login_wrong_password(self):
-        logging.debug("Start test_login_wrong_password")
+    def login_wrong_password_test(self):
+        logging.debug("Start login_wrong_password_test")
 
         error = None
         try:
@@ -101,7 +72,8 @@ class AuthTests(testing.AsyncTestCase):
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/login")
         self.assertEquals(error.code, 401, "/api/v1/auth/login raised %d instead of 401" % error.code)
 
-        logging.debug("Completed test_login_wrong_password")
+        logging.debug("Completed login_wrong_password_test")
+
 
 if __name__ == '__main__':
     testing.main()

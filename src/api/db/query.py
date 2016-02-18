@@ -51,5 +51,5 @@ class Query(object):
     def update(self, document):
         document['updated'] = datetime.utcnow().isoformat()
 
-        response = yield self.database[self.collection].update({"_id": document['_id']}, document)
+        response = yield self.database[self.collection].update({"_id": document["_id"]}, document)
         raise Return(response)

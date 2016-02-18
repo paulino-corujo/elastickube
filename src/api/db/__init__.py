@@ -1,20 +1,20 @@
 import logging
 from datetime import datetime
 
-from pymongo import MongoClient
+from tornado.gen import coroutine
 
 PASSWORD_REGEX = "^(([a-zA-Z]+\d+)|(\d+[a-zA-Z]+))[a-zA-Z0-9]*$"
 SCHEMA_VERSION = 1
 
 
-def init(mongo_url):
+@coroutine
+def init(database):
     logging.info("Initializing database...")
 
-    database = MongoClient(mongo_url).elastickube
-    settings = database.Settings.find_one({"deleted": None})
+    settings = yield database.Settings.find_one({"deleted": None})
 
     if not settings:
-        result = database.Settings.insert({
+        result = yield database.Settings.insert({
             "created": datetime.utcnow().isoformat(),
             "deleted": None,
             "schema": "http://elasticbox.net/schemas/settings",
