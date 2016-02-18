@@ -4,6 +4,7 @@ from api.db.query import Query
 from datetime import datetime
 from tornado.gen import coroutine, Return
 
+
 class UserActions(object):
 
     def __init__(self, message, settings):

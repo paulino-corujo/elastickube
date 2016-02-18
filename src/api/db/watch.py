@@ -89,7 +89,7 @@ def start_monitor(client):
 def _dispatch_users_documents(document):
     try:
         if 'username' in document:
-            logging.debug("Invoking %s callbacks for user: %s", len( _callbacks['users']), document['username'])
+            logging.debug("Invoking %s callbacks for user: %s", len(_callbacks['users']), document['username'])
             results = yield dict(
                 [(callback, callback(document)) for callback in _callbacks['users']]
             )
@@ -102,4 +102,3 @@ def _dispatch_users_documents(document):
 
     except Exception as e:
         logging.exception(e)
-
