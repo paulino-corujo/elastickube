@@ -10,19 +10,17 @@ class InstancesStoreService extends EventEmitter {
 
         this._$q = $q;
         this._actions = actions;
-        this._loading = this._$q.defer();
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
-
-                case this._actions.api.INSTANCES_PRELOADED:
-                    this._loading.resolve();
-                    this._setInstances(action.instances);
-                    this.emit(CHANGE_EVENT);
+                case this._actions.NAMESPACE_CHANGED:
+                case this._actions.INSTANCES_LOAD:
+                    this._isLoading = this._$q.defer();
                     break;
 
-                case this._actions.api.INSTANCES_LOADED:
+                case this._actions.INSTANCES_LOADED:
                     this._setInstances(action.instances);
+                    this._isLoading.resolve();
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -35,8 +33,8 @@ class InstancesStoreService extends EventEmitter {
         this._instances = instances;
     }
 
-    loading() {
-        return this._loading.promise;
+    isLoading() {
+        return this._isLoading.promise;
     }
 
     get(id) {

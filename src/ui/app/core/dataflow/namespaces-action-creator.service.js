@@ -1,23 +1,23 @@
 class NamespacesActionCreatorService {
-    constructor($q, actions, dispatcher) {
+    constructor(actions, dispatcher, namespacesAPI) {
         'ngInject';
 
-        this._$q = $q;
-        this._actions = actions.api;
+        this._actions = actions;
+        this._namespacesAPI = namespacesAPI;
         this._dispatcher = dispatcher;
     }
 
-    preload() {
+    load() {
         this._dispatcher.dispatch({
-            type: this._actions.PRELOAD_NAMESPACES
+            type: this._actions.NAMESPACES_LOAD
         });
-    }
-
-    namespacesPreloaded(namespaces) {
-        this._dispatcher.dispatch({
-            type: this._actions.NAMESPACES_PRELOADED,
-            namespaces
+        return this._namespacesAPI.loadNamespaces().then((namespaces) => {
+            this._dispatcher.dispatch({
+                type: this._actions.NAMESPACES_LOADED,
+                namespaces
+            });
         });
     }
 }
+
 export default NamespacesActionCreatorService;

@@ -2,25 +2,19 @@ import mockNamespaces from 'mocks/namespaces';
 
 class InstancesAPIService {
 
-    constructor(namespacesActionCreator, actions, dispatcher) {
+    constructor($q) {
         'ngInject';
 
-        this._actions = actions;
-        this._dispatcher = dispatcher;
-        this._namespacesActionCreator = namespacesActionCreator;
-
-        this.dispatchToken = dispatcher.register((x) => this._apiDispatcher(x));
+        this._$q = $q;
     }
 
-    _apiDispatcher(action) {
-        switch (action.type) {
-            case this._actions.api.PRELOAD_NAMESPACES:
+    loadNamespaces() {
+        const defer = this._$q.defer();
 
-                /* FIXME SIMULATED CALLBACK */
-                setTimeout(() => this._namespacesActionCreator.namespacesPreloaded(mockNamespaces), 0);
-                break;
-            default:
-        }
+        setTimeout(() => {
+            defer.resolve(mockNamespaces);
+        }, 0);
+        return defer.promise;
     }
 }
 

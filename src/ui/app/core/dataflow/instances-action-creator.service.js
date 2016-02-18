@@ -1,29 +1,21 @@
 class InstancesActionCreatorService {
-    constructor($q, actions, dispatcher) {
+    constructor(actions, dispatcher, instancesAPI) {
         'ngInject';
 
-        this._$q = $q;
-        this._actions = actions.api;
+        this._instancesAPI = instancesAPI;
+        this._actions = actions;
         this._dispatcher = dispatcher;
     }
 
-    preload() {
+    load(namespace) {
         this._dispatcher.dispatch({
-            type: this._actions.PRELOAD_INSTANCES
+            type: this._actions.INSTANCES_LOAD
         });
-    }
-
-    instancesLoaded(instances) {
-        this._dispatcher.dispatch({
-            type: this._actions.INSTANCES_LOADED,
-            instances
-        });
-    }
-
-    instancesPreloaded(instances) {
-        this._dispatcher.dispatch({
-            type: this._actions.INSTANCES_PRELOADED,
-            instances
+        return this._instancesAPI.loadInstances(namespace).then((instances) => {
+            this._dispatcher.dispatch({
+                type: this._actions.INSTANCES_LOADED,
+                instances
+            });
         });
     }
 }

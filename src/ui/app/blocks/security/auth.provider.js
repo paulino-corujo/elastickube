@@ -2,10 +2,10 @@ import AuthService from './auth.service';
 
 class AuthProvider {
     constructor() {
-        this.$get = ($cookies, routerHelper, session) => {
+        this.$get = ($rootScope, $cookies, routerHelper, session) => {
             'ngInject';
 
-            return new AuthService($cookies, routerHelper, session);
+            return new AuthService($rootScope, $cookies, routerHelper, session);
         };
     }
 }

@@ -1,26 +1,21 @@
 import { EventEmitter } from 'events';
+import constants from './constants';
 
 const NAMESPACE_UPDATED_EVENT = 'namespace.change';
 
-const sessionKeys = {
-    ACTIVE_NAMESPACE: 'ACTIVE_NAMESPACE'
-};
-
 class SessionStoreService extends EventEmitter {
-    constructor($q, actions, dispatcher, session) {
+    constructor(actions, dispatcher, session) {
         'ngInject';
 
         super();
 
-        this._$q = $q;
         this._actions = actions;
         this._session = session;
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
 
-                case this._actions.ui.NAMESPACE_SELECTED:
-                    session.setItem(sessionKeys.ACTIVE_NAMESPACE, action.namespace);
+                case this._actions.NAMESPACE_CHANGED:
                     this.emit(NAMESPACE_UPDATED_EVENT);
                     break;
 
@@ -30,7 +25,7 @@ class SessionStoreService extends EventEmitter {
     }
 
     getActiveNamespace() {
-        return this._session.getItem(sessionKeys.ACTIVE_NAMESPACE);
+        return this._session.getItem(constants.ACTIVE_NAMESPACE);
     }
 
     addNamespaceChangeListener(callback) {

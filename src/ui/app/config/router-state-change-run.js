@@ -12,7 +12,9 @@ function routerStateChange($rootScope, $state, sessionStore, routerHelper) {
     sessionStore.addNamespaceChangeListener(() => {
         const namespace = sessionStore.getActiveNamespace();
 
-        routerHelper.changeToState($state.current.name, { namespace });
+        if ($state.current.url !== '^') {
+            routerHelper.changeToState($state.current.name, { namespace });
+        }
     });
 }
 

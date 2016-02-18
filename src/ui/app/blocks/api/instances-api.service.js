@@ -2,33 +2,20 @@ import mockInstances from 'mocks/instances';
 
 class InstancesAPIService {
 
-    constructor(instancesActionCreator, actions, dispatcher) {
+    constructor($q) {
         'ngInject';
 
-        this._actions = actions;
-        this._dispatcher = dispatcher;
-        this._instancesActionCreator = instancesActionCreator;
-
-        this.dispatchToken = dispatcher.register((x) => this._apiDispatcher(x));
+        this._$q = $q;
     }
 
-    _apiDispatcher(action) {
-        switch (action.type) {
+    loadInstances(namespace) {
+        const defer = this._$q.defer();
 
-            case this._actions.api.PRELOAD_INSTANCES:
-
-                // FIXME SIMULATED CALLBACK
-                setTimeout(() => this._instancesActionCreator.instancesPreloaded(mockInstances.default), 0);
-                break;
-
-            case this._actions.ui.NAMESPACE_SELECTED:
-
-                // FIXME SIMULATED CALLBACK
-                setTimeout(() => this._instancesActionCreator.instancesLoaded(mockInstances[action.namespace]), 0);
-                break;
-
-            default:
-        }
+        // FIXME SIMULATED CALLBACK
+        setTimeout(() => {
+            defer.resolve(_.isUndefined(namespace) ? mockInstances.default : mockInstances[namespace]);
+        }, 0);
+        return defer.promise;
     }
 }
 

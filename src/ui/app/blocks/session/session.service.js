@@ -1,7 +1,8 @@
 class SessionService {
-    constructor(storage) {
+    constructor($q, storage) {
         'ngInject';
 
+        this._$q = $q;
         this._storage = storage;
         this._session = {};
 
@@ -18,7 +19,7 @@ class SessionService {
 
     setItem(key, value) {
         this._session[key] = value;
-        this._storage.setItem(key, JSON.stringify(value));
+        return this._$q.when(this._storage.setItem(key, JSON.stringify(value)));
     }
 
     removeItem(key) {

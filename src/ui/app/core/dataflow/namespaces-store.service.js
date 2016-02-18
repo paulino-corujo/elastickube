@@ -10,15 +10,17 @@ class NamespacesStoreService extends EventEmitter {
 
         this._$q = $q;
         this._actions = actions;
-        this._loading = this._$q.defer();
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
 
-                case this._actions.api.NAMESPACES_PRELOADED:
-                    this._loading.resolve();
+                case this._actions.NAMESPACES_LOAD:
+                    this._isLoading = this._$q.defer();
+                    break;
+
+                case this._actions.NAMESPACES_LOADED:
                     this._setNamespaces(action.namespaces);
-                    this._activeNamespace = action.namespaces[0];
+                    this._isLoading.resolve();
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -31,16 +33,16 @@ class NamespacesStoreService extends EventEmitter {
         this._namespaces = namespaces;
     }
 
-    loading() {
-        return this._loading.promise;
-    }
-
     getAll() {
         return this._namespaces;
     }
 
     getActiveNamespace() {
         return this._activeNamespace;
+    }
+
+    isLoading() {
+        return this._isLoading.promise;
     }
 
     addChangeListener(callback) {

@@ -2,10 +2,10 @@ import SessionService from './session.service';
 
 class SessionProvider {
     constructor() {
-        this.$get = (storage) => {
+        this.$get = ($q, storage) => {
             'ngInject';
 
-            return new SessionService(storage);
+            return new SessionService($q, storage);
         };
     }
 }
