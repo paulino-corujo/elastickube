@@ -138,7 +138,7 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
     def get(self):
         logging.info("Initiating Google OAuth.")
 
-        google_oauth = self.settings.get('google_oauth', False)
+        google_oauth = self.settings.get('google_oauth', None)
         code = self.get_argument('code', False)
 
         if code:

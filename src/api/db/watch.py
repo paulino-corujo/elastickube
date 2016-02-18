@@ -22,26 +22,28 @@ WATCHABLE_COLLECTIONS = [
     "elastickube.Namespaces"
 ]
 
-_callbacks = dict(
-    users=[]
-)
+_callbacks = dict()
 
 
 @coroutine
-def watch_users(coroutine_callback):
-    logging.info("Adding users callback")
+def add_callback(collection, coroutine_callback):
+    logging.info("Adding elastikube.%s callback", collection)
+    namespace = "elastickube.%s" % collection
 
-    _callbacks['users'].append(coroutine_callback)
+    if namespace in _callbacks:
+        _callbacks[namespace].append(coroutine_callback)
+    else:
+        _callbacks[namespace] = [coroutine_callback]
 
     raise Return()
 
 
 @coroutine
 def remove_callback(coroutine_callback):
-    if coroutine_callback in _callbacks['users']:
-        logging.info("Removing users callback")
-
-        _callbacks['users'].remove(coroutine_callback)
+    for namespace, callbacks in results.iteritems():
+        if coroutine_callback in callbacks:
+            logging.info("Removing callback from %s namespace.", namespace)
+            callbacks.remove(coroutine_callback)
 
     raise Return()
 
@@ -77,21 +79,20 @@ def start_monitor(client):
                 document = cursor.next_object()
                 last_timestamp = document['ts']
 
-                yield [
-                    _dispatch_users_documents(document['o'])
-                ]
+                yield _dispatch_documents(document)
 
     except Exception as e:
         logging.exception(e)
 
 
 @coroutine
-def _dispatch_users_documents(document):
-    try:
-        if 'username' in document:
-            logging.debug("Invoking %s callbacks for user: %s", len(_callbacks['users']), document['username'])
+def _dispatch_documents(document):
+    namespace = document['ns']
+
+    if namespace in _callbacks:
+        try:
             results = yield dict(
-                [(callback, callback(document)) for callback in _callbacks['users']]
+                [(callback, callback(document['o'])) for callback in _callbacks[namespace]]
             )
 
             # Remove all failed callbacks
@@ -100,5 +101,5 @@ def _dispatch_users_documents(document):
                     logging.debug("Removing callback: %s", result.exception().message)
                     yield remove_callback(callback)
 
-    except Exception as e:
-        logging.exception(e)
+        except Exception as e:
+            logging.exception(e)
