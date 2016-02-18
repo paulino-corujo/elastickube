@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://elasticbox.net/schemas/user",
+  "type": "object",
+  "required": [
+    "_id",
+    "created",
+    "deleted",
+    "email",
+    "firstname",
+    "last_login",
+    "lastname",
+    "role",
+    "schema",
+    "updated",
+    "username"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36
+    },
+    "created": {
+      "type": "string"
+    },
+    "deleted": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "email_validated_at": {
+      "type": "string"
+    },
+    "firstname": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "google_id": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "last_login": {
+      "type": "string",
+      "maxLength": 2048
+    },
+    "lastname": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "password": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "role": {
+      "type": "string",
+      "default": "user",
+      "enum": [
+        "administrator",
+        "user"
+      ]
+    },
+    "schema": {
+      "type": "string",
+      "enum": [
+        "http://elasticbox.net/schemas/user"
+      ]
+    },
+    "updated": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "type:": "object"
+}

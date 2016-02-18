@@ -1,0 +1,8 @@
+<div class="ek-instance-state-selector__state"
+     ng-repeat="state in ctrl.states track by $index"
+     ng-class="{'ek-instance-state-selector__state--selected': ctrl.selectedState === state }"
+     ng-click="ctrl.selectState(state)"
+     layout="row" layout-align="space-between center">
+    <span class="ek-instance-state-selector__state__name">{{:: state}}</span>
+    <span class="ek-instance-state-selector__state__counter">{{ state === 'all' ? ctrl.instances.length : ctrl.stateValues[state] || 0 }}</span>
+</div>

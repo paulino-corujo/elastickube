@@ -1,0 +1,37 @@
+@import "../../colors";
+
+.ek-namespace-selector {
+    &__namespace {
+        font-size: 13px;
+        font-weight: 500;
+        text-transform: capitalize;
+        margin-right: 10px;
+
+        &, &:not([disabled]):focus {
+            .md-select-value {
+                border-bottom: 0;
+                padding-bottom: 1px;
+
+                span {
+                    min-height: initial;
+                    height: initial;
+                    color: @white;
+                }
+
+                .md-select-icon {
+                    font-size: 11px;
+                    height: 13px;
+                    width: 13px;
+                }
+            }
+        }
+    }
+
+    &__namespace {
+        color: @white;
+
+        &__icon {
+            color: @white;
+        }
+    }
+}

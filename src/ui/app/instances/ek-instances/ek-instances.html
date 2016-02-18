@@ -1,0 +1,45 @@
+<ek-header-layout title="instances">
+    <div transclude-to="header" layout="row" layout-align="start center">
+        <ek-search-filter collection-to-be-filtered="ctrl.instancesFilteredByOwnerAndStatus"
+                          filtered-collection="ctrl.instancesFilteredBySearch"></ek-search-filter>
+
+        <div layout="row" layout-align="end center" flex>
+            <ek-button-group>
+                <button ng-class="{'ek-button-group--selected' : ctrl.selectedView === 'list'}"
+                        ng-click="ctrl.selectView('list')"
+                        aria-label="view list">
+                    <md-icon md-svg-src="{{:: icons.IC_VIEW_LIST_48PX }}"></md-icon>
+                </button>
+                <button ng-class="{'ek-button-group--selected' : ctrl.selectedView === 'grid'}"
+                        ng-click="ctrl.selectView('grid')"
+                        disabled="disabled"
+                        aria-label="view grid">
+                    <md-icon md-svg-src="{{:: icons.IC_VIEW_MODULE_48PX }}"></md-icon>
+                </button>
+            </ek-button-group>
+        </div>
+    </div>
+
+    <div transclude-to="body">
+        <ek-sidenav-layout>
+            <div transclude-to="sidenav">
+                <button class="ek-instances__new">New</button>
+                <ek-instance-filters instances-to-filter="ctrl.instances"
+                                     filtered-instances="ctrl.instancesFilteredByOwnerAndStatus"></ek-instance-filters>
+            </div>
+
+            <div class="ek-instances__body" transclude-to="body">
+                <div class="ek-instances__body__not-found-message"
+                     layout="column" layout-align="center center"
+                     ng-if="ctrl.showEmpty">No instance found
+                </div>
+
+                <div ng-if="!ctrl.showEmpty" ng-switch="ctrl.selectedView">
+                    <span ng-switch-when="grid">grid</span>
+                    <ek-instance-list ng-switch-default
+                                      instances="ctrl.instancesFilteredBySearch"></ek-instance-list>
+                </div>
+            </div>
+        </ek-sidenav-layout>
+    </div>
+</ek-header-layout>

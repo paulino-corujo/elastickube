@@ -1,0 +1,20 @@
+<div class="ek-owners-selector__header"
+     ng-click="ctrl.toggleOpen()"
+     layout="row" layout-align="start center">
+    <span class="ek-owners-selector__header__dropdown"
+          ng-class="{'ek-owners-selector__header__dropdown--closed': !ctrl.open }">
+        <md-icon md-svg-src="{{:: icons.IC_ARROW_DROP_DOWN_18PX }}"></md-icon>
+    </span>
+    <span class="ek-owners-selector__header__title">owners</span>
+</div>
+
+<div class="ek-owners-selector__owners"
+     ng-if="ctrl.open"
+     layout="row" layout-align="start" layout-wrap>
+
+    <ek-avatar class="ek-owners-selector__owners__owner ek-large"
+               ng-repeat="owner in ctrl.owners track by owner.id"
+               ng-click="ctrl.toggleSelectedOwner(owner)"
+               ng-class="{'ek-owners-selector__owners__owner--selected': ctrl.isOwnerSelected(owner)}"
+               workspace="owner"></ek-avatar>
+</div>

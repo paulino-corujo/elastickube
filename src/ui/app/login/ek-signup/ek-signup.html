@@ -1,0 +1,50 @@
+<div layout="column" layout-align="center center">
+    <h2 class="ek-login__title">Create an account</h2>
+
+    <form name="signupForm">
+        <div layout="row">
+            <md-input-container class="ek-login__name md-block animate">
+                <label>Your Name</label>
+                <input ng-model="user.name" name="username" required>
+                <div ng-messages="signupForm.username.$error">
+                    <div ng-message="required">Your name is required.</div>
+                </div>
+            </md-input-container>
+        </div>
+        <div layout="row">
+            <md-input-container class="ek-login__email md-block animate">
+                <label>Your Email</label>
+                <input ng-model="user.email" name="email" type="email" required>
+                <div ng-messages="signupForm.email.$error">
+                    <div ng-message="required">Your email is required.</div>
+                    <div ng-message="email">Your email is invalid.</div>
+                </div>
+            </md-input-container>
+        </div>
+        <div layout="row">
+            <md-input-container class="ek-login__password md-block animate">
+                <label>Create Password</label>
+                <input ng-model="user.password" name="password" type="password" required>
+                <div ng-messages="signupForm.password.$error">
+                    <div ng-message="required">Your password is required.</div>
+                </div>
+            </md-input-container>
+        </div>
+        <div layout="row">
+            <md-input-container class="ek-login__password-confirm md-block animate">
+                <label>Confirm Password</label>
+                <input ng-model="user.confirm" name="confirm" type="password" match-password="password" required>
+                <div ng-messages="signupForm.confirm.$error">
+                    <div ng-message="required">Password confirmation is required.</div>
+                    <div ng-message="passwordMatch">Password and password confirmation does not match.</div>
+                </div>
+            </md-input-container>
+        </div>
+
+        <div layout="row" layout-align="center">
+            <md-button class="ek-login__submit-btn md-raised md-primary"
+                       ng-disabled="signupForm.$invalid">sign up
+            </md-button>
+        </div>
+    </form>
+</div>

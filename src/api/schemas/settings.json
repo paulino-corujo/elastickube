@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://elasticbox.net/schemas/settings",
+  "type": "object",
+  "required": [
+    "_id"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "google_oauth": {
+          "type": "object",
+          "additionalProperties": false,
+          "password": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "regex": {
+                "type": "string"
+              }
+            }
+          },
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "redirect_uri": {
+              "type": "string"
+            },
+            "secret": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "created": {
+      "type": "string"
+    },
+    "deleted": {
+      "type": "string"
+    },
+    "schema": {
+      "type": "string",
+      "enum": [
+        "http://elasticbox.net/schemas/settings"
+      ]
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    }
+  },
+  "type:": "object"
+}

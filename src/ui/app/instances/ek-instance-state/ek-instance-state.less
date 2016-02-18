@@ -1,0 +1,33 @@
+@import "../../colors";
+
+.ek-instance-state {
+    &__indicator {
+        border-radius: 16px;
+        height: 16px;
+        width: 16px;
+
+        &--online {
+            background: #64DD17;
+            border: 1px solid #12C700;
+        }
+
+        &--unavailable {
+            background: #FFD740;
+            border: 1px solid #FFC400;
+        }
+
+        &--shutdown {
+            background: #FF5252;
+            border: 1px solid #FF1744;
+        }
+
+        &--terminated {
+            background: #BDBDBD;
+            border: 1px solid #9E9E9E;
+        }
+    }
+
+    &__name {
+        text-transform: capitalize;
+    }
+}
