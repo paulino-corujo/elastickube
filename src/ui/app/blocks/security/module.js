@@ -3,7 +3,7 @@ import 'angular-cookies';
 import routerModule from 'blocks/router/module';
 import sessionModule from 'blocks/session/module';
 
-import authProvider from './auth.provider';
+import authService from './auth.service';
 import authRoutes from './auth-routes';
 import checkRouteAccess from './check-route-access';
 
@@ -16,7 +16,7 @@ angular
         sessionModule
     ])
     .config(authRoutes)
-    .provider('auth', authProvider)
+    .service('auth', authService)
     .run(checkRouteAccess);
 
 export default moduleName;

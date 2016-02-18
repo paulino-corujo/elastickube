@@ -1,13 +1,25 @@
 <div layout="column" layout-align="center center">
     <h2 class="ek-login__title">Create an account</h2>
 
-    <form name="signupForm">
+    <form ng-submit="ctrl.submit()" name="signupForm">
         <div layout="row">
+            <div ng-messages="!signupForm.$valid">
+                <div ng-message="required">Admin user is already registered.</div>
+            </div>
             <md-input-container class="ek-login__name md-block animate">
                 <label>Your Name</label>
-                <input ng-model="user.name" name="username" required>
-                <div ng-messages="signupForm.username.$error">
+                <input ng-model="user.firstname" name="firstname" required>
+                <div ng-messages="signupForm.firstname.$error">
                     <div ng-message="required">Your name is required.</div>
+                </div>
+            </md-input-container>
+        </div>
+        <div layout="row">
+            <md-input-container class="ek-login__name md-block animate">
+                <label>Your Lastname</label>
+                <input ng-model="user.lastname" name="lastname" required>
+                <div ng-messages="signupForm.lastname.$error">
+                    <div ng-message="required">Your lastname is required.</div>
                 </div>
             </md-input-container>
         </div>
@@ -42,7 +54,7 @@
         </div>
 
         <div layout="row" layout-align="center">
-            <md-button class="ek-login__submit-btn md-raised md-primary"
+            <md-button type="submit" class="ek-login__submit-btn md-raised md-primary"
                        ng-disabled="signupForm.$invalid">sign up
             </md-button>
         </div>

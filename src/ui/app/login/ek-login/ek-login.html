@@ -1,14 +1,14 @@
 <div layout="column" layout-align="center center">
     <h2 class="ek-login__title">Login</h2>
 
-    <form name="loginForm">
+    <form ng-submit="ctrl.submit()" name="loginForm">
         <div layout="row">
             <md-input-container class="ek-login__email md-block animate">
-                <label>Email</label>
-                <input required="required" ng-model="user.email" name="email" type="email">
-                <div ng-messages="loginForm.email.$error">
-                    <div ng-message="required">Email is required.</div>
-                    <div ng-message="email">Email is invalid.</div>
+                <label>Username</label>
+                <input required="required" ng-model="user.username" name="username" type="email">
+                <div ng-messages="loginForm.username.$error">
+                    <div ng-message="required">Username is required.</div>
+                    <div ng-message="email">Username is invalid.</div>
                 </div>
             </md-input-container>
         </div>
@@ -23,7 +23,7 @@
         </div>
 
         <div layout="row" layout-align="center">
-            <md-button class="ek-login__submit-btn md-raised md-primary"
+            <md-button type="submit" class="ek-login__submit-btn md-raised md-primary"
                        ng-disabled="loginForm.$invalid">login</md-button>
         </div>
     </form>

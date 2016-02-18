@@ -1,10 +1,11 @@
 import './ek-signup.less';
 import Directive from 'directive';
+import Controller from './ek-signup.controller';
 import template from './ek-signup.html';
 
 class SignupDirective extends Directive {
     constructor() {
-        super({ template });
+        super({ Controller, template });
     }
 
     compile(tElement) {

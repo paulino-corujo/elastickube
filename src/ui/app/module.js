@@ -14,7 +14,6 @@ import routerConfig from './config/router-config';
 import themeConfig from './config/theme-config';
 import authConfig from './config/auth-run';
 import loginConfig from './config/login-run';
-import routerStateChange from './config/router-state-change-run';
 
 angular
     .module('app', [
@@ -33,6 +32,5 @@ angular
     .config(animateConfig)
     .config(routerConfig)
     .config(themeConfig)
-    .run(routerStateChange)
     .run(authConfig)
     .run(loginConfig);

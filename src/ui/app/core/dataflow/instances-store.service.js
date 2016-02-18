@@ -1,12 +1,12 @@
-import { EventEmitter } from 'events';
+import AbstractStore from './abstract-store';
 
 const CHANGE_EVENT = 'change';
 
-class InstancesStoreService extends EventEmitter {
-    constructor($q, actions, dispatcher) {
+class InstancesStoreService extends AbstractStore {
+    constructor($q, session, actions, dispatcher) {
         'ngInject';
 
-        super();
+        super(session);
 
         this._$q = $q;
         this._actions = actions;
@@ -35,6 +35,10 @@ class InstancesStoreService extends EventEmitter {
 
     isLoading() {
         return this._isLoading.promise;
+    }
+
+    destroy() {
+        delete this._instances;
     }
 
     get(id) {

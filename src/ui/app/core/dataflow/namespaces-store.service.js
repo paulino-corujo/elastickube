@@ -1,12 +1,12 @@
-import { EventEmitter } from 'events';
+import AbstractStore from './abstract-store';
 
 const CHANGE_EVENT = 'change';
 
-class NamespacesStoreService extends EventEmitter {
-    constructor($q, actions, dispatcher) {
+class NamespacesStoreService extends AbstractStore {
+    constructor($q, session, actions, dispatcher) {
         'ngInject';
 
-        super();
+        super(session);
 
         this._$q = $q;
         this._actions = actions;
@@ -33,12 +33,12 @@ class NamespacesStoreService extends EventEmitter {
         this._namespaces = namespaces;
     }
 
-    getAll() {
-        return this._namespaces;
+    destroy() {
+        delete this._namespaces;
     }
 
-    getActiveNamespace() {
-        return this._activeNamespace;
+    getAll() {
+        return this._namespaces;
     }
 
     isLoading() {
