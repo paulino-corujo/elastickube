@@ -8,9 +8,7 @@ class AdminSettingsDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-admin-settings')
-            .attr('layout', 'column');
+        tElement.addClass('ek-admin-settings');
     }
 }
 
