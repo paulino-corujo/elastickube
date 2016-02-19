@@ -1,8 +1,10 @@
 import logging
-
-from data.query import Query
 from datetime import datetime
+
+from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
+
+from data.query import Query, ObjectNotFoundException
 
 
 class UserActions(object):
@@ -32,13 +34,11 @@ class UserActions(object):
 
     @coroutine
     def delete(self, user_id):
-        logging.info("Deleting user")
+        logging.info("Deleting user %s", user_id)
 
-        user = yield Query(self.database, "Users").find_one({"_id": user_id})
-        if user is None:
-            logging.error("User is None")
-
-        user['deleted'] = datetime.utcnow().isoformat()
-        yield Query(self.database, "Users").update(user)
-        logging.info("Deleting user")
-        raise Return(user)
+        user = yield Query(self.database, "Users").find_one({"_id": ObjectId(user_id)})
+        if user is not None:
+            user['deleted'] = datetime.utcnow().isoformat()
+            yield Query(self.database, "Users").update(user)
+        else:
+            raise ObjectNotFoundException()

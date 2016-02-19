@@ -4,15 +4,14 @@
   "type": "object",
   "required": [
     "_id",
-    "created",
     "deleted",
     "email",
     "firstname",
     "last_login",
     "lastname",
+    "metadata",
     "role",
     "schema",
-    "updated",
     "username"
   ],
   "additionalProperties": false,
@@ -21,9 +20,6 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 36
-    },
-    "created": {
-      "type": "string"
     },
     "deleted": {
       "type": "string"
@@ -57,6 +53,14 @@
       "minLength": 1,
       "maxLength": 256
     },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "resourceVersion": {
+          "type": "number"
+        }
+      }
+    },
     "password": {
       "type": "string",
       "minLength": 1,
@@ -75,9 +79,6 @@
       "enum": [
         "http://elasticbox.net/schemas/user"
       ]
-    },
-    "updated": {
-      "type": "string"
     },
     "username": {
       "type": "string",

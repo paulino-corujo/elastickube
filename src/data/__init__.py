@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+import time
 
 from tornado.gen import coroutine
 
@@ -11,14 +11,16 @@ SCHEMA_VERSION = 1
 def init(database):
     logging.info("Initializing database...")
 
-    settings = yield database.Settings.find_one({"deleted": None})
+    yield setup_indexes(database)
 
+    settings = yield database.Settings.find_one({"deleted": None})
     if not settings:
         result = yield database.Settings.insert({
-            "created": datetime.utcnow().isoformat(),
             "deleted": None,
             "schema": "http://elasticbox.net/schemas/settings",
-            "updated": datetime.utcnow().isoformat(),
+            "metadata": {
+                "resourceVersion": time.time(),
+            },
             "authentication": {
                 "password": {
                     "regex": PASSWORD_REGEX
@@ -31,6 +33,13 @@ def init(database):
     else:
         if settings["schema_version"] != SCHEMA_VERSION:
             migrate(settings["schema_version"])
+
+
+@coroutine
+def setup_indexes(database):
+    yield database.Users.ensure_index(key_or_list="email", unique=True, sparse=True)
+    yield database.Users.ensure_index(key_or_list="username", unique=True, sparse=True)
+    yield database.Users.ensure_index(key_or_list="deleted", unique=False, sparse=True)
 
 
 def migrate(previous_version):

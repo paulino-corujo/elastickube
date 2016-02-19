@@ -3,7 +3,9 @@
   "id": "http://elasticbox.net/schemas/settings",
   "type": "object",
   "required": [
-    "_id"
+    "_id",
+    "metadata",
+    "schema"
   ],
   "additionalProperties": false,
   "properties": {
@@ -42,11 +44,16 @@
         }
       }
     },
-    "created": {
-      "type": "string"
-    },
     "deleted": {
       "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "resourceVersion": {
+          "type": "number"
+        }
+      }
     },
     "schema": {
       "type": "string",
@@ -55,10 +62,7 @@
       ]
     },
     "schema_version": {
-      "type": "string"
-    },
-    "updated": {
-      "type": "string"
+      "type": "int"
     }
   },
   "type:": "object"

@@ -14,9 +14,9 @@ class UsersWatcher(object):
 
     @coroutine
     def data_callback(self, document):
-        logging.debug("User '%(email)' saved", document)
-        self.callback(document)
+        logging.debug("User '%(email)s' saved", document)
 
+        self.callback(document)
         raise Return()
 
     def close(self):

@@ -3,7 +3,7 @@ import logging
 from bson.json_util import loads
 from tornado.gen import coroutine, Return
 
-from data.query import Query
+from data.query import Query, DatastoreDuplicateKeyException, ObjectNotFoundException
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.namespaces import NamespacesWatcher
 from api.v1.watchers.instances import InstancesWatcher
@@ -56,6 +56,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             self.write_message("Message %s cannot be deserialized" % message)
             raise Return()
 
+        status_code = 200
         if "action" in document and document["operation"] in ["create", "update", "delete"]:
             action_cls = action_lookup.get(document['action'], None)
             if action_cls:
@@ -63,13 +64,21 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                 if 'operation' in document:
                     result = None
                     if document['operation'] == 'create':
-                        result = yield action.create(document['body'])
+                        try:
+                            result = yield action.create(document['body'])
+                        except DatastoreDuplicateKeyException as e:
+                            status_code = 409
+                            result = {"message": e.message}
                     elif document['operation'] == 'update':
                         result = yield action.update(document['body'])
                     elif document['operation'] == 'delete':
-                        result = yield action.delete(document["body"]["_id"])
+                        try:
+                            result = yield action.delete(document["body"]["_id"])
+                        except ObjectNotFoundException:
+                            status_code = 404
+                            result = {"message": "Object not found."}
 
-                self.write_response(document, result)
+                self.write_response(document, result, status_code=status_code)
             else:
                 self.write_response(document, {"message": "Action not supported."}, status_code=400)
 
