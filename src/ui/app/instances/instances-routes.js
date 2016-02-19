@@ -1,8 +1,6 @@
 function instancesRoutes(routerHelperProvider) {
     'ngInject';
 
-    const defaultNamespace = 'engineering';
-
     routerHelperProvider.configureStates([{
         state: 'private.instances',
         config: {
@@ -22,7 +20,7 @@ function instancesRoutes(routerHelperProvider) {
                 }
             }
         }
-    }], `${defaultNamespace}/instances`);
+    }]);
 }
 
 export default instancesRoutes;

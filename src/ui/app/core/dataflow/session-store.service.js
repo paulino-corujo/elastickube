@@ -31,6 +31,10 @@ class SessionStoreService extends AbstractStore {
         return this._session.getItem(constants.ACTIVE_NAMESPACE);
     }
 
+    getSessionToken() {
+        return this._session.getItem(constants.SESSION_TOKEN);
+    }
+
     addNamespaceChangeListener(callback) {
         this.on(NAMESPACE_UPDATED_EVENT, callback);
     }

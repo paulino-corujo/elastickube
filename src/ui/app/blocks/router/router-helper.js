@@ -6,7 +6,7 @@ class RouterHelper {
     }
 
     changeToState(state, stateParams, options) {
-        this._$state.go(state, stateParams, options);
+        return this._$state.go(state, stateParams, options);
     }
 
     getStates() {

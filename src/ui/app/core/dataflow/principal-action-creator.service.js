@@ -17,12 +17,7 @@ class PrincpalActionCreatorService {
             type: this._actions.USER_SIGN_UP
         });
 
-        return this._principalAPI.signup(user).then(() => {
-            this._dispatcher.dispatch({
-                type: this._actions.USER_SIGNED_UP,
-                principal: user
-            });
-        });
+        return this._principalAPI.signup(user);
     }
 
     login(user) {
@@ -30,19 +25,24 @@ class PrincpalActionCreatorService {
             type: this._actions.USER_LOGIN
         });
 
-        return this._principalAPI.login(user).then(() => {
-            this._dispatcher.dispatch({
-                type: this._actions.USER_LOGGED,
-                principal: _.find(mockWorkspaces, { id: 'alberto' })
+        return this._principalAPI.login(user);
+    }
+
+    loggedIn() {
+        return this._$q.when(_.find(mockWorkspaces, { id: 'alberto' }))
+            .then((principal) => {
+                this._dispatcher.dispatch({
+                    type: this._actions.USER_LOGGED,
+                    principal
+                });
             });
-        });
     }
 
     logout() {
         return this._$q.when(this._dispatcher.dispatch({
             type: this._actions.USER_LOGOUT
         }));
-    };
+    }
 }
 
 export default PrincpalActionCreatorService;

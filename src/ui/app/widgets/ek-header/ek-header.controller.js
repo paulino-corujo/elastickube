@@ -1,10 +1,13 @@
 class HeaderController {
     constructor($rootScope, $scope, auth, routerHelper, sessionStore, principalActionCreator, principalStore) {
         'ngInject';
-        const watches = [];
-        const onChange = () => this.workspace = this._principalStore.getPrincipal();
 
-        this._$rootScope = $rootScope;
+        const watches = [];
+        const onChange = () => {
+            this.workspace = this._principalStore.getPrincipal();
+            this.sections = getSections(auth, routerHelper);
+        };
+
         this._auth = auth;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
@@ -20,6 +23,12 @@ class HeaderController {
             $rootScope.$on('$stateChangeSuccess', (event, toState) => this.selectedState = toState.name)
         ]);
 
+        //$rootScope.$on('$stateChangeSuccess', (event, toState) => {
+        //    if (toState.data && toState.data.header) {
+        //        this.selectedState = _.find(this.sections, (x) => x.data.header.name === toState.data.header.name);
+        //    }
+        //})
+
         $scope.$on('$destroy', () => {
             this._principalStore.removePrincipalChangeListener(onChange);
             watches.forEach((x) => x());
@@ -28,6 +37,7 @@ class HeaderController {
 
     goToSection(section) {
         const namespace = this._sessionStore.getActiveNamespace();
+
         this._routerHelper.changeToState(section.name, { namespace });
     }
 
