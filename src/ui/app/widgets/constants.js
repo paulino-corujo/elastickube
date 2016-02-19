@@ -1,4 +1,5 @@
 import KUBERNETES_LOGO from 'images/kubernetes-logo.svg';
+import GOOGLE_G_LOGO from 'images/google-g-logo.svg';
 import IC_SEARCH_48PX from 'material-design-icons/action/svg/production/ic_search_48px.svg';
 import IC_HELP_48PX from 'material-design-icons/action/svg/production/ic_help_48px.svg';
 import IC_MORE_VERT_48PX from 'material-design-icons/navigation/svg/production/ic_more_vert_48px.svg';
@@ -7,7 +8,8 @@ import IC_ARROW_UPWARD_48PX from 'material-design-icons/navigation/svg/productio
 
 const constants = {
     images: {
-        KUBERNETES_LOGO
+        KUBERNETES_LOGO,
+        GOOGLE_G_LOGO
     },
 
     icons: {
