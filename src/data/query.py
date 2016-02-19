@@ -84,3 +84,8 @@ class Query(object):
 
         response = yield self.database[self.collection].update({"_id": document["_id"]}, document)
         raise Return(response)
+
+    @coroutine
+    def remove(self, document):
+        response = yield self.database[self.collection].remove({"_id": document["_id"]})
+        raise Return(response)
