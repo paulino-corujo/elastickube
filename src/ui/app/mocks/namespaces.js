@@ -1,6 +1,5 @@
 const namespaces = [
-    'default',
-    'engineering'
+    'kube-system'
 ];
 
 export default namespaces;

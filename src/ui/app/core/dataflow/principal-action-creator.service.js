@@ -1,7 +1,7 @@
 // FIXME this mock should be removed when user API is ready
 import mockWorkspaces from 'mocks/workspaces';
 
-class PrincpalActionCreatorService {
+class PrincipalActionCreatorService {
 
     constructor($q, actions, dispatcher, principalAPI) {
         'ngInject';
@@ -45,4 +45,4 @@ class PrincpalActionCreatorService {
     }
 }
 
-export default PrincpalActionCreatorService;
+export default PrincipalActionCreatorService;

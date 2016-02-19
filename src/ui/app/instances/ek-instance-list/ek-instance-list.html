@@ -1,7 +1,7 @@
 <md-content>
     <ek-table headers="ctrl.headers" initial-selection="ctrl.headers[0]" initial-order='asc'
               header-click-listener="ctrl.sortByCallback">
-        <div class="ek-table__body__row" ng-repeat="instance in ctrl.sortedInstances track by instance.id">
+        <div class="ek-table__body__row" ng-repeat="instance in ctrl.sortedInstances track by instance.metadata.uid">
             <div class="ek-table__body__row__cell ek-instance-list__name">
                 <ek-instance-name instance="instance"></ek-instance-name>
             </div>
@@ -9,7 +9,7 @@
                 <ek-instance-state instance="instance"></ek-instance-state>
             </div>
             <div class="ek-table__body__row__cell ek-instance-list__serviceid">
-                <p>{{ instance.serviceId }}</p>
+                <p>{{ instance.metadata.name }}</p>
             </div>
             <div class="ek-table__body__row__cell ek-instance-list__labels">
                 <ek-instance-labels instance="instance"></ek-instance-labels>

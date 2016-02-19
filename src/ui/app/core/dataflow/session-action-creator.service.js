@@ -37,13 +37,7 @@ class SessionActionCreatorService {
                 this._dispatcher.dispatch({
                     type: this._actions.NAMESPACE_CHANGED
                 });
-                return this._instancesAPI.loadInstances(namespace);
-            })
-            .then((instances) => {
-                this._dispatcher.dispatch({
-                    type: this._actions.INSTANCES_LOADED,
-                    instances
-                });
+                return this._instancesAPI.subscribe(namespace);
             });
     }
 

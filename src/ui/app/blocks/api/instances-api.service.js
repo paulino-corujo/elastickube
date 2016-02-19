@@ -1,21 +1,13 @@
-import mockInstances from 'mocks/instances';
-
 class InstancesAPIService {
 
-    constructor($q) {
+    constructor(websocketClient) {
         'ngInject';
 
-        this._$q = $q;
+        this._websocketClient = websocketClient;
     }
 
-    loadInstances(namespace) {
-        const defer = this._$q.defer();
-
-        // FIXME SIMULATED CALLBACK
-        setTimeout(() => {
-            defer.resolve(_.isUndefined(namespace) ? mockInstances.default : mockInstances[namespace]);
-        }, 0);
-        return defer.promise;
+    subscribe(namespace) {
+        return this._websocketClient.subscribeEvent('instances', namespace);
     }
 }
 

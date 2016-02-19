@@ -13,7 +13,7 @@ import animateConfig from './config/animate-config';
 import routerConfig from './config/router-config';
 import themeConfig from './config/theme-config';
 import authConfig from './config/auth-run';
-import loginConfig from './config/login-run';
+import dataFlowInitialization from './config/data-flow-initialization-run';
 
 angular
     .module('app', [
@@ -33,4 +33,4 @@ angular
     .config(routerConfig)
     .config(themeConfig)
     .run(authConfig)
-    .run(loginConfig);
+    .run(dataFlowInitialization);

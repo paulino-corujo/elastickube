@@ -2,7 +2,7 @@
     <div class="mr10"><ek-avatar workspace="ctrl.owner"></ek-avatar></div>
     <div>
         <p class="mt0 mb0">{{ ctrl.owner.name }}</p>
-        <p class="mt0 mb0 ek-instance-modified__date">Modified {{ ctrl.instance.updated | ekHumanizeDate }} ago</p>
+        <p class="mt0 mb0 ek-instance-modified__date">Modified {{ ctrl.instance.status.startTime | ekHumanizeDate }} ago</p>
     </div>
 </div>
 

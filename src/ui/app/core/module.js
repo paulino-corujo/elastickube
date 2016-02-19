@@ -20,6 +20,7 @@ import SessionActionCreatorService from './dataflow/session-action-creator.servi
 import SessionStoreService from './dataflow/session-store.service.js';
 import PrincipalActionCreatorService from './dataflow/principal-action-creator.service';
 import PrincipalStoreService from './dataflow/principal-store.service.js';
+import WebsocketActionCreatorService from './dataflow/websocket-action-creator.service';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
 import MultiTranscludeService from './services/multi-transclude.service';
@@ -54,6 +55,8 @@ angular
     .service('sessionStore', SessionStoreService)
 
     .service('principalActionCreator', PrincipalActionCreatorService)
-    .service('principalStore', PrincipalStoreService);
+    .service('principalStore', PrincipalStoreService)
+
+    .service('websocketActionCreator', WebsocketActionCreatorService);
 
 export default moduleName;
