@@ -15,28 +15,30 @@ class UserActions(object):
     def create(self, document):
         logging.info("Creating user")
 
-        user = yield self.database.Users.insert(document)
+        user = yield Query(self.database, "Users").insert(document)
         raise Return(user)
 
     @coroutine
     def update(self, document):
-        logging.info("Updating userr")
+        logging.info("Updating user")
 
         user = yield Query(self.database, "Users").find_one(document['_id'])
         user['firstname'] = document['firstname']
         user['lastname'] = document['lastname']
 
-        yield Query(self.database, "Users").save(user)
+        yield Query(self.database, "Users").update(user)
 
         raise Return(user)
 
     @coroutine
-    def delete(self):
-        logging.info("Deleting userr")
+    def delete(self, user_id):
+        logging.info("Deleting user")
 
-        user = yield Query(self.database, "Users").find_one(document['_id'])
-        user['deleted'] = datetime.now()
+        user = yield Query(self.database, "Users").find_one({"_id": user_id})
+        if user is None:
+            logging.error("User is None")
 
-        yield Query(self.database, "Users").save(user)
-
+        user['deleted'] = datetime.utcnow().isoformat()
+        yield Query(self.database, "Users").update(user)
+        logging.info("Deleting user")
         raise Return(user)

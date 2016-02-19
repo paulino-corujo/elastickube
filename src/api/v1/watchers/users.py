@@ -11,15 +11,15 @@ class UsersWatcher(object):
         logging.info("Initializing UsersWatcher")
 
         self.callback = callback
-        watch.watch_users(self.data_callback)
+        watch.add_callback("Users", self.data_callback)
 
     @coroutine
     def data_callback(self, document):
-        logging.debug("User '%(username)' saved", document)
+        logging.debug("User '%(email)' saved", document)
         self.callback(document)
 
         raise Return()
 
     def close(self):
         logging.info("Closing UsersWatcher")
-        watch.remove_callback(self.data_callback)
+        watch.remove_callback("elastickube.Users", self.data_callback)

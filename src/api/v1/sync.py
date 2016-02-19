@@ -15,6 +15,7 @@ import logging
 from api.kube.exceptions import WatchDisconnectedException
 from tornado.gen import coroutine, Return
 
+
 @coroutine
 def sync_namespaces(settings):
     logging.info("Initializing watcher...")
@@ -32,7 +33,6 @@ def sync_namespaces(settings):
         settings['database'].Namespaces.save(namespace)
         version = namespace['metadata']['resourceVersion']
 
-
     def done_callback(future):
         logging.warn("Disconnected from kubeclient.")
 
@@ -49,4 +49,3 @@ def sync_namespaces(settings):
 
     except Exception as e:
         logging.exception(e)
-

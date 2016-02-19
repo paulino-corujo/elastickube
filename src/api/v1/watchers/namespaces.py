@@ -6,7 +6,7 @@ from tornado.gen import coroutine, Return
 
 class NamespacesWatcher(object):
 
-    def __init__(self, settings, message, callback):
+    def __init__(self, message, settings, callback):
         logging.info("Initializing NamespacesWatcher")
 
         self.callback = callback
@@ -21,5 +21,4 @@ class NamespacesWatcher(object):
 
     def close(self):
         logging.info("Closing NamespacesWatcher")
-        remove_callback(self.data_callback)
-
+        remove_callback('elastickube.Namespaces', self.data_callback)

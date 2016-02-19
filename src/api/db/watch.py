@@ -39,11 +39,10 @@ def add_callback(collection, coroutine_callback):
 
 
 @coroutine
-def remove_callback(coroutine_callback):
-    for namespace, callbacks in results.iteritems():
-        if coroutine_callback in callbacks:
-            logging.info("Removing callback from %s namespace.", namespace)
-            callbacks.remove(coroutine_callback)
+def remove_callback(namespace, coroutine_callback):
+    if coroutine_callback in _callbacks[namespace]:
+        logging.info("Removing callback from %s namespace.", namespace)
+        _callbacks[namespace].remove(coroutine_callback)
 
     raise Return()
 
@@ -55,7 +54,7 @@ def start_monitor(client):
     try:
         oplog = client["local"]["oplog.rs"]
 
-        cursor = oplog.find().sort('ts', pymongo.ASCENDING).limit(-1)
+        cursor = oplog.find().sort('ts', pymongo.DESCENDING).limit(-1)
         if (yield cursor.fetch_next):
             document = cursor.next_object()
 
@@ -99,7 +98,7 @@ def _dispatch_documents(document):
             for callback, result in results.iteritems():
                 if result and result.exception():
                     logging.debug("Removing callback: %s", result.exception().message)
-                    yield remove_callback(callback)
+                    yield remove_callback(namespace, callback)
 
         except Exception as e:
             logging.exception(e)
