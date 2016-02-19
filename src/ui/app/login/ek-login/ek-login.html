@@ -23,17 +23,15 @@
         </div>
 
         <div layout="row" layout-align="center">
-            <md-button type="submit" class="ek-login__submit-btn md-raised md-primary"
+            <md-button type="submit" class="ek-login__submit-btn md-raised md-primary md-ink-ripple"
                        ng-disabled="loginForm.$invalid">login</md-button>
         </div>
     </form>
-
-    <div layout="row" layout-align="center center">
-        Don't have an account?
-        <md-button ui-sref="anonymous.signup" md-no-ink
-                   class="md-primary">Sign up
-        </md-button>
+    <div layout="row" layout-align="center">
+        <div class="divider"><span>OR</span></div>
     </div>
-
-    <p>Login using <a href="/api/v1/auth/google" target="_self">Google</a></p>
+    <div layout="row" layout-align="center">
+        <md-button href="/api/v1/auth/google" target="_self"
+                   class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: images.GOOGLE_G_LOGO }}">Login with Google</md-button>
+    </div>
 </div>
