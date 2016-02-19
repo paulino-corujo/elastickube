@@ -20,4 +20,3 @@ def initialize():
     settings['database'] = settings['motor'].elastickube
 
     GitSync(settings)
-
