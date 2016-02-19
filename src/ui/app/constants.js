@@ -1,5 +1,5 @@
 const constants = {
-    NAVIGATE_TO: 'NAVIGATE_TO',
+    SESSION_TOKEN_NAME: 'ElasticKube-Token',
 
     pages: {
         LOGIN: 'anonymous.login',

@@ -23,6 +23,7 @@ import PrincipalStoreService from './dataflow/principal-store.service.js';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
 import MultiTranscludeService from './services/multi-transclude.service';
+import InitializationService from './services/initialization.service';
 
 const moduleName = 'app.core';
 
@@ -41,6 +42,7 @@ angular
 
     .service('dispatcher', DispatcherService)
     .service('multiTransclude', MultiTranscludeService)
+    .service('initialization', InitializationService)
 
     .service('instancesActionCreator', InstancesActionCreatorService)
     .service('instancesStore', InstancesStoreService)

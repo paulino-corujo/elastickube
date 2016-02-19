@@ -1,13 +1,29 @@
 import constants from './constants';
+import globalConstants from 'constants';
 
 class SessionActionCreatorService {
-    constructor(actions, dispatcher, session, instancesAPI) {
+    constructor(actions, dispatcher, session, instancesAPI, routerHelper) {
         'ngInject';
 
         this._actions = actions;
-        this._session = session;
-        this._instancesAPI = instancesAPI;
         this._dispatcher = dispatcher;
+        this._instancesAPI = instancesAPI;
+        this._session = session;
+        this._routerHelper = routerHelper;
+    }
+
+    storeSessionToken(sessionToken) {
+        this._dispatcher.dispatch({
+            type: this._actions.SESSION_TOKEN_STORE,
+            sessionToken
+        });
+
+        return this._session.setItem(constants.SESSION_TOKEN, sessionToken)
+            .then(() => {
+                this._dispatcher.dispatch({
+                    type: this._actions.SESSION_TOKEN_STORED
+                });
+            });
     }
 
     selectNamespace(namespace) {
@@ -28,6 +44,20 @@ class SessionActionCreatorService {
                     type: this._actions.INSTANCES_LOADED,
                     instances
                 });
+            });
+    }
+
+    destroy() {
+        this._dispatcher.dispatch({
+            type: this._actions.SESSION_DESTROY
+        });
+
+        return this._session.destroy()
+            .then(() => {
+                this._dispatcher.dispatch({
+                    type: this._actions.SESSION_DESTROYED
+                });
+                return this._routerHelper.changeToState(globalConstants.pages.LOGIN);
             });
     }
 }

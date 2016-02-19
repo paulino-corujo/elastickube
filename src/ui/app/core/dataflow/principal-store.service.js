@@ -12,7 +12,6 @@ class UserStoreService extends AbstractStore {
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
-                case this._actions.USER_SIGNED_UP:
                 case this._actions.USER_LOGGED:
                     this._principal = action.principal;
                     this.emit(CHANGE_EVENT);
@@ -36,7 +35,7 @@ class UserStoreService extends AbstractStore {
     }
 
     isAdmin() {
-        return false;
+        return true;
     }
 
     addPrincipalChangeListener(callback) {
