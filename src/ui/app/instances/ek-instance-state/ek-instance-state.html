@@ -1,6 +1,6 @@
 <div flex layout="row" layout-align="start center">
-    <i class="mr10 ek-instance-state__indicator ek-instance-state__indicator--{{ instance.state }}"></i>
+    <i class="mr10 ek-instance-state__indicator ek-instance-state__indicator--{{ instance.status.phase }}"></i>
     <div>
-        <p class="ek-instance-state__name">{{ instance.state }}</p>
+        <p class="ek-instance-state__name">{{ instance.status.phase }}</p>
     </div>
 </div>

@@ -1,6 +1,8 @@
 <div flex layout="row" layout-align="start center">
-    <div class="mr10"><img class="ek-instance-name__icon" ng-src="{{ instance.icon }}"></div>
+    <div class="mr10">
+        <!--<img class="ek-instance-name__icon" ng-src="{{ instance.icon }}">-->
+    </div>
     <div>
-        <p class="mt0 mb0">{{ instance.name }}</p>
+        <p class="mt0 mb0">{{ instance.metadata.name }}</p>
     </div>
 </div>

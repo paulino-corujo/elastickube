@@ -1,18 +1,18 @@
 const headers = [{
     title: 'Name',
-    sortableField: 'name'
+    sortableField: 'metadata.name'
 }, {
     title: 'State',
-    sortableField: 'state'
+    sortableField: 'status.phase'
 }, {
     title: 'Service ID',
-    sortableField: 'serviceId'
+    sortableField: 'metadata.name'
 }, {
     title: 'Labels',
-    sortableField: 'labels.length'
+    sortableField: 'metadata.labels'
 }, {
     title: 'Modified',
-    sortableField: 'updated'
+    sortableField: 'status.startTime'
 }];
 
 export default headers;

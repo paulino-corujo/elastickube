@@ -7,16 +7,11 @@ class InstancesActionCreatorService {
         this._dispatcher = dispatcher;
     }
 
-    load(namespace) {
+    subscribe(namespace) {
         this._dispatcher.dispatch({
-            type: this._actions.INSTANCES_LOAD
+            type: this._actions.INSTANCES_SUBSCRIBE
         });
-        return this._instancesAPI.loadInstances(namespace).then((instances) => {
-            this._dispatcher.dispatch({
-                type: this._actions.INSTANCES_LOADED,
-                instances
-            });
-        });
+        return this._instancesAPI.subscribe(namespace);
     }
 }
 

@@ -1,77 +1,93 @@
-// TODO Pending of refactoring
 class WebsocketClientService {
 
-    constructor($q, $rootScope) {
+    constructor($q, $rootScope, websocketActionCreator) {
         'ngInject';
 
         this._$q = $q;
-
-        this.$rootScope = $rootScope;
-        this.connectionAttempts = 1;
-        this.eventMessageListeners = [];
-        this.eventsSubscribed = new Set();
-        this.currentOnGoingMessages = {};
+        this._$rootScope = $rootScope;
+        this._connectionAttempts = 1;
+        this._websocketActionCreator = websocketActionCreator;
+        this._eventsSubscribed = new Set();
+        this._currentOnGoingMessages = {};
     }
 
     connect() {
-        if (_.isUndefined(this.websocket) || this.websocket.readyState === WebSocket.CLOSED) {
-            this.websocket = new WebSocket(`ws://${location.hostname}/api/v1/websockets`);
+        const defer = this._$q.defer();
 
-            this.websocket.onopen = () => {
-                this.connectionAttempts = 1;
-                this.eventsSubscribed.forEach((x) => this.subscribeEvent(x));
+        if (_.isUndefined(this._websocket) || this._websocket.readyState === WebSocket.CLOSED) {
+            this._websocket = new WebSocket(`ws://${location.hostname}/api/v1/ws`);
+
+            this._websocket.onopen = () => {
+                this._connectionAttempts = 1;
+                defer.resolve();
             };
 
-            this.websocket.onmessage = (evt) => {
-                const message = JSON.parse(evt);
+            this._websocket.onmessage = (evt) => {
+                const message = JSON.parse(evt.data);
 
-                if (message.callbackId) {
-                    this.$rootScope.$apply(() => {
-                        this.currentOnGoingMessages[message.callbackId].resolve(message.data);
-                        delete this.currentOnGoingMessages[message.callbackId];
+                if (message.correlation) {
+                    this._$rootScope.$apply(() => {
+                        this._currentOnGoingMessages[message.correlation].resolve(message.body);
+                        delete this._currentOnGoingMessages[message.correlation];
                     });
                 } else {
-                    this.eventMessageListeners.forEach((eventMessageListener) => {
-                        this.$rootScope.$apply(() => eventMessageListener.notifyMessage(message.data));
-                    });
+                    this._websocketActionCreator.updateInstances(message);
                 }
             };
 
-            this.websocket.onclose = () => {
-                const time = generateInterval(this.connectionAttempts);
+            this._websocket.onerror = () => {
+                defer.reject();
+            };
+
+            this._websocket.onclose = () => {
+                const time = generateInterval(this._connectionAttempts);
 
                 setTimeout(() => {
-                    this.connectionAttempts++;
+                    this._connectionAttempts++;
                     this.connect();
                 }, time);
             };
         }
+        return defer.promise;
+    }
+
+    disconnect() {
+        this._websocket.close();
     }
 
     sendMessage(message) {
-        if (this.websocket.readyState === WebSocket.OPEN) {
-            return this.$q.reject('Not Connected');
+        if (this._websocket.readyState !== WebSocket.OPEN) {
+            return this._$q.reject('Not Connected');
         }
 
-        const defer = this.$q.defer();
-        const callbackId = _.uniqueId();
+        const defer = this._$q.defer();
+        const correlationId = _.uniqueId();
 
-        this.currentOnGoingMessages[callbackId] = defer;
+        this._currentOnGoingMessages[correlationId] = defer;
 
-        message.callbackId = callbackId;
-        this.websocket.send(JSON.stringify(message));
+        message.correlation = correlationId;
+        this._websocket.send(JSON.stringify(message));
 
         return defer.promise;
     }
 
-    subscribeEvent(eventName) {
-        this.sendMessage(eventName);
-        this.eventsSubscribed.add(eventName);
+    subscribeEvent(action, namespace) {
+        const message = {
+            action,
+            namespace,
+            operation: 'watch'
+        };
+
+        return this.sendMessage(message)
+            .then((data) => {
+                this._$q.when(this._eventsSubscribed.add(action));
+                this._websocketActionCreator.instancesSubscribed(data);
+            });
     }
 
     unsubscribeEvent(eventName) {
-        this.sendMessage(eventName);
-        this.eventsSubscribed.delete(eventName);
+        return this.sendMessage(eventName)
+            .then(() => this._eventsSubscribed.delete(eventName));
     }
 }
 

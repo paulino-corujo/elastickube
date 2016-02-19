@@ -14,13 +14,18 @@ class InstancesStoreService extends AbstractStore {
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
                 case this._actions.NAMESPACE_CHANGED:
-                case this._actions.INSTANCES_LOAD:
+                case this._actions.INSTANCES_SUBSCRIBE:
                     this._isLoading = this._$q.defer();
                     break;
 
-                case this._actions.INSTANCES_LOADED:
+                case this._actions.INSTANCES_SUBSCRIBED:
                     this._setInstances(action.instances);
                     this._isLoading.resolve();
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.INSTANCES_UPDATE:
+                    this._instances.push(action.instance);
                     this.emit(CHANGE_EVENT);
                     break;
 
