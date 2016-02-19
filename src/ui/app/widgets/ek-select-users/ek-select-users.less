@@ -1,0 +1,33 @@
+@import "../../colors";
+
+.ek-search-filter {
+    position: relative;
+
+    input {
+        height: 30px;
+        width: 360px;
+        padding: 0 34px 0 14px;
+        border-radius: 2px;
+        border: 1px solid @grey400;
+        transition: all .15s ease-in-out;
+
+        &:hover {
+            border-color: #bdbdbd;
+            box-shadow: inset 0px 1px 1px rgba(0,0,0,0.08);
+        }
+        &:focus {
+            border-color: @cyan400;
+            box-shadow: inset 0px 1px 1px rgba(0,0,0,0.08);
+        }
+    }
+
+    &__icon {
+        color: @grey500;
+        position: absolute;
+        right: 8px;
+        top: 6px;
+        width: 18px;
+        height: 18px;
+        opacity: 0.6;
+    }
+}

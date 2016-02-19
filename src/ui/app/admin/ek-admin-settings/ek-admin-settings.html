@@ -1,15 +1,97 @@
 <div layout="column" layout-align="start center">
 
-    <div class="ek-admin-settings__block">
-        <h4 class="ek-admin-settings__block__title">cluster administrators</h4>
+    <div class="ek-admin-settings__admins" layout="column">
+        <h4 class="ek-admin-settings__admins__title">cluster administrators</h4>
+
+        <ek-select-users selected-users="ctrl.admins"></ek-select-users>
+
+        <div class="ek-admin-settings__admins__list" layout="column"
+             ng-if="ctrl.admins.length > 0">
+            <div class="ek-admin-settings__admins__list__admin"
+                 layout="row" layout-align="space-between"
+                 ng-repeat="admin in ctrl.admins">
+                <ek-user-info user-id="admin"
+                              show-id="true"></ek-user-info>
+                <md-icon class="ek-admin-settings__admins__list__admin__clear"
+                         ng-click="ctrl.removeAdmin(admin)"
+                         md-svg-src="{{:: icons.IC_CLEAR_48PX }}"></md-icon>
+            </div>
+        </div>
     </div>
 
-    <div class="ek-admin-settings__block">
-        <h4 class="ek-admin-settings__block__title">authentication</h4>
+    <div class="ek-admin-settings__authentication" layout="column">
+        <h4 class="ek-admin-settings__authentication__title">authentication</h4>
+
+        <span class="ek-admin-settings__authentication__subtitle">what services can users use to login?</span>
+        <div class="ek-admin-settings__authentication__methods">
+
+            <div class="ek-admin-settings__authentication__methods__google"
+                 layout="row" layout-align="space-between center">
+                <div layout="row">Google</div>
+                <md-switch class="md-primary" aria-label="Switch Google authentication"
+                           ng-model="ctrl.authentication.google"></md-switch>
+            </div>
+
+            <div class="ek-admin-settings__authentication__methods__github"
+                 layout="row" layout-align="space-between center">
+                <div layout="row">GitHub</div>
+                <md-switch class="md-primary" aria-label="Switch GitHub authentication"
+                           ng-model="ctrl.authentication.github" ng-disabled="true"></md-switch>
+            </div>
+
+            <div class="ek-admin-settings__authentication__methods__password"
+                 layout="row" layout-align="space-between center">
+                <div layout="row">Username & Password</div>
+
+                <md-switch class="md-primary" aria-label="Switch Username and Pasword authentication"
+                           ng-model="ctrl.authentication.password"></md-switch>
+            </div>
+
+            <div class="ek-admin-settings__authentication__methods__ldap"
+                 layout="row" layout-align="space-between center">
+                <div layout="row">LDAP</div>
+
+                <md-switch class="md-primary" aria-label="Switch LDAP authentication"
+                           ng-model="ctrl.authentication.ldap" ng-disabled="true"></md-switch>
+            </div>
+
+        </div>
     </div>
 
-    <div class="ek-admin-settings__block">
-        <h4 class="ek-admin-settings__block__title">email</h4>
+    <div class="ek-admin-settings__mail" layout="column">
+        <h4 class="ek-admin-settings__mail__title">email</h4>
+
+        <span class="ek-admin-settings__mail__subtitle">Outbound Email (SMTP)</span>
+        <md-switch class="md-primary" aria-label="Outbound Email"
+                   ng-model="ctrl.mail.outbound"></md-switch>
+        <div ng-if="ctrl.mail.outbound">
+            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">Server Address</div>
+            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
+                   ng-model="ctrl.mail.server.address">
+
+            <div class="ek-admin-settings__mail__subtitle">Port</div>
+            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--short"
+                   ng-model="ctrl.mail.server.port">
+
+            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">No-Reply Address</div>
+            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
+                   ng-model="ctrl.mail.server.noReply">
+        </div>
+
+        <span class="ek-admin-settings__mail__subtitle">Authentication</span>
+        <md-switch class="md-primary" aria-label="Authentication" ng-model="ctrl.mail.authentication"></md-switch>
+        <div ng-if="ctrl.mail.authentication">
+            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">SMTP Username</div>
+            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
+                   ng-model="ctrl.mail.server.username">
+
+            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">SMTP Password</div>
+            <input type="password" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
+                   ng-model="ctrl.mail.server.password">
+        </div>
+
+        <span class="ek-admin-settings__mail__subtitle">TLS/SSL</span>
+        <md-switch class="md-primary" aria-label="tls/ssl" ng-model="ctrl.tls"></md-switch>
     </div>
 
 </div>

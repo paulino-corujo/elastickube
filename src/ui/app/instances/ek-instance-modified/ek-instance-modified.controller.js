@@ -1,8 +1,8 @@
-import mockWorkspaces from 'mocks/workspaces';
+import mockUsers from 'mocks/users';
 
 class InstanceModifiedController {
     constructor() {
-        this.owner = _.find(mockWorkspaces, { id: this.instance.owner });
+        this.owner = _.find(mockUsers, { id: this.instance.owner });
     }
 }
 

@@ -1,0 +1,14 @@
+<md-autocomplete md-no-cache="true"
+                 md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+                 md-search-text="ctrl.searchText"
+                 md-selected-item-change="ctrl.selectUser(user)"
+                 md-items="user in ctrl.querySearch(ctrl.searchText)"
+                 md-item-text="user.name"
+                 md-min-length="0"
+                 placeholder="Add user as an administrator..."
+                 md-menu-class="autocomplete-custom-template">
+
+    <md-item-template>
+        <ek-user-info user-id="user.id"></ek-user-info>
+    </md-item-template>
+</md-autocomplete>

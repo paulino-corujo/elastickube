@@ -21,15 +21,11 @@ class HeaderController {
 
         watches.concat([
             $rootScope.$on('$stateChangeSuccess', (event, toState) => {
-                this.selectedState = _.find(this.sections, (x) => x.data.header.name === toState.data.header.name);
+                if (toState.data && toState.data.header) {
+                    this.selectedState = _.find(this.sections, (x) => x.data.header.name === toState.data.header.name);
+                }
             })
         ]);
-
-        //$rootScope.$on('$stateChangeSuccess', (event, toState) => {
-        //    if (toState.data && toState.data.header) {
-        //        this.selectedState = _.find(this.sections, (x) => x.data.header.name === toState.data.header.name);
-        //    }
-        //})
 
         $scope.$on('$destroy', () => {
             this._principalStore.removePrincipalChangeListener(onChange);
