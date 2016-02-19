@@ -1,6 +1,6 @@
 import logging
 
-from api.db.query import Query
+from data.query import Query
 from datetime import datetime
 from tornado.gen import coroutine, Return
 

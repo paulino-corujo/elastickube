@@ -1,8 +1,7 @@
 import logging
 
 from tornado.gen import coroutine, Return
-
-from api.db import watch
+from data.watch import add_callback, remove_callback
 
 
 class UsersWatcher(object):
@@ -11,7 +10,7 @@ class UsersWatcher(object):
         logging.info("Initializing UsersWatcher")
 
         self.callback = callback
-        watch.add_callback("Users", self.data_callback)
+        add_callback("Users", self.data_callback)
 
     @coroutine
     def data_callback(self, document):
@@ -22,4 +21,4 @@ class UsersWatcher(object):
 
     def close(self):
         logging.info("Closing UsersWatcher")
-        watch.remove_callback("elastickube.Users", self.data_callback)
+        remove_callback("elastickube.Users", self.data_callback)
