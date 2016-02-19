@@ -3,7 +3,7 @@ import logging
 from bson.json_util import loads
 from tornado.gen import coroutine, Return
 
-from api.db.query import Query
+from data.query import Query
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.namespaces import NamespacesWatcher
 from api.v1.watchers.instances import InstancesWatcher

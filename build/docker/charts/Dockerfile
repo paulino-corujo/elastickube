@@ -5,6 +5,6 @@ ENV PYTHONPATH          /opt/elastickube/src
 
 WORKDIR ${ELASTICKUBE_PATH}
 
-RUN pip install --no-compile tornado motor PyJWT pycurl
+RUN pip install --no-compile tornado motor GitPython
 
-CMD while true; do (python src/api/server.py; sleep 5) done
+CMD while true; do (python src/charts/server.py; sleep 5) done

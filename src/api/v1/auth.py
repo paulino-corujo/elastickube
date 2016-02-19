@@ -7,7 +7,7 @@ from tornado.auth import GoogleOAuth2Mixin, OAuth2Mixin
 from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler, HTTPError
 
-from api.db.query import Query
+from data.query import Query
 from api.v1 import ELASTICKUBE_TOKEN_HEADER
 
 

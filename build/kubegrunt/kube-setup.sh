@@ -4,6 +4,7 @@ KUBECTL="/opt/kubernetes/$(ls /opt/kubernetes | head -n 1)/bin/kubectl"
 
 # Rebuild images
 docker build --file=../docker/api/Dockerfile --tag=elasticbox/elastickube-api ../docker/api
+docker build --file=../docker/charts/Dockerfile --tag=elasticbox/elastickube-charts ../docker/charts
 docker build --file=../docker/nginx/Dockerfile --tag=elasticbox/elastickube-nginx ../docker/nginx
 
 # Ensure mongo controller is running

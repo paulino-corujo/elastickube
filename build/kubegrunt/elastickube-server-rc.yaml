@@ -26,6 +26,17 @@ spec:
           mountPath: /opt/elastickube
         - name: elastickube-run
           mountPath: /var/run
+      - name: elastickube-charts
+        image: elasticbox/elastickube-charts
+        resources:
+          limits:
+            cpu: 100m
+            memory: 500Mi
+        volumeMounts:
+        - name: elastickube-code
+          mountPath: /opt/elastickube
+        - name: elastickube-charts
+          mountPath: /var/elastickube/charts
       - name: elastickube-nginx
         image: elasticbox/elastickube-nginx
         resources:
@@ -46,6 +57,9 @@ spec:
       - name: elastickube-code
         hostPath:
           path: /opt/elastickube
+      - name: elastickube-charts
+        hostPath:
+          path: /var/elastickube/charts
       - name: elastickube-run
         hostPath:
           path: /var/run/elastickube

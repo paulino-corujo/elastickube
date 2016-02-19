@@ -11,7 +11,7 @@ from tornado.web import RequestHandler, HTTPError
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from api.v1.sync import sync_namespaces
-from api.db import watch, init as initialize_database
+from data import watch, init as initialize_database
 from api.kube import client
 
 PING_FREQUENCY = timedelta(seconds=5)
