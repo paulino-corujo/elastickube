@@ -29,7 +29,6 @@ _callbacks = dict()
 def add_callback(collection, coroutine_callback):
     logging.info("Adding elastikube.%s callback", collection)
     namespace = "elastickube.%s" % collection
-
     if namespace in _callbacks:
         _callbacks[namespace].append(coroutine_callback)
     else:

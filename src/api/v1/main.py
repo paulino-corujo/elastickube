@@ -1,9 +1,10 @@
 import logging
 
 from bson.json_util import loads
+from pymongo.errors import DuplicateKeyError
 from tornado.gen import coroutine, Return
 
-from data.query import Query, DatastoreDuplicateKeyException, ObjectNotFoundException
+from data.query import ObjectNotFoundException
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.namespaces import NamespacesWatcher
 from api.v1.watchers.instances import InstancesWatcher
@@ -17,12 +18,6 @@ action_lookup = dict(
     namespaces=NamespaceActions
 )
 
-watch_lookup = dict(
-    namespaces=NamespacesWatcher,
-    instances=InstancesWatcher,
-    users=UsersWatcher
-)
-
 
 class MainWebSocketHandler(SecureWebSocketHandler):
 
@@ -30,18 +25,20 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         super(MainWebSocketHandler, self).__init__(application, request, **kwargs)
 
         self.connected = False
-        self.global_watchers = []
         self.current_watchers = dict()
+
+        self.watcher_lookup = dict(
+            instances=InstancesWatcher(self.settings, self.write_response),
+            namespaces=NamespacesWatcher(self.settings, self.write_response),
+            users=UsersWatcher(self.settings, self.write_response)
+        )
 
     @coroutine
     def open(self):
-        logging.info("Initializing NamespacesHandler")
+        logging.info("Initializing MainWebSocketHandler")
 
         try:
             yield super(MainWebSocketHandler, self).open()
-
-            ns_watcher = NamespacesWatcher(self.settings, None, self.write_message)
-            self.global_watchers.append(ns_watcher)
 
         except Exception as e:
             logging.exception(e)
@@ -66,7 +63,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                     if document['operation'] == 'create':
                         try:
                             result = yield action.create(document['body'])
-                        except DatastoreDuplicateKeyException as e:
+                        except DuplicateKeyError as e:
                             status_code = 409
                             result = {"message": e.message}
                     elif document['operation'] == 'update':
@@ -83,19 +80,18 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                 self.write_response(document, {"message": "Action not supported."}, status_code=400)
 
         elif "action" in document and document["operation"] == "watch":
-            watcher_cls = watch_lookup.get(document["action"], None)
-            if watcher_cls:
+            watcher = self.watcher_lookup.get(document["action"], None)
+            if watcher:
                 if document["action"] in self.current_watchers.keys():
                     self.write_response(document, {"message": "Action already watched."}, status_code=400)
                 else:
-                    initial_documents = yield Query(self.settings['database'], document['action'].title()).find()
-                    self.current_watchers[document["action"]] = watcher_cls(document, self.settings, self.write_message)
-                    self.write_response(document, initial_documents)
+                    self.current_watchers[document["action"]] = watcher.watch(document)
             else:
                 self.write_response(document, {"message": "Action not supported for operation watch."}, status_code=400)
         elif "action" in document and document["operation"] == "unwatch":
             if document["action"] in self.current_watchers.keys():
-                self.current_watchers[document["action"]].close()
+                watcher = self.watcher_lookup.get(document["action"], None)
+                watcher.close()
                 del self.current_watchers[document["action"]]
                 self.write_response(document, {})
             else:
@@ -106,12 +102,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
     @coroutine
     def on_close(self):
-        logging.info("Closing NamespacesHandler")
+        logging.info("Closing MainWebSocketHandler")
 
-        for watcher in self.global_watchers:
-            watcher.close()
-
-        for watcher in self.current_watchers.values():
+        for watcher_key in self.current_watchers.keys():
+            watcher = self.watcher_lookup.get(watcher_key, None)
             watcher.close()
 
         yield super(MainWebSocketHandler, self).on_close()

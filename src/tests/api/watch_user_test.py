@@ -28,6 +28,7 @@ class WatchUsersTest(testing.AsyncTestCase):
     @testing.gen_test(timeout=60)
     def watch_users_test(self):
         logging.debug("Start watch_users_test")
+
         token = yield get_token(self.io_loop)
         request = HTTPRequest(
             "ws://localhost/api/v1/ws",
