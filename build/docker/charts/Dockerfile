@@ -5,6 +5,6 @@ ENV PYTHONPATH          /opt/elastickube/src
 
 WORKDIR ${ELASTICKUBE_PATH}
 
-RUN pip install --no-compile tornado motor GitPython
+RUN pip install --no-compile tornado motor GitPython pyyaml
 
 CMD while true; do (python src/charts/server.py; sleep 5) done
