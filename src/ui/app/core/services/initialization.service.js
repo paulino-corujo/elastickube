@@ -33,8 +33,10 @@ class InitializationService {
     initializeLoggedInUser() {
         const sessionToken = this._$cookies.get(constants.SESSION_TOKEN_NAME);
         const sessionDestroyed = sessionToken !== this._sessionStore.getSessionToken()
-            ? this._sessionActionCreator.destroy().then(() => this._sessionActionCreator.storeSessionToken(sessionToken))
-            : false;
+            ? this._sessionActionCreator.destroy().then(() => {
+                this._$cookies.put(constants.SESSION_TOKEN_NAME, sessionToken);
+                return this._sessionActionCreator.storeSessionToken(sessionToken);
+            }) : false;
 
         return this._$q.when(sessionDestroyed)
             .then(() => this._websocketClient.connect())
