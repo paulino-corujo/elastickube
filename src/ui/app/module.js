@@ -9,6 +9,7 @@ import instancesModule from 'instances/module';
 import loginModule from 'login/module';
 import templatesModule from 'templates/module';
 
+import baseRoutes from './config/base-routes';
 import animateConfig from './config/animate-config';
 import routerConfig from './config/router-config';
 import themeConfig from './config/theme-config';
@@ -29,8 +30,11 @@ angular
         loginModule,
         templatesModule
     ])
+
+    .config(baseRoutes)
     .config(animateConfig)
     .config(routerConfig)
     .config(themeConfig)
+
     .run(authConfig)
     .run(dataFlowInitialization);

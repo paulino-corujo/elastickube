@@ -2,14 +2,13 @@ import './core.less';
 
 import 'angular-aria';
 import 'angular-animate';
+import 'angular-cookies';
 import 'angular-messages';
 import 'angular-ui-grid/ui-grid';
 import 'angular-material/angular-material';
 
 import apiModule from 'blocks/api/module';
 import routerModule from 'blocks/router/module';
-import securityModule from 'blocks/security/module';
-import sessionModule from 'blocks/session/module';
 
 import actions from './dataflow/actions';
 import DispatcherService from './dataflow/dispatcher.service.js';
@@ -29,6 +28,8 @@ import humanizeDateFilter from './filters/humanize-date.filter';
 import InitializationService from './services/initialization.service';
 import LoginService from './services/login.service';
 import MultiTranscludeService from './services/multi-transclude.service';
+import AuthService from './security/auth.service';
+import SessionService from './services/session.service';
 
 const moduleName = 'app.core';
 
@@ -36,17 +37,21 @@ angular
     .module(moduleName, [
         'ngMaterial',
         'ngAnimate',
+        'ngCookies',
         'ngMessages',
         'ui.grid',
         'ui.grid.selection',
         apiModule,
-        routerModule,
-        securityModule,
-        sessionModule
+        routerModule
     ])
+
+    .constant('storage', localStorage)
     .constant('actions', actions)
+
     .filter('ekHumanizeDate', () => humanizeDateFilter)
 
+    .service('session', SessionService)
+    .service('auth', AuthService)
     .service('dispatcher', DispatcherService)
     .service('initialization', InitializationService)
     .service('login', LoginService)

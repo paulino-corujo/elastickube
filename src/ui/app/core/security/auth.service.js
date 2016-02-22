@@ -14,22 +14,6 @@ class AuthService {
         this.checkCookie();
     }
 
-    get unauthorizedLoggedStateChange() {
-        return this._unauthorizedLoggedStateChange || (() => {});
-    }
-
-    set unauthorizedLoggedStateChange(action) {
-        this._unauthorizedLoggedStateChange = action;
-    }
-
-    get unauthorizedNotLoggedStateChange() {
-        return this._unauthorizedNotLoggedStateChange || (() => {});
-    }
-
-    set unauthorizedNotLoggedStateChange(action) {
-        this._unauthorizedNotLoggedStateChange = action;
-    }
-
     checkCookie() {
         let sessionToken = this._$cookies.get(constants.SESSION_TOKEN_NAME);
 

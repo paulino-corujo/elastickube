@@ -15,6 +15,9 @@ class InitializationService {
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
         this._usersActionCreator = usersActionCreator;
+
+        this.deferred = $q.defer();
+        this.initialized = false;
     }
 
     execute() {
@@ -39,6 +42,12 @@ class InitializationService {
                 }
 
                 return this._sessionActionCreator.selectNamespace(namespace);
+            })
+            .then(() => {
+                if (!this.initialized) {
+                    this.initialized = true;
+                    this.deferred.resolve();
+                }
             });
     }
 }

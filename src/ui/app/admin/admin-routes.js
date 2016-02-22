@@ -1,4 +1,4 @@
-import profiles from 'blocks/security/profiles';
+import profiles from 'core/security/profiles';
 
 const states = [{
     state: 'admin',

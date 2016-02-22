@@ -1,4 +1,4 @@
-import profiles from './profiles';
+import profiles from 'core/security/profiles';
 
 const states = [{
     state: 'anonymous',
