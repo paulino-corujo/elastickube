@@ -5,6 +5,10 @@ import coreModule from 'core/module';
 import AvatarDirective from './ek-avatar/ek-avatar.directive';
 import ButtonGroupDirective from './ek-button-group/ek-button-group.directive';
 import HeaderDirective from './ek-header/ek-header.directive';
+import InstanceLabelsDirective from './ek-instance-labels/ek-instance-labels.directive';
+import InstanceModifiedDirective from './ek-instance-modified/ek-instance-modified.directive';
+import InstanceNameDirective from './ek-instance-name/ek-instance-name.directive';
+import InstanceStateDirective from './ek-instance-state/ek-instance-state.directive';
 import NamespaceSelectorDirective from './ek-namespaces-selector/ek-namespace-selector.directive';
 import OwnersSelectorDirective from './ek-owners-selector/ek-owners-selector.directive';
 import SearchFilterDirective from './ek-search-filter/ek-search-filter.directive';
@@ -21,6 +25,10 @@ angular
     .directive('ekAvatar', () => new AvatarDirective())
     .directive('ekButtonGroup', () => new ButtonGroupDirective())
     .directive('ekHeader', () => new HeaderDirective())
+    .directive('ekInstanceLabels', () => new InstanceLabelsDirective())
+    .directive('ekInstanceModified', () => new InstanceModifiedDirective())
+    .directive('ekInstanceName', () => new InstanceNameDirective())
+    .directive('ekInstanceState', () => new InstanceStateDirective())
     .directive('ekNamespaceSelector', () => new NamespaceSelectorDirective())
     .directive('ekOwnersSelector', () => new OwnersSelectorDirective())
     .directive('ekSearchFilter', () => new SearchFilterDirective())

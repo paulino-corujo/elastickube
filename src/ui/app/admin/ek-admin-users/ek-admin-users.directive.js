@@ -9,8 +9,7 @@ class AdminUsersDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-admin-users');
+        tElement.addClass('ek-admin-users');
     }
 }
 
