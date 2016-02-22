@@ -36,7 +36,7 @@ class InstancesWatcher(object):
         self.message = message
 
         # To be retrieved from message
-        namespace = 'default'
+        namespace = 'kube-system'
         self.connected = True
         try:
             self.watcher = self.settings["kube"].pods.watch(

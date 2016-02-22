@@ -27,11 +27,11 @@ class WebsocketClientService {
 
                 if (message.correlation) {
                     this._$rootScope.$apply(() => {
-                        this._currentOnGoingMessages[message.correlation].resolve(message.body);
+                        this._currentOnGoingMessages[message.correlation].resolve(message);
                         delete this._currentOnGoingMessages[message.correlation];
                     });
                 } else {
-                    this._websocketActionCreator.updateInstances(message);
+                    this._websocketActionCreator.updateResource(message);
                 }
             };
 
@@ -79,9 +79,9 @@ class WebsocketClientService {
         };
 
         return this.sendMessage(message)
-            .then((data) => {
+            .then((response) => {
                 this._$q.when(this._eventsSubscribed.add(action));
-                this._websocketActionCreator.instancesSubscribed(data);
+                this._websocketActionCreator.subscribedResource(response);
             });
     }
 

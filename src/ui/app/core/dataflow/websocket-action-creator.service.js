@@ -6,20 +6,43 @@ class WebsocketActionCreatorService {
         this._dispatcher = dispatcher;
     }
 
-    instancesSubscribed(instances) {
-        this._dispatcher.dispatch({
-            type: this._actions.INSTANCES_SUBSCRIBED,
-            instances
-        });
+    subscribedResource(message) {
+        const event = {};
+        let eventName;
+
+        switch (message.action) {
+            case this._actions.INSTANCES:
+                eventName = this._actions.INSTANCES_SUBSCRIBED;
+                break;
+            case this._actions.NAMESPACES:
+                eventName = this._actions.NAMESPACES_SUBSCRIBED;
+                break;
+        }
+
+        event.type = eventName;
+        event[message.action] = message.body;
+
+        this._dispatcher.dispatch(event);
     }
 
-    updateInstances(instance) {
-        this._dispatcher.dispatch({
-            type: this._actions.INSTANCES_UPDATE,
-            instance
-        });
-    }
+    updateResource(message) {
+        const event = {};
+        let eventName;
 
+        switch (message.action) {
+            case this._actions.INSTANCES:
+                eventName = this._actions.INSTANCES_UPDATED;
+                break;
+            case this._actions.NAMESPACES:
+                eventName = this._actions.NAMESPACES_UPDATED;
+                break;
+        }
+
+        event.type = eventName;
+        event[message.action] = message.action;
+
+        this._dispatcher.dispatch(event);
+    }
 }
 
 export default WebsocketActionCreatorService;
