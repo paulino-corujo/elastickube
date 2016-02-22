@@ -4,7 +4,7 @@ class InitializationService {
 
     /* eslint max-params: 0 */
     constructor($q, $cookies, namespacesActionCreator, namespacesStore, principalActionCreator, sessionActionCreator, sessionStore,
-                usersActionCreator) {
+                websocketClient) {
         'ngInject';
 
         this._$q = $q;
@@ -14,7 +14,7 @@ class InitializationService {
         this._principalActionCreator = principalActionCreator;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
-        this._usersActionCreator = usersActionCreator;
+        this._websocketClient = websocketClient;
 
         this.deferred = $q.defer();
         this.initialized = false;
@@ -37,6 +37,7 @@ class InitializationService {
             : false;
 
         return this._$q.when(sessionDestroyed)
+            .then(() => this._websocketClient.connect())
             .then(() => this._principalActionCreator.loggedIn())
             .then(() => this._namespacesActionCreator.subscribe())
             .then(() => {

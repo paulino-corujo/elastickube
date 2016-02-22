@@ -39,9 +39,10 @@ class PrincipalActionCreatorService {
     }
 
     logout() {
-        return this._$q.when(this._dispatcher.dispatch({
-            type: this._actions.PRINCIPAL_LOGOUT
-        }));
+        return this._$q
+            .when(this._dispatcher.dispatch({
+                type: this._actions.PRINCIPAL_LOGOUT
+            }));
     }
 }
 

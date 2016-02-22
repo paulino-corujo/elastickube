@@ -5,8 +5,9 @@ class WebsocketClientService {
 
         this._$q = $q;
         this._$rootScope = $rootScope;
-        this._connectionAttempts = 1;
         this._websocketActionCreator = websocketActionCreator;
+
+        this._connectionAttempts = 1;
         this._eventsSubscribed = new Set();
         this._currentOnGoingMessages = {};
     }
@@ -19,6 +20,7 @@ class WebsocketClientService {
 
             this._websocket.onopen = () => {
                 this._connectionAttempts = 1;
+                this._reconnect = true;
                 defer.resolve();
             };
 
@@ -40,26 +42,32 @@ class WebsocketClientService {
             };
 
             this._websocket.onclose = () => {
-                const time = generateInterval(this._connectionAttempts);
+                if (this._reconnect) {
+                    const time = generateInterval(this._connectionAttempts);
 
-                setTimeout(() => {
-                    this._connectionAttempts++;
-                    this.connect();
-                }, time);
+                    setTimeout(() => {
+                        this._connectionAttempts++;
+                        this.connect();
+                    }, time);
+                }
             };
+        } else {
+            defer.resolve();
         }
+
         return defer.promise;
     }
 
     disconnect() {
         const promises = [];
 
-        this._eventsSubscribed.forEach((value, key) => {
-            promises.push(this.unSubscribeEvent(key));
-        });
+        this._eventsSubscribed.forEach((value) => promises.push(this.unSubscribeEvent(value)));
 
-        this._$q.all(promises)
-            .then(() => this._websocket.close());
+        return this._$q.all(promises)
+            .then(() => {
+                this._reconnect = false;
+                this._websocket.close();
+            });
     }
 
     sendMessage(message) {

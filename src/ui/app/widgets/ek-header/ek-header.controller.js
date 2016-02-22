@@ -1,7 +1,5 @@
-import globalConstants from 'constants';
-
 class HeaderController {
-    constructor($rootScope, $scope, auth, routerHelper, sessionStore, principalActionCreator, principalStore) {
+    constructor($rootScope, $scope, auth, routerHelper, sessionStore, principalStore) {
         'ngInject';
 
         const watches = [];
@@ -13,7 +11,6 @@ class HeaderController {
         this._auth = auth;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
-        this._principalActionCreator = principalActionCreator;
         this._principalStore = principalStore;
 
         this.sections = getSections(auth, routerHelper);
@@ -46,9 +43,7 @@ class HeaderController {
     }
 
     logout() {
-        this._principalActionCreator.logout()
-            .then(() => this._auth.logout())
-            .then(() => this._routerHelper.changeToState(globalConstants.pages.LOGIN));
+        this._auth.logout();
     }
 }
 
