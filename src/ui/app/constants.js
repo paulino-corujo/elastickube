@@ -1,6 +1,10 @@
 const constants = {
     SESSION_TOKEN_NAME: 'ElasticKube-Token',
 
+    INSTANCES: 'instances',
+    NAMESPACES: 'namespaces',
+    USERS: 'users',
+
     pages: {
         LOGIN: 'anonymous.login',
         INSTANCES: 'private.instances'

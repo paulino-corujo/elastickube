@@ -17,10 +17,12 @@ class UserStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.SESSION_DESTROYED:
                 case this._actions.PRINCIPAL_LOGOUT:
                     delete this._principal;
                     this.emit(CHANGE_EVENT);
                     break;
+
                 default:
             }
         });

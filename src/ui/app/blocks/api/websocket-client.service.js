@@ -5,8 +5,9 @@ class WebsocketClientService {
 
         this._$q = $q;
         this._$rootScope = $rootScope;
-        this._connectionAttempts = 1;
         this._websocketActionCreator = websocketActionCreator;
+
+        this._connectionAttempts = 1;
         this._eventsSubscribed = new Set();
         this._currentOnGoingMessages = {};
     }
@@ -19,6 +20,7 @@ class WebsocketClientService {
 
             this._websocket.onopen = () => {
                 this._connectionAttempts = 1;
+                this._reconnect = true;
                 defer.resolve();
             };
 
@@ -40,19 +42,32 @@ class WebsocketClientService {
             };
 
             this._websocket.onclose = () => {
-                const time = generateInterval(this._connectionAttempts);
+                if (this._reconnect) {
+                    const time = generateInterval(this._connectionAttempts);
 
-                setTimeout(() => {
-                    this._connectionAttempts++;
-                    this.connect();
-                }, time);
+                    setTimeout(() => {
+                        this._connectionAttempts++;
+                        this.connect();
+                    }, time);
+                }
             };
+        } else {
+            defer.resolve();
         }
+
         return defer.promise;
     }
 
     disconnect() {
-        this._websocket.close();
+        const promises = [];
+
+        this._eventsSubscribed.forEach((value) => promises.push(this.unSubscribeEvent(value)));
+
+        return this._$q.all(promises)
+            .then(() => {
+                this._reconnect = false;
+                this._websocket.close();
+            });
     }
 
     sendMessage(message) {
@@ -74,20 +89,31 @@ class WebsocketClientService {
     subscribeEvent(action, namespace) {
         const message = {
             action,
-            namespace,
             operation: 'watch'
         };
 
+        if (!_.isUndefined(namespace)) {
+            message.namespace = namespace;
+        }
+
         return this.sendMessage(message)
             .then((response) => {
-                this._$q.when(this._eventsSubscribed.add(action));
+                this._eventsSubscribed.add(action);
                 this._websocketActionCreator.subscribedResource(response);
             });
     }
 
-    unsubscribeEvent(eventName) {
-        return this.sendMessage(eventName)
-            .then(() => this._eventsSubscribed.delete(eventName));
+    unSubscribeEvent(action) {
+        const message = {
+            action,
+            operation: 'unwatch'
+        };
+
+        return this._$q.when(this._eventsSubscribed.has(action) && this.sendMessage(message)
+                .then((response) => {
+                    this._eventsSubscribed.delete(action);
+                    this._websocketActionCreator.unSubscribedResource(response);
+                }));
     }
 }
 

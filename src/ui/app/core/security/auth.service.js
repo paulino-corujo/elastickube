@@ -2,39 +2,28 @@ import constants from 'constants';
 import profiles from './profiles';
 
 class AuthService {
-    constructor($cookies, initialization, principalStore, sessionActionCreator, sessionStore) {
+    constructor($cookies, initialization, principalStore, routerHelper, sessionActionCreator, sessionStore, websocketClient) {
         'ngInject';
+        let sessionToken = $cookies.get(constants.SESSION_TOKEN_NAME);
 
-        this._$cookies = $cookies;
-        this._initialization = initialization;
         this._principalStore = principalStore;
+        this._routerHelper = routerHelper;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
-
-        this.checkCookie();
-    }
-
-    checkCookie() {
-        let sessionToken = this._$cookies.get(constants.SESSION_TOKEN_NAME);
+        this._websocketClient = websocketClient;
 
         if (_.isUndefined(sessionToken)) {
             sessionToken = this._sessionStore.getSessionToken();
 
-            // TODO remove cookie and use token header in requests
-            if (!_.isUndefined(sessionToken)) {
-                this._$cookies.put(constants.SESSION_TOKEN_NAME, sessionToken, {
-                    secure: false
-                });
-
-                this._userLogged();
+            if (_.isUndefined(sessionToken)) {
+                initialization.initializeUnloggedUser();
+            } else {
+                $cookies.put(constants.SESSION_TOKEN_NAME, sessionToken, { secure: false });
+                initialization.initializeLoggedInUser();
             }
         } else {
-            this._userLogged();
+            initialization.initializeLoggedInUser();
         }
-    }
-
-    _userLogged() {
-        this._initialization.execute();
     }
 
     isLoggedIn() {
@@ -46,7 +35,9 @@ class AuthService {
     }
 
     logout() {
-        this._sessionActionCreator.destroy();
+        return this._sessionActionCreator.destroy()
+            .then(() => this._websocketClient.disconnect())
+            .then(() => this._routerHelper.changeToState(constants.pages.LOGIN));
     }
 
     authorize(access) {

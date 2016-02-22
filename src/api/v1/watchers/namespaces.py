@@ -28,7 +28,6 @@ class NamespacesWatcher(object):
 
     @coroutine
     def data_callback(self, document):
-        logging.debug("Namespace '%(name)s' saved", document['metadata'])
         self.callback(self.message, document, status_code=200)
         raise Return()
 

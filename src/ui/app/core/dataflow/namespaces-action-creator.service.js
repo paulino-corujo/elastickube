@@ -7,17 +7,11 @@ class NamespacesActionCreatorService {
         this._dispatcher = dispatcher;
     }
 
-    load() {
+    subscribe() {
         this._dispatcher.dispatch({
-            type: this._actions.NAMESPACES_LOAD
+            type: this._actions.NAMESPACES_SUBSCRIBE
         });
-        return this._namespacesAPI.loadNamespaces()
-            .then((namespaces) => {
-                this._dispatcher.dispatch({
-                    type: this._actions.NAMESPACES_LOADED,
-                    namespaces
-                });
-            });
+        return this._namespacesAPI.subscribe();
     }
 }
 

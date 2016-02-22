@@ -14,11 +14,11 @@ class NamespacesStoreService extends AbstractStore {
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
 
-                case this._actions.NAMESPACES_LOAD:
+                case this._actions.NAMESPACES_SUBSCRIBE:
                     this._isLoading = this._$q.defer();
                     break;
 
-                case this._actions.NAMESPACES_LOADED:
+                case this._actions.NAMESPACES_SUBSCRIBED:
                     this._setNamespaces(action.namespaces);
                     this._isLoading.resolve();
                     this.emit(CHANGE_EVENT);

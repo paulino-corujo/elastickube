@@ -1,18 +1,11 @@
-function dataFlowInitialization($injector, principalStore, sessionStore, websocketClient) {
+function dataFlowInitialization($injector) {
     'ngInject';
 
-    $injector.get('sessionStore');
     $injector.get('instancesStore');
     $injector.get('namespacesStore');
+    $injector.get('principalStore');
+    $injector.get('sessionStore');
     $injector.get('usersStore');
-
-    principalStore.addPrincipalChangeListener(() => {
-        if (_.isUndefined(principalStore.getPrincipal())) {
-            websocketClient.disconnect();
-        } else {
-            websocketClient.connect();
-        }
-    });
 }
 
 export default dataFlowInitialization;
