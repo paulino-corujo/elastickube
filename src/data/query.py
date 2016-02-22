@@ -1,30 +1,6 @@
 import time
 
-from pymongo.errors import DuplicateKeyError
 from tornado.gen import coroutine, Return
-
-
-class DatastoreDuplicateKeyException(Exception):
-
-    def __init__(self, error, collection):
-        Exception.__init__(self, self._generate_message(error, collection))
-
-    def _generate_message(self, error, collection):
-        duplicates = {}
-        if isinstance(error, DuplicateKeyError):
-            split_error = str(error.message).split(" index: ")[1].split(" dup key: { :")
-            keys = [key.rstrip("-_").lstrip("_") for key in split_error[0].split("1") if key != ""]
-            values = [value.rstrip(" }").lstrip().strip('"') for value in split_error[1].split(", :") if value != ""]
-            duplicates = dict(zip(keys, values))
-
-        if len(duplicates.keys()) == 0:
-            return error.message
-        elif len(duplicates.keys()) == 1:
-            return "%s object with %s %s already exists" % (
-                collection, str(duplicates.keys()[0]), str(duplicates.values()[0]))
-        else:
-            formatted_duplicates = ', '.join(["%s = %s" % (k, v) for (k, v) in duplicates.iteritems()])
-            return '%s object already exists with the following keys: %s' % (collection, formatted_duplicates)
 
 
 class ObjectNotFoundException(Exception):
@@ -70,11 +46,7 @@ class Query(object):
         document["metadata"] = dict(resourceVersion=time.time())
         document["deleted"] = None
 
-        try:
-            document_id = yield self.database[self.collection].insert(document)
-        except DuplicateKeyError as e:
-            raise DatastoreDuplicateKeyException(e, self.collection)
-
+        document_id = yield self.database[self.collection].insert(document)
         inserted_document = yield self.database[self.collection].find_one({"_id": document_id})
         raise Return(inserted_document)
 

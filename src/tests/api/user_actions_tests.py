@@ -202,7 +202,9 @@ class UserActionTests(testing.AsyncTestCase):
         self.assertTrue(isinstance(deserialized_message['body'], dict),
                         "Body is not a dict but %s" % type(deserialized_message['body']))
 
-        expected_message = "Users object with email %s already exists" % self.user_email
+        expected_message = 'E11000 duplicate key error collection: elastickube.Users index: email_1 dup '\
+            'key: { : "%s" }' % self.user_email
+
         self.assertTrue(deserialized_message['body']['message'] == expected_message,
                         "Message is %s instead of '%s'" % (deserialized_message['body']["message"], expected_message))
 
