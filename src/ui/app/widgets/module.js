@@ -9,7 +9,6 @@ import NamespaceSelectorDirective from './ek-namespaces-selector/ek-namespace-se
 import OwnersSelectorDirective from './ek-owners-selector/ek-owners-selector.directive';
 import SearchFilterDirective from './ek-search-filter/ek-search-filter.directive';
 import SelectUsersDirective from './ek-select-users/ek-select-users.directive';
-import TableDirective from './ek-table/ek-table.directive';
 import UserInfoDirective from './ek-user-info/ek-user-info.directive';
 
 const moduleName = 'app.widgets';
@@ -26,7 +25,6 @@ angular
     .directive('ekOwnersSelector', () => new OwnersSelectorDirective())
     .directive('ekSearchFilter', () => new SearchFilterDirective())
     .directive('ekSelectUsers', () => new SelectUsersDirective())
-    .directive('ekTable', () => new TableDirective())
     .directive('ekUserInfo', () => new UserInfoDirective());
 
 export default moduleName;

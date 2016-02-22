@@ -14,12 +14,6 @@ class TemplateListDirective extends Directive {
 
     compile(tElement) {
         tElement.addClass('ek-template-list');
-
-        return ($scope, $element, $attrs, ctrl) => {
-            const ekTableCtrl = $element.find('.ek-table').controller('ekTable');
-
-            ekTableCtrl.headerClickListener = ctrl.sortByCallback.bind(ctrl);
-        };
     }
 }
 

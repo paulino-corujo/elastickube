@@ -1,12 +1,16 @@
-import rowTemplate from './ek-template-list-row.template.html';
+import rowTemplate from './ek-admin-users-row.template.html';
 
-class TemplateListController {
-    constructor($scope) {
+class AdminUsersController {
+    constructor($scope, usersStore) {
         'ngInject';
+
+        this.bulkActions = 'Bulk Actions';
+        this.users = usersStore.getAll();
+        this.filteredUsers = [];
 
         this.gridOptions = {
             rowTemplate,
-            data: 'ctrl.templates',
+            data: 'ctrl.filteredUsers',
             enableFiltering: false,
             enableRowSelection: true,
             enableSelectAll: true,
@@ -15,18 +19,17 @@ class TemplateListController {
             showGridFooter: true,
             columnDefs: [
                 {
-                    name: 'template',
-                    field: 'name',
+                    name: 'name',
+                    field: 'id',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-template-name template="row.entity"></ek-template-name>`
+                    cellTemplate: `<ek-user-info user-id="row.entity.id"></ek-user-info>`
                 },
-                { name: 'type', enableColumnMenu: false },
-                { name: 'members', enableColumnMenu: false },
+                { name: 'username', field: 'id', enableColumnMenu: false },
+                { name: 'email', enableColumnMenu: false },
                 {
-                    name: 'modified',
-                    field: 'updated',
+                    name: 'created',
                     enableColumnMenu: false,
-                    cellTemplate: `<div>{{ row.entity.updated | ekHumanizeDate }} ago</div>`
+                    cellTemplate: `<div>{{ row.entity.created | ekHumanizeDate }} ago</div>`
                 }
             ],
             onRegisterApi: (gridApi) => {
@@ -42,4 +45,4 @@ class TemplateListController {
     }
 }
 
-export default TemplateListController;
+export default AdminUsersController;

@@ -1,1 +1,23 @@
-Users
+<div layout="column">
+    <div class="ek-admin-users__header" layout="row" layout-align="space-between center">
+        <div layout="row" layout-align="start center">
+            <md-select class="ek-select-button"
+                       ng-model="ctrl.bulkActions"
+                       ng-if="ctrl.hasRowsSelected"
+                       aria-label="bulk actions">
+                <md-option>Bulk Actions</md-option>
+            </md-select>
+
+            <div class="separator" ng-if="ctrl.hasRowsSelected"></div>
+
+            <ek-search-filter collection-to-be-filtered="ctrl.users"
+                              filtered-collection="ctrl.filteredUsers"></ek-search-filter>
+        </div>
+        <md-button class="md-raised md-primary">new</md-button>
+    </div>
+
+    <div class="ek-admin-users__body" flex>
+        <div class="ek-admin-users__body__table ek-table" ui-grid="ctrl.gridOptions" ui-grid-selection></div>
+    </div>
+</div>
+

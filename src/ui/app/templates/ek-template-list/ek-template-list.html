@@ -1,18 +1,1 @@
-<md-content>
-    <ek-table headers="ctrl.headers" initial-selection="ctrl.headers[0]" initial-order='asc'>
-        <div class="ek-table__body__row" ng-repeat="template in ctrl.sortedTemplates track by template.id">
-            <div class="ek-table__body__row__cell ek-template-list__name">
-                <ek-template-name template="template"></ek-template-name>
-            </div>
-            <div class="ek-table__body__row__cell ek-template-list__type">
-                <p>{{ template.type }}</p>
-            </div>
-            <div class="ek-table__body__row__cell ek-template-list__members">
-                <p>{{ template.members }}</p>
-            </div>
-            <div class="ek-table__body__row__cell ek-template-list__modified">
-                <p>{{ template.updated | ekHumanizeDate }} ago</p>
-            </div>
-        </div>
-    </ek-table>
-</md-content>
+<div class="ek-template-list__table ek-table" ui-grid="ctrl.gridOptions" ui-grid-selection></div>

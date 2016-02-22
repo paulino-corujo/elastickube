@@ -3,6 +3,7 @@ import './core.less';
 import 'angular-aria';
 import 'angular-animate';
 import 'angular-messages';
+import 'angular-ui-grid/ui-grid';
 import 'angular-material/angular-material';
 
 import apiModule from 'blocks/api/module';
@@ -36,6 +37,8 @@ angular
         'ngMaterial',
         'ngAnimate',
         'ngMessages',
+        'ui.grid',
+        'ui.grid.selection',
         apiModule,
         routerModule,
         securityModule,

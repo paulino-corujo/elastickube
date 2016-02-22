@@ -14,7 +14,7 @@ class LoginDirective extends Directive {
             .addClass('ek-login')
             .attr('layout', 'column');
 
-            return ($scope) => _.extend($scope, constants);
+        return ($scope) => _.extend($scope, constants);
     }
 }
 

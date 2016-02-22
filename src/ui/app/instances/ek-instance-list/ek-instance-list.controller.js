@@ -1,26 +1,62 @@
-import headers from './ek-instance-list.headers';
+import rowTemplate from './ek-instance-list-row.template.html';
 
 class InstanceListController {
     constructor($scope) {
         'ngInject';
 
-        this.headers = headers;
-        this.sortBy = this.headers[0];
+        this.gridOptions = {
+            rowTemplate,
+            data: 'ctrl.instances',
+            enableFiltering: false,
+            enableRowSelection: true,
+            enableSelectAll: true,
+            selectionRowHeaderWidth: 50,
+            rowHeight: 50,
+            showGridFooter: true,
+            columnDefs: [
+                {
+                    name: 'name',
+                    field: 'metadata.name',
+                    enableColumnMenu: false,
+                    cellTemplate: `<ek-instance-name instance="row.entity"></ek-instance-name>`
+                },
+                {
+                    name: 'state',
+                    field: 'status.phase',
+                    enableColumnMenu: false,
+                    cellTemplate: `<ek-instance-state instance="row.entity"></ek-instance-state>`
+                },
+                {
+                    name: 'labels',
+                    field: 'metadata.labels',
+                    enableColumnMenu: false,
+                    cellTemplate: `<p>{{ row.entity.metadata.name }}</p>`
+                },
+                {
+                    name: 'serviceId',
+                    displayName: 'Service ID',
+                    field: 'metadata.name',
+                    enableColumnMenu: false,
+                    cellTemplate: `<ek-instance-labels instance="row.entity"></ek-instance-labels>`
+                },
+                {
+                    name: 'modified',
+                    field: 'status.startTime',
+                    enableColumnMenu: false,
+                    cellTemplate: `<ek-instance-modified instance="row.entity"></ek-instance-modified>`
+                }
+            ],
+            onRegisterApi: (gridApi) => {
+                this.gridApi = gridApi;
 
-        $scope.$watchCollection('ctrl.instances', (x) => this.sortedInstances = sortInstances(x, this.sortBy));
+                gridApi.selection.on.rowSelectionChanged($scope, () =>
+                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+
+                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
+                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+            }
+        };
     }
-
-    sortByCallback(column, sortOrder) {
-        this.sortedInstances = sortInstances(this.sortedInstances, column, sortOrder);
-    }
-}
-
-function sortInstances(instances, column, sortOrder) {
-    if (angular.isDefined(column.sortableField)) {
-        return _.orderBy(instances, (x) => _.get(x, column.sortableField), sortOrder);
-    }
-
-    return instances;
 }
 
 export default InstanceListController;

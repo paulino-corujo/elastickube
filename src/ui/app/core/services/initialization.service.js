@@ -3,12 +3,14 @@ import constants from 'constants';
 class InitializationService {
 
     /* eslint max-params: 0 */
-    constructor($q, $cookies, namespacesActionCreator, principalActionCreator, sessionActionCreator, sessionStore, usersActionCreator) {
+    constructor($q, $cookies, namespacesActionCreator, namespacesStore, principalActionCreator, sessionActionCreator, sessionStore,
+                usersActionCreator) {
         'ngInject';
 
         this._$q = $q;
         this._$cookies = $cookies;
         this._namespacesActionCreator = namespacesActionCreator;
+        this._namespacesStore = namespacesStore;
         this._principalActionCreator = principalActionCreator;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
@@ -26,7 +28,18 @@ class InitializationService {
             .then(() => this._$q.all([
                 this._namespacesActionCreator.load(),
                 this._usersActionCreator.load()
-            ]));
+            ]))
+            .then(() => {
+                let namespace = this._sessionStore.getActiveNamespace();
+
+                if (_.isUndefined(namespace)) {
+                    namespace = _.chain(this._namespacesStore.getAll())
+                        .first()
+                        .value();
+                }
+
+                return this._sessionActionCreator.selectNamespace(namespace);
+            });
     }
 }
 
