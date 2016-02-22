@@ -37,7 +37,10 @@ class SessionActionCreatorService {
                 this._dispatcher.dispatch({
                     type: this._actions.NAMESPACE_CHANGED
                 });
-                return this._instancesAPI.subscribe(namespace);
+                return this._instancesAPI.unsubscribe();
+            })
+            .then(() => {
+                return this._instancesAPI.subscribe(namespace.metadata.name);
             });
     }
 

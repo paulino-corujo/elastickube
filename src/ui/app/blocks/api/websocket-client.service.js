@@ -41,7 +41,7 @@ class WebsocketClientService {
 
             this._websocket.onclose = () => {
                 const time = generateInterval(this._connectionAttempts);
-
+                console.log('a');
                 setTimeout(() => {
                     this._connectionAttempts++;
                     this.connect();
@@ -52,7 +52,14 @@ class WebsocketClientService {
     }
 
     disconnect() {
-        this._websocket.close();
+        const promises = [];
+
+        this._eventsSubscribed.forEach((value, key) => {
+            promises.push(this.unSubscribeEvent(key));
+        });
+
+        this._$q.all(promises)
+            .then(() => this._websocket.close());
     }
 
     sendMessage(message) {
@@ -74,20 +81,31 @@ class WebsocketClientService {
     subscribeEvent(action, namespace) {
         const message = {
             action,
-            namespace,
             operation: 'watch'
         };
 
+        if (!_.isUndefined(namespace)) {
+            message.namespace = namespace;
+        }
+
         return this.sendMessage(message)
             .then((response) => {
-                this._$q.when(this._eventsSubscribed.add(action));
+                this._eventsSubscribed.add(action);
                 this._websocketActionCreator.subscribedResource(response);
             });
     }
 
-    unsubscribeEvent(eventName) {
-        return this.sendMessage(eventName)
-            .then(() => this._eventsSubscribed.delete(eventName));
+    unSubscribeEvent(action) {
+        const message = {
+            action,
+            operation: 'unwatch'
+        };
+
+        return this._$q.when(this._eventsSubscribed.has(action) && this.sendMessage(message)
+                .then((response) => {
+                    this._eventsSubscribed.delete(action);
+                    this._websocketActionCreator.unSubscribedResource(response);
+                }));
     }
 }
 

@@ -1,21 +1,14 @@
-import mockNamespaces from 'mocks/namespaces';
+class NamespacesAPIService {
 
-class InstancesAPIService {
-
-    constructor($q) {
+    constructor(websocketClient) {
         'ngInject';
 
-        this._$q = $q;
+        this._websocketClient = websocketClient;
     }
 
-    loadNamespaces() {
-        const defer = this._$q.defer();
-
-        setTimeout(() => {
-            defer.resolve(mockNamespaces);
-        }, 0);
-        return defer.promise;
+    subscribe() {
+        return this._websocketClient.subscribeEvent('namespaces');
     }
 }
 
-export default InstancesAPIService;
+export default NamespacesAPIService;

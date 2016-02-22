@@ -11,7 +11,7 @@ class LoginService {
     execute() {
         const namespace = this._sessionStore.getActiveNamespace();
 
-        return this._routerHelper.changeToState(constants.pages.INSTANCES, { namespace });
+        return this._routerHelper.changeToState(constants.pages.INSTANCES, { namespace: namespace.metadata.name });
     }
 }
 

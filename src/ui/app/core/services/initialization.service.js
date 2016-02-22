@@ -28,10 +28,7 @@ class InitializationService {
 
         return this._$q.when(sessionDestroyed)
             .then(() => this._principalActionCreator.loggedIn())
-            .then(() => this._$q.all([
-                this._namespacesActionCreator.load(),
-                this._usersActionCreator.load()
-            ]))
+            .then(() => this._namespacesActionCreator.subscribe())
             .then(() => {
                 let namespace = this._sessionStore.getActiveNamespace();
 

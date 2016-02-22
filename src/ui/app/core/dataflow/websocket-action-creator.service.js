@@ -1,3 +1,5 @@
+import constants from 'constants';
+
 class WebsocketActionCreatorService {
     constructor(actions, dispatcher) {
         'ngInject';
@@ -11,12 +13,10 @@ class WebsocketActionCreatorService {
         let eventName;
 
         switch (message.action) {
-
-            case this._actions.INSTANCES:
+            case constants.INSTANCES:
                 eventName = this._actions.INSTANCES_SUBSCRIBED;
                 break;
-
-            case this._actions.NAMESPACES:
+            case constants.NAMESPACES:
                 eventName = this._actions.NAMESPACES_SUBSCRIBED;
                 break;
 
@@ -29,17 +29,33 @@ class WebsocketActionCreatorService {
         this._dispatcher.dispatch(event);
     }
 
+    unSubscribedResource(message) {
+        const event = {};
+        let eventName;
+
+        switch (message.action) {
+            case constants.INSTANCES:
+                eventName = this._actions.INSTANCES_UNSUBSCRIBED;
+                break;
+            case constants.NAMESPACES:
+                eventName = this._actions.NAMESPACES_UNSUBSCRIBED;
+                break;
+        }
+
+        event.type = eventName;
+
+        this._dispatcher.dispatch(event);
+    }
+
     updateResource(message) {
         const event = {};
         let eventName;
 
         switch (message.action) {
-
-            case this._actions.INSTANCES:
+            case constants.INSTANCES:
                 eventName = this._actions.INSTANCES_UPDATED;
                 break;
-
-            case this._actions.NAMESPACES:
+            case constants.NAMESPACES:
                 eventName = this._actions.NAMESPACES_UPDATED;
                 break;
 

@@ -21,7 +21,9 @@ class AuthService {
             sessionToken = this._sessionStore.getSessionToken();
 
             // TODO remove cookie and use token header in requests
-            if (!_.isUndefined(sessionToken)) {
+            if (_.isUndefined(sessionToken)) {
+                this._initialization.initialized = true;
+            } else {
                 this._$cookies.put(constants.SESSION_TOKEN_NAME, sessionToken, {
                     secure: false
                 });

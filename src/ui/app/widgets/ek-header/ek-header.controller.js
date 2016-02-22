@@ -36,7 +36,7 @@ class HeaderController {
     goToSection(section) {
         const namespace = this._sessionStore.getActiveNamespace();
 
-        this._routerHelper.changeToState(section.name, { namespace });
+        this._routerHelper.changeToState(section.name, { namespace: namespace.metadata.name });
     }
 
     isLoggedIn() {
