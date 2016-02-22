@@ -1,13 +1,21 @@
-function authConfiguration(auth, routerHelper) {
+function checkRouteAccess($rootScope, auth, routerHelper) {
     'ngInject';
 
-    auth.unauthorizedLoggedStateChange = () => routerHelper.changeToState('anonymous.login');
+    $rootScope.$on('$stateChangeStart', (event, toState, toParams, fromState) => {
+        if (!auth.authorize(toState.data.access)) {
+            event.preventDefault();
 
-    auth.unauthorizedNotLoggedStateChange = () => {
-        const defaultNamespace = 'engineering';
+            if (fromState.url === '^') {
+                if (auth.isLoggedIn()) {
+                    const defaultNamespace = 'engineering';
 
-        routerHelper.changeToState('private.instances', { namespace: defaultNamespace });
-    };
+                    routerHelper.changeToState('private.instances', { namespace: defaultNamespace });
+                } else {
+                    routerHelper.changeToState('anonymous.login');
+                }
+            }
+        }
+    });
 }
 
-export default authConfiguration;
+export default checkRouteAccess;
