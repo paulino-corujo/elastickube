@@ -41,7 +41,7 @@ class WebsocketClientService {
 
             this._websocket.onclose = () => {
                 const time = generateInterval(this._connectionAttempts);
-                console.log('a');
+
                 setTimeout(() => {
                     this._connectionAttempts++;
                     this.connect();

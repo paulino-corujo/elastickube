@@ -20,7 +20,17 @@ class InitializationService {
         this.initialized = false;
     }
 
-    execute() {
+    initializeUnloggedUser() {
+        return this._sessionActionCreator.destroy()
+            .then(() => {
+                if (!this.initialized) {
+                    this.initialized = true;
+                    this.deferred.resolve();
+                }
+            });
+    }
+
+    initializeLoggedInUser() {
         const sessionToken = this._$cookies.get(constants.SESSION_TOKEN_NAME);
         const sessionDestroyed = sessionToken !== this._sessionStore.getSessionToken()
             ? this._sessionActionCreator.destroy().then(() => this._sessionActionCreator.storeSessionToken(sessionToken))

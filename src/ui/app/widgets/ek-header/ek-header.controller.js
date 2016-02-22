@@ -1,3 +1,5 @@
+import globalConstants from 'constants';
+
 class HeaderController {
     constructor($rootScope, $scope, auth, routerHelper, sessionStore, principalActionCreator, principalStore) {
         'ngInject';
@@ -45,9 +47,8 @@ class HeaderController {
 
     logout() {
         this._principalActionCreator.logout()
-            .then(() => {
-                this._auth.logout();
-            });
+            .then(() => this._auth.logout())
+            .then(() => this._routerHelper.changeToState(globalConstants.pages.LOGIN));
     }
 }
 

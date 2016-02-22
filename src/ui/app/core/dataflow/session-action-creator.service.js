@@ -1,15 +1,13 @@
 import constants from './constants';
-import globalConstants from 'constants';
 
 class SessionActionCreatorService {
-    constructor(actions, dispatcher, session, instancesAPI, routerHelper) {
+    constructor(actions, dispatcher, session, instancesAPI) {
         'ngInject';
 
         this._actions = actions;
         this._dispatcher = dispatcher;
         this._instancesAPI = instancesAPI;
         this._session = session;
-        this._routerHelper = routerHelper;
     }
 
     storeSessionToken(sessionToken) {
@@ -54,7 +52,6 @@ class SessionActionCreatorService {
                 this._dispatcher.dispatch({
                     type: this._actions.SESSION_DESTROYED
                 });
-                return this._routerHelper.changeToState(globalConstants.pages.LOGIN);
             });
     }
 }
