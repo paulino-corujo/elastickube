@@ -12,12 +12,12 @@ class UserStoreService extends AbstractStore {
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
-                case this._actions.USER_LOGGED:
+                case this._actions.PRINCIPAL_LOGGED:
                     this._principal = action.principal;
                     this.emit(CHANGE_EVENT);
                     break;
 
-                case this._actions.USER_LOGOUT:
+                case this._actions.PRINCIPAL_LOGOUT:
                     delete this._principal;
                     this.emit(CHANGE_EVENT);
                     break;

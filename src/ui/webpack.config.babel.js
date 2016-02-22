@@ -18,13 +18,16 @@ const webpackConfig = {
             'angular-material',
             'angular-cookies',
             'angular-password',
+            'angular-ui-grid/ui-grid',
             'flux',
             'ui-router',
             'lodash',
             'moment',
             'normalize.css/normalize.css',
             'roboto-fontface/css/roboto-fontface.css',
-            'angular-material/angular-material.css']
+            'angular-ui-grid/ui-grid.css',
+            'angular-material/angular-material.css'
+        ]
     },
 
     resolve: {
@@ -53,7 +56,7 @@ const webpackConfig = {
             },
             {
                 test: /\.(eot|woff2?|ttf|svg)$/i,
-                include: /\/(fonts)\//,
+                include: /\/(fonts|angular-ui-grid)\//,
                 loader: 'file?name=assets/fonts/[name]-[hash].[ext]'
             }
         ]

@@ -15,8 +15,7 @@ class AuthService {
     }
 
     get unauthorizedLoggedStateChange() {
-        return this._unauthorizedLoggedStateChange || (() => {
-            });
+        return this._unauthorizedLoggedStateChange || (() => {});
     }
 
     set unauthorizedLoggedStateChange(action) {
@@ -24,8 +23,7 @@ class AuthService {
     }
 
     get unauthorizedNotLoggedStateChange() {
-        return this._unauthorizedNotLoggedStateChange || (() => {
-            });
+        return this._unauthorizedNotLoggedStateChange || (() => {});
     }
 
     set unauthorizedNotLoggedStateChange(action) {

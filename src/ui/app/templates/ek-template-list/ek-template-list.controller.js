@@ -1,26 +1,45 @@
-import headers from './ek-template-list.headers';
+import rowTemplate from './ek-template-list-row.template.html';
 
 class TemplateListController {
     constructor($scope) {
         'ngInject';
 
-        this.headers = headers;
-        this.sortBy = this.headers[0];
+        this.gridOptions = {
+            rowTemplate,
+            data: 'ctrl.templates',
+            enableFiltering: false,
+            enableRowSelection: true,
+            enableSelectAll: true,
+            selectionRowHeaderWidth: 50,
+            rowHeight: 50,
+            showGridFooter: true,
+            columnDefs: [
+                {
+                    name: 'template',
+                    field: 'name',
+                    enableColumnMenu: false,
+                    cellTemplate: `<ek-template-name template="row.entity"></ek-template-name>`
+                },
+                { name: 'type', enableColumnMenu: false },
+                { name: 'members', enableColumnMenu: false },
+                {
+                    name: 'modified',
+                    field: 'updated',
+                    enableColumnMenu: false,
+                    cellTemplate: `<div>{{ row.entity.updated | ekHumanizeDate }} ago</div>`
+                }
+            ],
+            onRegisterApi: (gridApi) => {
+                this.gridApi = gridApi;
 
-        $scope.$watchCollection('ctrl.templates', (x) => this.sortedTemplates = sortTemplates(x, this.sortBy));
+                gridApi.selection.on.rowSelectionChanged($scope, () =>
+                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+
+                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
+                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+            }
+        };
     }
-
-    sortByCallback(column, sortOrder) {
-        this.sortedTemplates = sortTemplates(this.sortedTemplates, column, sortOrder);
-    }
-}
-
-function sortTemplates(templates, column, sortOrder) {
-    if (!_.isUndefined(column.sortableField)) {
-        return _.orderBy(templates, (x) => _.get(x, column.sortableField), sortOrder);
-    }
-
-    return templates;
 }
 
 export default TemplateListController;

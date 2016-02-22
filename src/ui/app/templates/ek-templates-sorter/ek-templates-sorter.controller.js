@@ -1,4 +1,4 @@
-import mockWorkspaces from 'mocks/workspaces';
+import mockUsers from 'mocks/users';
 
 class TemplatesSorterController {
     constructor($scope) {
@@ -32,7 +32,7 @@ function sortByMostRecent(collectionToSort) {
 }
 
 function sortByOwner(collectionToSort) {
-    return _.sortBy(collectionToSort, (x) => _.find(mockWorkspaces, { id: x.owner }).name);
+    return _.sortBy(collectionToSort, (x) => _.find(mockUsers, { id: x.owner }).name);
 }
 
 export default TemplatesSorterController;

@@ -11,12 +11,16 @@ class WebsocketActionCreatorService {
         let eventName;
 
         switch (message.action) {
+
             case this._actions.INSTANCES:
                 eventName = this._actions.INSTANCES_SUBSCRIBED;
                 break;
+
             case this._actions.NAMESPACES:
                 eventName = this._actions.NAMESPACES_SUBSCRIBED;
                 break;
+
+            default:
         }
 
         event.type = eventName;
@@ -30,12 +34,16 @@ class WebsocketActionCreatorService {
         let eventName;
 
         switch (message.action) {
+
             case this._actions.INSTANCES:
                 eventName = this._actions.INSTANCES_UPDATED;
                 break;
+
             case this._actions.NAMESPACES:
                 eventName = this._actions.NAMESPACES_UPDATED;
                 break;
+
+            default:
         }
 
         event.type = eventName;

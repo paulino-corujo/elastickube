@@ -20,14 +20,12 @@ class HeaderController {
         this._principalStore.addPrincipalChangeListener(onChange);
 
         watches.concat([
-            $rootScope.$on('$stateChangeSuccess', (event, toState) => this.selectedState = toState.name)
+            $rootScope.$on('$stateChangeSuccess', (event, toState) => {
+                if (toState.data && toState.data.header) {
+                    this.selectedState = _.find(this.sections, (x) => x.data.header.name === toState.data.header.name);
+                }
+            })
         ]);
-
-        //$rootScope.$on('$stateChangeSuccess', (event, toState) => {
-        //    if (toState.data && toState.data.header) {
-        //        this.selectedState = _.find(this.sections, (x) => x.data.header.name === toState.data.header.name);
-        //    }
-        //})
 
         $scope.$on('$destroy', () => {
             this._principalStore.removePrincipalChangeListener(onChange);
@@ -55,7 +53,7 @@ class HeaderController {
 
 function getSections(auth, routerHelper) {
     return _.chain(routerHelper.getStates())
-        .filter(x => x.data && x.data.header && auth.authorize(x.data.access))
+        .filter(x => x.data && x.data.header && x.data.header.position && auth.authorize(x.data.access))
         .sort((x, y) => x.data.header.position - y.data.header.position)
         .value();
 }

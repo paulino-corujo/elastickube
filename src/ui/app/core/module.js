@@ -3,6 +3,7 @@ import './core.less';
 import 'angular-aria';
 import 'angular-animate';
 import 'angular-messages';
+import 'angular-ui-grid/ui-grid';
 import 'angular-material/angular-material';
 
 import apiModule from 'blocks/api/module';
@@ -20,11 +21,14 @@ import SessionActionCreatorService from './dataflow/session-action-creator.servi
 import SessionStoreService from './dataflow/session-store.service.js';
 import PrincipalActionCreatorService from './dataflow/principal-action-creator.service';
 import PrincipalStoreService from './dataflow/principal-store.service.js';
+import UsersActionCreatorService from './dataflow/users-action-creator.service';
+import UsersStoreService from './dataflow/users-store.service.js';
 import WebsocketActionCreatorService from './dataflow/websocket-action-creator.service';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
-import MultiTranscludeService from './services/multi-transclude.service';
 import InitializationService from './services/initialization.service';
+import LoginService from './services/login.service';
+import MultiTranscludeService from './services/multi-transclude.service';
 
 const moduleName = 'app.core';
 
@@ -33,6 +37,8 @@ angular
         'ngMaterial',
         'ngAnimate',
         'ngMessages',
+        'ui.grid',
+        'ui.grid.selection',
         apiModule,
         routerModule,
         securityModule,
@@ -42,8 +48,9 @@ angular
     .filter('ekHumanizeDate', () => humanizeDateFilter)
 
     .service('dispatcher', DispatcherService)
-    .service('multiTransclude', MultiTranscludeService)
     .service('initialization', InitializationService)
+    .service('login', LoginService)
+    .service('multiTransclude', MultiTranscludeService)
 
     .service('instancesActionCreator', InstancesActionCreatorService)
     .service('instancesStore', InstancesStoreService)
@@ -56,6 +63,9 @@ angular
 
     .service('principalActionCreator', PrincipalActionCreatorService)
     .service('principalStore', PrincipalStoreService)
+
+    .service('usersActionCreator', UsersActionCreatorService)
+    .service('usersStore', UsersStoreService)
 
     .service('websocketActionCreator', WebsocketActionCreatorService);
 

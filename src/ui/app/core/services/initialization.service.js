@@ -3,18 +3,18 @@ import constants from 'constants';
 class InitializationService {
 
     /* eslint max-params: 0 */
-    constructor($q, $cookies, namespacesActionCreator, namespacesStore, principalActionCreator, routerHelper, sessionActionCreator,
-                sessionStore) {
+    constructor($q, $cookies, namespacesActionCreator, namespacesStore, principalActionCreator, sessionActionCreator, sessionStore,
+                usersActionCreator) {
         'ngInject';
 
         this._$q = $q;
         this._$cookies = $cookies;
-        this._namespacesStore = namespacesStore;
         this._namespacesActionCreator = namespacesActionCreator;
+        this._namespacesStore = namespacesStore;
         this._principalActionCreator = principalActionCreator;
-        this._routerHelper = routerHelper;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
+        this._usersActionCreator = usersActionCreator;
     }
 
     execute() {
@@ -25,7 +25,10 @@ class InitializationService {
 
         return this._$q.when(sessionDestroyed)
             .then(() => this._principalActionCreator.loggedIn())
-            .then(() => this._namespacesActionCreator.load())
+            .then(() => this._$q.all([
+                this._namespacesActionCreator.load(),
+                this._usersActionCreator.load()
+            ]))
             .then(() => {
                 let namespace = this._sessionStore.getActiveNamespace();
 
@@ -34,10 +37,9 @@ class InitializationService {
                         .first()
                         .value();
                 }
-                return this._sessionActionCreator.selectNamespace(namespace)
-                    .then(() => namespace);
-            })
-            .then((namespace) => this._routerHelper.changeToState(constants.pages.INSTANCES, { namespace }));
+
+                return this._sessionActionCreator.selectNamespace(namespace);
+            });
     }
 }
 

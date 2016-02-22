@@ -1,5 +1,5 @@
 // FIXME this mock should be removed when user API is ready
-import mockWorkspaces from 'mocks/workspaces';
+import mockUsers from 'mocks/users';
 
 class PrincipalActionCreatorService {
 
@@ -14,7 +14,7 @@ class PrincipalActionCreatorService {
 
     signup(user) {
         this._dispatcher.dispatch({
-            type: this._actions.USER_SIGN_UP
+            type: this._actions.PRINCIPAL_SIGN_UP
         });
 
         return this._principalAPI.signup(user);
@@ -22,17 +22,17 @@ class PrincipalActionCreatorService {
 
     login(user) {
         this._dispatcher.dispatch({
-            type: this._actions.USER_LOGIN
+            type: this._actions.PRINCIPAL_LOGIN
         });
 
         return this._principalAPI.login(user);
     }
 
     loggedIn() {
-        return this._$q.when(_.find(mockWorkspaces, { id: 'alberto' }))
+        return this._$q.when(_.find(mockUsers, { id: 'alberto' }))
             .then((principal) => {
                 this._dispatcher.dispatch({
-                    type: this._actions.USER_LOGGED,
+                    type: this._actions.PRINCIPAL_LOGGED,
                     principal
                 });
             });
@@ -40,7 +40,7 @@ class PrincipalActionCreatorService {
 
     logout() {
         return this._$q.when(this._dispatcher.dispatch({
-            type: this._actions.USER_LOGOUT
+            type: this._actions.PRINCIPAL_LOGOUT
         }));
     }
 }

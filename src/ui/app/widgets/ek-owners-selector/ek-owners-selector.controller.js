@@ -1,4 +1,4 @@
-import mockWorkspaces from 'mocks/workspaces';
+import mockUsers from 'mocks/users';
 
 class OwnersSelectorController {
     constructor($scope) {
@@ -32,7 +32,7 @@ class OwnersSelectorController {
 
 function getOwners(shareables) {
     return _.chain(shareables)
-        .map((x) => _.find(mockWorkspaces, { id: x.owner }))
+        .map((x) => _.find(mockUsers, { id: x.owner }))
         .uniq()
         .sortBy('id')
         .value();

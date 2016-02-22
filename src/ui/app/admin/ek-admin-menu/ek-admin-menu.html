@@ -1,0 +1,8 @@
+<div class="ek-admin-menu__item"
+     layout="row" layout-align="start center"
+     ng-repeat="item in ctrl.items track by item.state"
+     ng-class="{'ek-admin-menu__item--selected': ctrl.selectedItem === item }"
+     ng-click="ctrl.selectItem(item)">
+    <md-icon class="ek-admin-menu__item__icon" md-svg-src="{{:: item.icon }}"></md-icon>
+    <span class="ek-admin-menu__item__name">{{:: item.name }}</span>
+</div>

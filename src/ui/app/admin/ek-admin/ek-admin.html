@@ -1,6 +1,10 @@
 <ek-sidenav-layout>
-    <div transclude-to="sidenav">menu</div>
-    <div transclude-to="body">
-        Admin body
+    <div class="ek-admin__sidenav" transclude-to="sidenav">
+        <h4 class="ek-admin__sidenav__title">admin</h4>
+        <ek-admin-menu></ek-admin-menu>
     </div>
+
+    <md-content class="ek-admin__body" transclude-to="body">
+        <ui-view></ui-view>
+    </md-content>
 </ek-sidenav-layout>

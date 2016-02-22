@@ -11,12 +11,13 @@ class NamespacesActionCreatorService {
         this._dispatcher.dispatch({
             type: this._actions.NAMESPACES_LOAD
         });
-        return this._namespacesAPI.loadNamespaces().then((namespaces) => {
-            this._dispatcher.dispatch({
-                type: this._actions.NAMESPACES_LOADED,
-                namespaces
+        return this._namespacesAPI.loadNamespaces()
+            .then((namespaces) => {
+                this._dispatcher.dispatch({
+                    type: this._actions.NAMESPACES_LOADED,
+                    namespaces
+                });
             });
-        });
     }
 }
 

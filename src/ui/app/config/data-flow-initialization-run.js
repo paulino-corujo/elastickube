@@ -4,6 +4,7 @@ function dataFlowInitialization($injector, principalStore, sessionStore, websock
     $injector.get('sessionStore');
     $injector.get('instancesStore');
     $injector.get('namespacesStore');
+    $injector.get('usersStore');
 
     principalStore.addPrincipalChangeListener(() => {
         if (_.isUndefined(principalStore.getPrincipal())) {

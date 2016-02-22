@@ -14,12 +14,6 @@ class InstanceListDirective extends Directive {
 
     compile(tElement) {
         tElement.addClass('ek-instance-list');
-
-        return ($scope, $element, $attrs, ctrl) => {
-            const ekTableCtrl = $element.find('.ek-table').controller('ekTable');
-
-            ekTableCtrl.headerClickListener = ctrl.sortByCallback.bind(ctrl);
-        };
     }
 }
 

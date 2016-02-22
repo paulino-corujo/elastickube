@@ -1,0 +1,28 @@
+@import "../../colors";
+
+.ek-admin-menu {
+    &__item {
+        height: 30px;
+        cursor: pointer;
+
+        &__icon {
+            opacity: 0.4;
+            width: 18px;
+            height: 18px;
+            margin: 0 16px;
+        }
+
+        &--selected {
+            font-weight: 500;
+            background-color: @blue100;
+
+            .ek-admin-menu__item__icon {
+                opacity: 1;
+            }
+        }
+
+        &:not(&--selected):hover {
+           background-color: @grey150;
+        }
+    }
+}
