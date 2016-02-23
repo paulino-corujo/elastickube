@@ -142,7 +142,7 @@ if __name__ == '__main__':
     add_user_parser.add_argument(
         '-p',
         '--password',
-        default='elastickube',
+        default='elastickube123',
         required=False,
         dest='password',
         help='User password')
