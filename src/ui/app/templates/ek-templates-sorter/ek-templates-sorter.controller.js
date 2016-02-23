@@ -1,8 +1,8 @@
-import mockUsers from 'mocks/users';
-
 class TemplatesSorterController {
-    constructor($scope) {
+    constructor($scope, usersStore) {
         'ngInject';
+
+        this._userStoreService = usersStore;
 
         this.sortTypes = ['name', 'most recent', 'owner'];
         this.sortType = _.first(this.sortTypes);
@@ -32,7 +32,7 @@ function sortByMostRecent(collectionToSort) {
 }
 
 function sortByOwner(collectionToSort) {
-    return _.sortBy(collectionToSort, (x) => _.find(mockUsers, { id: x.owner }).name);
+    return _.sortBy(collectionToSort, (x) => _.find(this._userStoreService.getAll(), { id: x.owner }).name);
 }
 
 export default TemplatesSorterController;

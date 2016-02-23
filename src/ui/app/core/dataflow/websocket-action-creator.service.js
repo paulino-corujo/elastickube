@@ -22,6 +22,10 @@ class WebsocketActionCreatorService {
                 eventName = this._actions.NAMESPACES_SUBSCRIBED;
                 break;
 
+            case constants.USERS:
+                eventName = this._actions.USERS_SUBSCRIBED;
+                break;
+
             default:
         }
 
@@ -45,6 +49,10 @@ class WebsocketActionCreatorService {
                 eventName = this._actions.NAMESPACES_UNSUBSCRIBED;
                 break;
 
+            case constants.USERS:
+                eventName = this._actions.USERS_UNSUBSCRIBED;
+                break;
+
             default:
         }
 
@@ -65,6 +73,10 @@ class WebsocketActionCreatorService {
 
             case constants.NAMESPACES:
                 eventName = this._actions.NAMESPACES_UPDATED;
+                break;
+
+            case constants.USERS:
+                eventName = this._actions.USERS_UPDATED;
                 break;
 
             default:
