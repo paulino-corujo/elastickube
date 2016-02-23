@@ -6,6 +6,7 @@ class AuthService {
         'ngInject';
         let sessionToken = $cookies.get(constants.SESSION_TOKEN_NAME);
 
+        this._$cookies = $cookies;
         this._principalStore = principalStore;
         this._routerHelper = routerHelper;
         this._sessionActionCreator = sessionActionCreator;
@@ -35,6 +36,8 @@ class AuthService {
     }
 
     logout() {
+        this._$cookies.remove(constants.SESSION_TOKEN_NAME);
+
         return this._sessionActionCreator.destroy()
             .then(() => this._websocketClient.disconnect())
             .then(() => this._routerHelper.changeToState(constants.pages.LOGIN));
