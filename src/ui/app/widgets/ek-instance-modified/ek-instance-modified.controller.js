@@ -15,6 +15,10 @@ class InstanceModifiedController {
             this._userStoreService.removeChangeListener(onChange);
         });
     }
+
+    getModifiedTimestamp() {
+        return this.instance.status.startTime ? this.instance.status.startTime : this.instance.metadata.creationTimestamp;
+    }
 }
 
 export default InstanceModifiedController;
