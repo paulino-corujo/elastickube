@@ -1,12 +1,13 @@
 import './ek-instance-state.less';
 import Directive from 'directive';
+import Controller from './ek-instance-state.controller';
 import template from './ek-instance-state.html';
 
 class InstanceStateDirective extends Directive {
     constructor() {
-        super({ template });
+        super({ Controller, template });
 
-        this.scope = {
+        this.bindToController = {
             instance: '='
         };
     }
