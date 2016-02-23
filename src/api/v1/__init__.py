@@ -36,7 +36,9 @@ def configure(settings):
 @coroutine
 def initialize(settings):
     yield initialize_database(settings['database'])
-    yield watch.start_monitor(settings['motor'])
+    yield sync_namespaces(settings)
+
+    watch.start_monitor(settings['motor'])
 
 
 class SecureWebSocketHandler(WebSocketHandler):

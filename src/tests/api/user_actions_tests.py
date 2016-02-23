@@ -115,6 +115,7 @@ class UserActionTests(testing.AsyncTestCase):
 
         message = yield connection.read_message()
         deserialized_message = json.loads(message)
+        expected_message = "users %s not found." % self.user_id
         self.assertTrue(deserialized_message['status_code'] == 404,
                         "Status code is %d instead of 404" % deserialized_message['status_code'])
         self.assertTrue(deserialized_message['correlation'] == 123,
@@ -125,8 +126,8 @@ class UserActionTests(testing.AsyncTestCase):
                         "Action is %s instead of users" % deserialized_message['action'])
         self.assertTrue(isinstance(deserialized_message["body"], dict),
                         "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(deserialized_message["body"]["message"] == 'Object not found.',
-                        "Message is %s instead of 'Object not found.'" % deserialized_message['body']["message"])
+        self.assertTrue(deserialized_message["body"]["message"] == expected_message,
+                        "Message is %s instead of '%s'" % (deserialized_message['body']["message"], expected_message))
 
         connection.close()
         logging.debug("Completed create_user_test")

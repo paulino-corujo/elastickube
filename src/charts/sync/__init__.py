@@ -22,4 +22,3 @@ def initialize():
     settings['repo'] = 'https://github.com/helm/charts.git'
 
     yield GitSync(settings).sync()
-

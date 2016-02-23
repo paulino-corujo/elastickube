@@ -7,7 +7,7 @@ from tornado.gen import coroutine, Return
 
 class NamespaceActions(object):
 
-    def __init__(self, message, settings):
+    def __init__(self, settings):
         logging.info("Initializing UserActions")
         self.kube_client = settings['kube']
 
@@ -30,21 +30,18 @@ class NamespaceActions(object):
 
     @coroutine
     def update(self, document):
-        logging.info("Updating userr")
+        logging.info("Updating namespace")
 
         user = yield Query(self.database, "Users").find_one(document['_id'])
-        user['firstname'] = document['firstname']
-        user['lastname'] = document['lastname']
-
         yield Query(self.database, "Users").save(user)
 
         raise Return(user)
 
     @coroutine
-    def delete(self):
-        logging.info("Deleting userr")
+    def delete(self, namespace_id):
+        logging.info("Deleting namespace")
 
-        user = yield Query(self.database, "Users").find_one(document['_id'])
+        user = yield Query(self.database, "Users").find_one(namespace_id)
         user['deleted'] = datetime.now()
 
         yield Query(self.database, "Users").save(user)

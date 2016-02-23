@@ -6,10 +6,10 @@ from data.query import Query
 from data.watch import add_callback, remove_callback
 
 
-class UsersWatcher(object):
+class SettingsWatcher(object):
 
     def __init__(self, settings, callback):
-        logging.info("Initializing UsersWatcher")
+        logging.info("Initializing SettingsWatcher")
 
         self.settings = settings
         self.callback = callback
@@ -17,24 +17,24 @@ class UsersWatcher(object):
 
     @coroutine
     def watch(self, message):
-        logging.info("Starting watch Users")
+        logging.info("Starting watch Settings")
 
         self.message = message
 
-        users = yield Query(self.settings["database"], "Users").find()
+        settings = yield Query(self.settings["database"], "Settings").find_one()
         self.callback(dict(
             action=self.message["action"],
             operation="watched",
             correlation=self.message["correlation"],
             status_code=200,
-            body=users
+            body=[settings]
         ))
 
-        add_callback("Users", self.data_callback)
+        add_callback("Settings", self.data_callback)
 
     @coroutine
     def data_callback(self, document):
-        logging.info("UsersWatcher data_callback")
+        logging.debug("SettingsWatcher data_callback")
         self.callback(dict(
             action=self.message["action"],
             operation="watched",
@@ -45,6 +45,6 @@ class UsersWatcher(object):
         raise Return()
 
     def unwatch(self):
-        logging.info("Stopping watch Users")
-        remove_callback("elastickube.Users", self.data_callback)
+        logging.info("Stopping watch Settings")
+        remove_callback("elastickube.Settings", self.data_callback)
         self.message = None

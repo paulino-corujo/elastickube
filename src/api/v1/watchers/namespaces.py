@@ -21,17 +21,30 @@ class NamespacesWatcher(object):
 
         self.message = message
 
-        initial_documents = yield Query(self.settings["database"], "Namespaces").find()
-        yield self.data_callback(initial_documents)
+        namespaces = yield Query(self.settings["database"], "Namespaces").find()
+        self.callback(dict(
+            action=self.message["action"],
+            operation="watched",
+            correlation=self.message["correlation"],
+            status_code=200,
+            body=namespaces
+        ))
 
         add_callback("Namespaces", self.data_callback)
 
     @coroutine
     def data_callback(self, document):
-        self.callback(self.message, document, status_code=200)
+        logging.debug("NamespacesWatcher data_callback")
+        self.callback(dict(
+            action=self.message["action"],
+            operation="watched",
+            status_code=200,
+            body=document
+        ))
+
         raise Return()
 
-    def close(self):
-        logging.info("Closing NamespacesWatcher")
+    def unwatch(self):
+        logging.info("Stopping watch Namespaces")
         remove_callback('elastickube.Namespaces', self.data_callback)
         self.message = None

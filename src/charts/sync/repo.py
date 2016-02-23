@@ -7,7 +7,7 @@ from data.query import Query
 from git.repo import Repo
 from git.exc import InvalidGitRepositoryError
 from yaml import load, load_all
-from tornado.gen import coroutine, Return,sleep
+from tornado.gen import coroutine, Return, sleep
 from tornado.iostream import PipeIOStream
 
 
@@ -66,7 +66,6 @@ class GitSync(object):
 
         self.charts = discovered_charts
 
-
     @coroutine
     def import_chart(self, directory):
         chart_path = os.path.join(directory, 'Chart.yaml')
@@ -99,8 +98,8 @@ class GitSync(object):
         for file in glob.glob(manifests_path):
             with open(file, 'r') as stream:
                 manifests[file] = dict(
-                    resources = [resource for resource in load_all(stream)],
-                    commit = self.repo.iter_commits(paths=file).next()
+                    resources=[resource for resource in load_all(stream)],
+                    commit=self.repo.iter_commits(paths=file).next()
                 )
 
         raise Return(manifests)
