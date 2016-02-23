@@ -25,16 +25,14 @@ class HTTPClient(object):
         self.token = token
         self.version = version
 
-        self._client = self.build_client()
         self._base_url = 'https://{0}/api/{1}'.format(self.server, self.version)
 
-    def build_client(self):
         defaults = dict(validate_cert=False)
         if self.username and self.password:
             defaults['auth_username'] = self.username
             defaults['auth_password'] = self.password
 
-        return AsyncHTTPClient(force_instance=True, defaults=defaults)
+        AsyncHTTPClient.configure(None, defaults=defaults)
 
     def build_url(self, url_path, **kwargs):
         if url_path.startswith('/'):
@@ -77,62 +75,82 @@ class HTTPClient(object):
         params = self.build_params(url_path, **kwargs)
         url = url_concat(self.build_url(url_path, **kwargs), params)
 
-        result = yield self._client.fetch(url, method='GET', headers=self.build_headers())
-        raise Return(result)
+        client = AsyncHTTPClient()
+        try:
+            result = yield client.fetch(url, method='GET', headers=self.build_headers())
+            raise Return(result)
+        finally:
+            client.close()
 
     @coroutine
     def post(self, url_path, **kwargs):
         url = self.build_url(url_path, **kwargs)
         params = self.build_params(url_path, **kwargs)
 
-        result = yield self._client.fetch(
-            url,
-            method='POST',
-            headers=self.build_headers('application/json'),
-            **params)
+        client = AsyncHTTPClient()
+        try:
+            result = yield client.fetch(
+                url,
+                method='POST',
+                headers=self.build_headers('application/json'),
+                **params)
 
-        raise Return(result)
+            raise Return(result)
+        finally:
+            client.close()
 
     @coroutine
     def put(self, url_path, **kwargs):
         url = self.build_url(url_path, **kwargs)
         params = self.build_params(url_path, **kwargs)
 
-        result = yield self._client.fetch(
-            url,
-            method='PUT',
-            headers=self.build_headers('application/json'),
-            **params)
+        client = AsyncHTTPClient()
+        try:
+            result = yield client.fetch(
+                url,
+                method='PUT',
+                headers=self.build_headers('application/json'),
+                **params)
 
-        raise Return(result)
+            raise Return(result)
+        finally:
+            client.close()
 
     @coroutine
     def delete(self, url_path, **kwargs):
-        response = yield self._client.fetch(
-            self.build_url(url_path, **kwargs),
-            method='DELETE',
-            headers=self.build_headers())
-        raise Return(response)
+        client = AsyncHTTPClient()
+        try:
+            response = yield client.fetch(
+                self.build_url(url_path, **kwargs),
+                method='DELETE',
+                headers=self.build_headers())
+            raise Return(response)
+        finally:
+            client.close()
 
     @coroutine
     def patch(self, url_path, **kwargs):
         url = self.build_url(url_path, **kwargs)
         params = self.build_params(url_path, **kwargs)
 
-        result = yield self._client.fetch(
-            url,
-            method='PATCH',
-            headers=self.build_headers('application/merge-patch+json'),
-            **params)
+        client = AsyncHTTPClient()
+        try:
+            result = yield client.fetch(
+                url,
+                method='PATCH',
+                headers=self.build_headers('application/merge-patch+json'),
+                **params)
 
-        raise Return(result)
+            raise Return(result)
+        finally:
+            client.close()
 
     @coroutine
     def watch(self, url_path, on_data, **kwargs):
         class WatchFuture(Future):
 
             def cancel(self):
-                self._client.close()
+                client.close()
                 logging.debug("Closing http connection")
 
         def data_callback(data):
@@ -148,8 +166,9 @@ class HTTPClient(object):
             request_timeout=3600,
             streaming_callback=data_callback)
 
+        client = AsyncHTTPClient()
         future = WatchFuture()
-        chain_future(self._client.fetch(request), future)
+        chain_future(client.fetch(request), future)
 
         yield future
 
