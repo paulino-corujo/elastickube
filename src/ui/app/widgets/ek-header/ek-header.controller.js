@@ -1,5 +1,5 @@
 class HeaderController {
-    constructor($rootScope, $scope, auth, routerHelper, sessionStore, principalStore) {
+    constructor($rootScope, $scope, $injector, auth, routerHelper, sessionStore, principalStore) {
         'ngInject';
 
         const watches = [];
@@ -8,6 +8,7 @@ class HeaderController {
             this.sections = getSections(auth, routerHelper);
         };
 
+        this._$injector = $injector;
         this._auth = auth;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
@@ -33,9 +34,7 @@ class HeaderController {
     }
 
     goToSection(section) {
-        const namespace = this._sessionStore.getActiveNamespace();
-
-        this._routerHelper.changeToState(section.name, { namespace: namespace.metadata.name });
+        return section.data.header.click(this._$injector);
     }
 
     isLoggedIn() {

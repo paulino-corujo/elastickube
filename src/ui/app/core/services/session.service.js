@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import constants from 'constants';
 
 const SESSION_DESTROYED_EVENT = 'session.destroyed';
 

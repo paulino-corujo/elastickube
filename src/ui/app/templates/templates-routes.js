@@ -6,7 +6,12 @@ const states = [{
         data: {
             header: {
                 name: 'templates',
-                position: 2
+                position: 2,
+                click: ($injector) => {
+                    const actionCreator = $injector.get('templatesNavigationActionCreator');
+
+                    return actionCreator.templates();
+                }
             }
         }
     }

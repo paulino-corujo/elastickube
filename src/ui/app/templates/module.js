@@ -3,6 +3,9 @@ import layoutModule from 'layout/module';
 import widgetsModule from 'widgets/module';
 
 import templatesRoutes from './templates-routes';
+
+import NavigationActionCreator from './navigation-action-creator.service';
+
 import TemplateCardDirective from './ek-template-card/ek-template-card.directive';
 import TemplateFiltersDirective from './ek-template-filters/ek-template-filters.directive';
 import TemplateGridDirective from './ek-template-grid/ek-template-grid.directive';
@@ -21,6 +24,9 @@ angular
         widgetsModule
     ])
     .config(templatesRoutes)
+
+    .service('templatesNavigationActionCreator', NavigationActionCreator)
+
     .directive('ekTemplateCard', () => new TemplateCardDirective())
     .directive('ekTemplateFilters', () => new TemplateFiltersDirective())
     .directive('ekTemplateGrid', () => new TemplateGridDirective())

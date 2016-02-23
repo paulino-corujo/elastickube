@@ -1,4 +1,4 @@
-function checkRouteAccess($rootScope, auth, routerHelper, initialization) {
+function checkRouteAccess($rootScope, auth, initialization, instancesNavigationActionCreator, loginNavigationActionCreator, routerHelper) {
     'ngInject';
 
     $rootScope.$on('$stateChangeStart', (event, toState, toParams, fromState) => {
@@ -8,11 +8,9 @@ function checkRouteAccess($rootScope, auth, routerHelper, initialization) {
 
                 if (fromState.url === '^') {
                     if (auth.isLoggedIn()) {
-                        const defaultNamespace = 'engineering';
-
-                        routerHelper.changeToState('private.instances', { namespace: defaultNamespace });
+                        instancesNavigationActionCreator.instances();
                     } else {
-                        routerHelper.changeToState('anonymous.login');
+                        loginNavigationActionCreator.login();
                     }
                 }
             }

@@ -5,10 +5,6 @@ const constants = {
     NAMESPACES: 'namespaces',
     USERS: 'users',
 
-    pages: {
-        LOGIN: 'anonymous.login',
-        INSTANCES: 'private.instances'
-    },
     httpStatusCode: {
         OK: 200,
         BAD_REQUEST: 400,

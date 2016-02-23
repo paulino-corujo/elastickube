@@ -1,21 +1,18 @@
 import constants from 'constants';
 
 class LoginService {
-    constructor(initialization, routerHelper, sessionStore) {
+    constructor(initialization, instancesNavigationActionCreator, routerHelper, sessionStore) {
         'ngInject';
 
         this._initialization = initialization;
+        this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
     }
 
     execute() {
         return this._initialization.initializeLoggedInUser()
-            .then(() => {
-                const namespace = this._sessionStore.getActiveNamespace();
-
-                return this._routerHelper.changeToState(constants.pages.INSTANCES, { namespace: namespace.metadata.name });
-            });
+            .then(() => this._instancesNavigationActionCreator.instances());
     }
 }
 
