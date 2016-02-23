@@ -2,7 +2,8 @@ import constants from 'constants';
 import profiles from './profiles';
 
 class AuthService {
-    constructor($cookies, initialization, loginNavigationActionCreator, principalStore, routerHelper, sessionActionCreator, sessionStore, websocketClient) {
+    constructor($cookies, initialization, loginNavigationActionCreator, principalStore, routerHelper,
+                sessionActionCreator, sessionStore, websocketClient) {
         'ngInject';
         let sessionToken = $cookies.get(constants.SESSION_TOKEN_NAME);
 

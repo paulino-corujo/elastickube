@@ -27,15 +27,15 @@ class InstanceListController {
                     cellTemplate: `<ek-instance-state instance="row.entity"></ek-instance-state>`
                 },
                 {
-                    name: 'labels',
-                    field: 'metadata.labels',
+                    name: 'serviceId',
+                    displayName: 'Service ID',
+                    field: 'metadata.name',
                     enableColumnMenu: false,
                     cellTemplate: `<p>{{ row.entity.metadata.name }}</p>`
                 },
                 {
-                    name: 'serviceId',
-                    displayName: 'Service ID',
-                    field: 'metadata.name',
+                    name: 'labels',
+                    field: 'metadata.labels',
                     enableColumnMenu: false,
                     cellTemplate: `<ek-instance-labels instance="row.entity"></ek-instance-labels>`
                 },
