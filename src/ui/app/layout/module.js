@@ -1,5 +1,6 @@
 import coreModule from 'core/module';
 
+import ApplicationLayoutDirective from './ek-application-layout/ek-application-layout.directive';
 import HeaderLayoutDirective from './ek-header-layout/ek-header-layout.directive';
 import SideNavLayoutDirective from './ek-sidenav-layout/ek-sidenav-layout.directive';
 
@@ -9,6 +10,11 @@ angular
     .module(moduleName, [
         coreModule
     ])
+    .directive('ekApplicationLayout', (multiTransclude) => {
+        'ngInject';
+
+        return new ApplicationLayoutDirective(multiTransclude);
+    })
     .directive('ekHeaderLayout', (multiTransclude) => {
         'ngInject';
 

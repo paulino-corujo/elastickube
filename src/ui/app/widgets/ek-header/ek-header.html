@@ -1,9 +1,4 @@
-<div class="ek-header__logo" layout="row" layout-align="start center">
-    <img ng-src="{{:: images.KUBERNETES_LOGO }}">
-</div>
-
-<div ng-if="ctrl.isLoggedIn()"
-     layout="row" layout-align="space-between" flex>
+<div layout="row" layout-align="space-between" flex>
     <div class="ek-header__sections"
          layout="row" layout-align="start">
         <a ng-repeat="section in ctrl.sections track by section.name"

@@ -30,7 +30,7 @@ class SessionActionCreatorService {
             namespace
         });
 
-        return this._session.setItem(constants.ACTIVE_NAMESPACE, namespace)
+        return this._session.setItem(constants.ACTIVE_NAMESPACE, namespace.metadata.uid)
             .then(() => {
                 this._dispatcher.dispatch({
                     type: this._actions.NAMESPACE_CHANGED
