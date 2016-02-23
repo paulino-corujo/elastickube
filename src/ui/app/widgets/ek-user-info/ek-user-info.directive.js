@@ -8,8 +8,8 @@ class UserInfoDirective extends Directive {
         super({ Controller, template });
 
         this.bindToController = {
-            userId: '=',
-            showId: '@?'
+            username: '=',
+            showUsername: '@?'
         };
     }
 

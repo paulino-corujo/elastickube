@@ -10,8 +10,8 @@
             <div class="ek-admin-settings__admins__list__admin"
                  layout="row" layout-align="space-between"
                  ng-repeat="admin in ctrl.admins">
-                <ek-user-info user-id="admin"
-                              show-id="true"></ek-user-info>
+                <ek-user-info username="admin"
+                              show-username="true"></ek-user-info>
                 <md-icon class="ek-admin-settings__admins__list__admin__clear"
                          ng-click="ctrl.removeAdmin(admin)"
                          md-svg-src="{{:: icons.IC_CLEAR_48PX }}"></md-icon>

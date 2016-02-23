@@ -1,4 +1,7 @@
 <div layout="row" layout-align="start center">
     <ek-avatar class="ek-small mr7" workspace="ctrl.user"></ek-avatar>
-    <div>{{ ctrl.user.name }} <span ng-if="ctrl.showUserId">{{ user.id }}</span></div>
+    <div>
+        <span class="ek-user-info__name">{{ ctrl.user.firstname }} {{ ctrl.user.lastname }}</span>
+        <span class="ek-user-info__username" ng-if="ctrl.show">({{ ctrl.user.username }})</span>
+    </div>
 </div>

@@ -37,8 +37,8 @@ class UsersStoreService extends AbstractStore {
         delete this._users;
     }
 
-    get(id) {
-        return _.find(this._users, { id });
+    get(username) {
+        return _.find(this._users, { username });
     }
 
     getAll() {

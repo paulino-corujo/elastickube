@@ -2,9 +2,9 @@ class UserInfoController {
     constructor($scope, usersStore) {
         'ngInject';
 
-        this.showUserId = this.showId && this.showId.toLowerCase() === 'true';
+        this.show = this.showUsername && this.showUsername.toLowerCase() === 'true';
 
-        $scope.$watch('ctrl.userId', (x) => this.user = usersStore.get(x));
+        $scope.$watch('ctrl.username', (x) => this.user = usersStore.get(x));
     }
 }
 
