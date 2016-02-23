@@ -14,11 +14,11 @@ class UsersStoreService extends AbstractStore {
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
 
-                case this._actions.USERS_LOAD:
+                case this._actions.USERS_SUBSCRIBE:
                     this._isLoading = this._$q.defer();
                     break;
 
-                case this._actions.USERS_LOADED:
+                case this._actions.USERS_SUBSCRIBED:
                     this._setUsers(action.users);
                     this._isLoading.resolve();
                     this.emit(CHANGE_EVENT);

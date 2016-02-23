@@ -4,7 +4,7 @@ class InitializationService {
 
     /* eslint max-params: 0 */
     constructor($q, $cookies, namespacesActionCreator, namespacesStore, principalActionCreator, sessionActionCreator, sessionStore,
-                websocketClient) {
+                usersActionCreator, websocketClient) {
         'ngInject';
 
         this._$q = $q;
@@ -14,6 +14,7 @@ class InitializationService {
         this._principalActionCreator = principalActionCreator;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
+        this._usersActionCreator = usersActionCreator;
         this._websocketClient = websocketClient;
 
         this.deferred = $q.defer();
@@ -42,6 +43,7 @@ class InitializationService {
             .then(() => this._websocketClient.connect())
             .then(() => this._principalActionCreator.loggedIn())
             .then(() => this._namespacesActionCreator.subscribe())
+            .then(() => this._usersActionCreator.subscribe())
             .then(() => {
                 let namespace = this._sessionStore.getActiveNamespace();
 
