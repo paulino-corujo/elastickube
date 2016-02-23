@@ -4,13 +4,14 @@ import constants from './constants';
 const NAMESPACE_UPDATED_EVENT = 'namespace.change';
 
 class SessionStoreService extends AbstractStore {
-    constructor(session, actions, dispatcher) {
+    constructor(session, actions, dispatcher, namespacesStore) {
         'ngInject';
 
         super(session);
 
         this._actions = actions;
         this._session = session;
+        this._namespacesStore = namespacesStore;
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
@@ -28,7 +29,9 @@ class SessionStoreService extends AbstractStore {
     }
 
     getActiveNamespace() {
-        return this._session.getItem(constants.ACTIVE_NAMESPACE);
+        const namespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
+
+        return _.find(this._namespacesStore.getAll(), (x) => x.metadata.uid === namespaceUID);
     }
 
     getSessionToken() {

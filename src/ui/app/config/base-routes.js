@@ -1,10 +1,12 @@
 import profiles from 'core/security/profiles';
+import anonymousTemplate from './anonymous.template.html';
+import privateTemplate from './private.template.html';
 
 const states = [{
     state: 'anonymous',
     config: {
         abstract: true,
-        template: '<ui-view></ui-view>',
+        template: anonymousTemplate,
         data: {
             access: profiles.ANONYMOUS
         }
@@ -13,7 +15,7 @@ const states = [{
     state: 'private',
     config: {
         abstract: true,
-        template: '<ui-view></ui-view>',
+        template: privateTemplate,
         data: {
             access: profiles.PRIVATE
         }

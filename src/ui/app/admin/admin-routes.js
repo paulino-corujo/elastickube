@@ -4,6 +4,7 @@ const states = [{
     state: 'admin',
     config: {
         abstract: true,
+        parent: 'private',
         template: '<ek-admin></ek-admin>',
         url: '/admin',
         data: {
