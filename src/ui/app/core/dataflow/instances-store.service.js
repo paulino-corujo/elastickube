@@ -18,7 +18,7 @@ class InstancesStoreService extends AbstractStore {
                     break;
 
                 case this._actions.INSTANCES_SUBSCRIBED:
-                    this._setInstances([action.instances]);
+                    this._setInstances(action.instances);
                     this._isLoading.resolve();
                     this.emit(CHANGE_EVENT);
                     break;
