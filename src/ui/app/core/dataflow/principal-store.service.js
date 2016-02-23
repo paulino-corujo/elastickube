@@ -37,7 +37,7 @@ class UserStoreService extends AbstractStore {
     }
 
     isAdmin() {
-        return true;
+        return this._principal;
     }
 
     addPrincipalChangeListener(callback) {

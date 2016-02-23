@@ -8,12 +8,9 @@ class LoginController {
     }
 
     submit() {
-        this._principalActionCreator.login(this._$scope.user)
+        this._principalActionCreator.login(this.user)
             .then(() => this._login.execute())
-            .catch((response) => {
-                console.log(response);
-                console.warn('Invalid User or Password.');
-            });
+            .catch(() => console.warn('Invalid User or Password.'));
     }
 }
 
