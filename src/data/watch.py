@@ -20,7 +20,8 @@ WATCHABLE_OPERATIONS = ['i', 'u']
 WATCHABLE_COLLECTIONS = [
     "elastickube.Users",
     "elastickube.Namespaces",
-    "elastickube.Settings"
+    "elastickube.Settings",
+    "elastickube.Charts"
 ]
 
 _callbacks = dict()

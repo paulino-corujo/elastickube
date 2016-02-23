@@ -5,8 +5,9 @@ from pymongo.errors import DuplicateKeyError
 from tornado.gen import coroutine, Return
 
 from api.v1 import SecureWebSocketHandler
-from api.v1.watchers.namespaces import NamespacesWatcher
+from api.v1.watchers.charts import ChartsWatcher
 from api.v1.watchers.instances import InstancesWatcher
+from api.v1.watchers.namespaces import NamespacesWatcher
 from api.v1.watchers.settings import SettingsWatcher
 from api.v1.watchers.users import UsersWatcher
 from api.v1.actions.namespace import NamespaceActions
@@ -16,7 +17,7 @@ from data.query import ObjectNotFoundException
 
 REST_OPERATIONS = ["create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
-SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances"]
+SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "charts"]
 
 
 class MainWebSocketHandler(SecureWebSocketHandler):
@@ -30,6 +31,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         self.actions_lookup = dict(
             instances=dict(
                 watchers=InstancesWatcher(self.settings, self.write_message)
+            ),
+            charts=dict(
+                watchers=ChartsWatcher(self.settings, self.write_message)
             ),
             namespaces=dict(
                 rest=NamespaceActions(self.settings),
