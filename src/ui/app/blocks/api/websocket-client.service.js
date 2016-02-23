@@ -29,7 +29,11 @@ class WebsocketClientService {
 
                 if (message.correlation) {
                     this._$rootScope.$apply(() => {
-                        this._currentOnGoingMessages[message.correlation].resolve(message);
+                        if (message.status_code >= 400) {
+                            this._currentOnGoingMessages[message.correlation].reject(message);
+                        } else {
+                            this._currentOnGoingMessages[message.correlation].resolve(message);
+                        }
                         delete this._currentOnGoingMessages[message.correlation];
                     });
                 } else {
