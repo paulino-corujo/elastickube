@@ -101,8 +101,7 @@ class InstancesWatcher(object):
 
         result = yield self.settings["kube"].replication_controllers.get(namespace=self.namespace)
         self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
-        items.append(result.get("items", []))
-
+        items.extend(result.get("items", []))
         response = dict(
             action=self.message["action"],
             operation="watched",
