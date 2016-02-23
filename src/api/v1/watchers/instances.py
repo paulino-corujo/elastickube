@@ -78,9 +78,9 @@ class InstancesWatcher(object):
         self.watchers[watcher_key]["resourceVersion"] = data['object']['metadata']['resourceVersion']
 
         operation = "updated"
-        if operation["type"] == "ADDED":
+        if data["type"] == "ADDED":
             operation = "created"
-        elif operation["type"] == "REMOVED":
+        elif data["type"] == "REMOVED":
             operation = "deleted"
 
         response = dict(
