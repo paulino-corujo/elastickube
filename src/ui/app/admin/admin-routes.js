@@ -18,7 +18,12 @@ const states = [{
         data: {
             header: {
                 name: 'admin',
-                position: 3
+                position: 3,
+                click: ($injector) => {
+                    const actionCreator = $injector.get('adminNavigationActionCreator');
+
+                    return actionCreator.settings();
+                }
             }
         }
     }

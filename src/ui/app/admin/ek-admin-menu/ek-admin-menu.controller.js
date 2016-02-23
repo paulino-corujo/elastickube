@@ -1,18 +1,18 @@
 import icons from '../icons';
 
 class AdminMenuController {
-    constructor($rootScope, $state, routerHelper) {
+    constructor($rootScope, $state, adminNavigationActionCreator) {
         'ngInject';
 
         this._$state = $state;
-        this._routerHelper = routerHelper;
+        this._adminNavigationActionCreator = adminNavigationActionCreator;
 
         this.items = [
-            { icon: icons.IC_SETTINGS_48PX, name: 'settings', state: 'admin.settings' },
-            { icon: icons.IC_USERS_48PX, name: 'users', state: 'admin.users' },
-            { icon: icons.IC_NAMESPACES_48PX, name: 'namespaces', state: 'admin.namespaces' },
-            { icon: icons.IC_SETTINGS_48PX, name: 'templates', state: 'admin.templates' },
-            { icon: icons.IC_SETTINGS_48PX, name: 'instances', state: 'admin.instances' }
+            { icon: icons.IC_SETTINGS_48PX, name: 'settings', state: 'settings' },
+            { icon: icons.IC_USERS_48PX, name: 'users', state: 'users' },
+            { icon: icons.IC_NAMESPACES_48PX, name: 'namespaces', state: 'namespaces' },
+            { icon: icons.IC_SETTINGS_48PX, name: 'templates', state: 'templates' },
+            { icon: icons.IC_SETTINGS_48PX, name: 'instances', state: 'instances' }
         ];
 
         this.selectedItem = this._getSelectedItem();
@@ -23,11 +23,11 @@ class AdminMenuController {
     }
 
     _getSelectedItem() {
-        return _.find(this.items, (x) => this._$state.current.name === x.state);
+        return _.find(this.items, (x) => this._$state.current.name.split('.')[1] === x.state);
     }
 
     selectItem(item) {
-        this._routerHelper.changeToState(item.state);
+        return this._adminNavigationActionCreator[item.state]();
     }
 }
 

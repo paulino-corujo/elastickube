@@ -13,13 +13,17 @@ class RouterHelperProvider {
         };
     }
 
-    configureStates(states, otherwisePath) {
-        states.forEach((x) => this._$stateProvider.state(x.state, x.config));
-
-        if (otherwisePath && !this._hasOtherwise) {
+    configureOtherwise(otherwise) {
+        if (this._hasOtherwise) {
+            throw new Error('Otherwise already configured');
+        } else if (otherwise) {
             this._hasOtherwise = true;
-            this._$urlRouterProvider.otherwise(otherwisePath);
+            this._$urlRouterProvider.otherwise(otherwise);
         }
+    }
+
+    configureStates(states) {
+        states.forEach((x) => this._$stateProvider.state(x.state, x.config));
     }
 }
 

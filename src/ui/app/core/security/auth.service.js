@@ -2,11 +2,12 @@ import constants from 'constants';
 import profiles from './profiles';
 
 class AuthService {
-    constructor($cookies, initialization, principalStore, routerHelper, sessionActionCreator, sessionStore, websocketClient) {
+    constructor($cookies, initialization, loginNavigationActionCreator, principalStore, routerHelper, sessionActionCreator, sessionStore, websocketClient) {
         'ngInject';
         let sessionToken = $cookies.get(constants.SESSION_TOKEN_NAME);
 
         this._$cookies = $cookies;
+        this._loginNavigationActionCreator = loginNavigationActionCreator;
         this._principalStore = principalStore;
         this._routerHelper = routerHelper;
         this._sessionActionCreator = sessionActionCreator;
@@ -40,7 +41,7 @@ class AuthService {
 
         return this._sessionActionCreator.destroy()
             .then(() => this._websocketClient.disconnect())
-            .then(() => this._routerHelper.changeToState(constants.pages.LOGIN));
+            .then(() => this._loginNavigationActionCreator.login());
     }
 
     authorize(access) {

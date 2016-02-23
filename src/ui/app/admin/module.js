@@ -3,6 +3,9 @@ import layoutModule from 'layout/module';
 import widgetsModule from 'widgets/module';
 
 import adminRoutes from './admin-routes';
+
+import NavigationActionCreator from './navigation-action-creator.service';
+
 import AdminDirective from './ek-admin/ek-admin.directive';
 import AdminMenuDirective from './ek-admin-menu/ek-admin-menu.directive';
 import AdminSettingsDirective from './ek-admin-settings/ek-admin-settings.directive';
@@ -20,6 +23,9 @@ angular
         widgetsModule
     ])
     .config(adminRoutes)
+
+    .service('adminNavigationActionCreator', NavigationActionCreator)
+
     .directive('ekAdmin', () => new AdminDirective())
     .directive('ekAdminMenu', () => new AdminMenuDirective())
     .directive('ekAdminSettings', () => new AdminSettingsDirective())
