@@ -5,8 +5,13 @@ import constants from '../../widgets/constants';
 import template from './ek-login.html';
 
 class LoginDirective extends Directive {
+
     constructor() {
         super({ Controller, template });
+
+        this.bindToController = {
+            authProviders: '='
+        };
     }
 
     compile(tElement) {

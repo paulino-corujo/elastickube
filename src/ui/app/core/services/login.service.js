@@ -1,5 +1,3 @@
-import constants from 'constants';
-
 class LoginService {
     constructor(initialization, instancesNavigationActionCreator, routerHelper, sessionStore) {
         'ngInject';

@@ -1,8 +1,20 @@
 const states = [{
     state: 'anonymous.login',
     config: {
-        template: '<ek-login></ek-login>',
-        url: '/login'
+        template: '<ek-login auth-providers="authProviders"></ek-login>',
+        url: '/login',
+        controller: ($scope, authProviders) => {
+            'ngInject';
+
+            $scope.authProviders = authProviders;
+        },
+        resolve: {
+            authProviders: (settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.authProviders();
+            }
+        }
     }
 }, {
     state: 'anonymous.signup',

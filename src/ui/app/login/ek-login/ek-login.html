@@ -1,11 +1,11 @@
 <div layout="column" layout-align="center center">
     <h2 class="ek-login__title">Login</h2>
 
-    <form ng-submit="ctrl.submit()" name="loginForm">
+    <form ng-submit="ctrl.submit()" name="loginForm" ng-if="ctrl.authProviders.password">
         <div layout="row">
             <md-input-container class="ek-login__email md-block animate">
                 <label>Username</label>
-                <input required="required" ng-model="user.username" name="username" type="email">
+                <input required="required" ng-model="ctrl.user.username" name="username" type="email">
                 <div ng-messages="loginForm.username.$error">
                     <div ng-message="required">Username is required.</div>
                     <div ng-message="email">Username is invalid.</div>
@@ -15,9 +15,12 @@
         <div layout="row">
             <md-input-container class="ek-login__password md-block animate">
                 <label>Password</label>
-                <input required ng-model="user.password" name="password" type="password">
+                <input ng-model="ctrl.user.password"
+                       ng-pattern="ctrl.authProviders.password.regex"
+                       name="password" type="password" required>
                 <div ng-messages="loginForm.password.$error">
                     <div ng-message="required">Password is required.</div>
+                    <div ng-message="pattern">Password not match the specified format.</div>
                 </div>
             </md-input-container>
         </div>
@@ -27,10 +30,12 @@
                        ng-disabled="loginForm.$invalid">login</md-button>
         </div>
     </form>
-    <div layout="row" layout-align="center">
+
+    <div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && ctrl.authProviders.google_oauth">
         <div class="divider"><span>OR</span></div>
     </div>
-    <div layout="row" layout-align="center">
+
+    <div layout="row" layout-align="center" ng-if="ctrl.authProviders.google_oauth">
         <md-button href="/api/v1/auth/google" target="_self"
                    class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: images.GOOGLE_G_LOGO }}">Login with Google</md-button>
     </div>
