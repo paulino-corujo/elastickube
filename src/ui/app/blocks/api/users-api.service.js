@@ -8,7 +8,7 @@ class UsersAPIService {
         this._$q = $q;
     }
 
-    loadUsers() {
+    subscribe() {
         const defer = this._$q.defer();
 
         setTimeout(() => {

@@ -7,14 +7,15 @@ class UsersActionCreatorService {
         this._usersAPI = usersAPI;
     }
 
-    load() {
+    subscribe() {
         this._dispatcher.dispatch({
-            type: this._actions.USERS_LOAD
+            type: this._actions.USERS_SUBSCRIBE
         });
-        return this._usersAPI.loadUsers()
+
+        return this._usersAPI.subscribe()
             .then((users) => {
                 this._dispatcher.dispatch({
-                    type: this._actions.USERS_LOADED,
+                    type: this._actions.USERS_SUBSCRIBED,
                     users
                 });
             });
