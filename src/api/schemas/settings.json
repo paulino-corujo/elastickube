@@ -14,6 +14,15 @@
       "minLength": 1,
       "maxLength": 36
     },
+    "charts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repo_url": {
+          "type": "string"
+        }
+      }
+    },
     "authentication": {
       "type": "object",
       "additionalProperties": false,

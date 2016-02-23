@@ -4,7 +4,8 @@ import time
 from tornado.gen import coroutine
 
 PASSWORD_REGEX = "^(([a-zA-Z]+\d+)|(\d+[a-zA-Z]+))[a-zA-Z0-9]*$"
-SCHEMA_VERSION = 1
+DEFAULT_GITREPO = "https://github.com/helm/charts.git"
+SCHEMA_VERSION = 2
 
 
 @coroutine
@@ -14,12 +15,16 @@ def init(database):
     yield setup_indexes(database)
 
     settings = yield database.Settings.find_one({"deleted": None})
+
     if not settings:
         result = yield database.Settings.insert({
             "deleted": None,
             "schema": "http://elasticbox.net/schemas/settings",
             "metadata": {
                 "resourceVersion": time.time(),
+            },
+            "charts": {
+              "repo_url": DEFAULT_GITREPO
             },
             "authentication": {
                 "password": {
@@ -32,7 +37,7 @@ def init(database):
         logging.debug("Initial Settings document created, %s", result)
     else:
         if settings["schema_version"] != SCHEMA_VERSION:
-            migrate(settings["schema_version"])
+            migrate(database, settings)
 
 
 @coroutine
@@ -42,5 +47,14 @@ def setup_indexes(database):
     yield database.Users.ensure_index(key_or_list="deleted", unique=False, sparse=True)
 
 
-def migrate(previous_version):
-    logging.debug("Migrating DB from version %d to %d", previous_version, SCHEMA_VERSION)
+def migrate(database, settings):
+    logging.debug("Migrating DB from version %d to %d", settings['schema_version'], SCHEMA_VERSION)
+
+    if settings['schema_version'] == 1:
+        settings['charts'] = {
+            "repo_url": DEFAULT_GITREPO
+        }
+
+        settings['schema_version'] = 2
+
+    database.Settings.update({ "_id": settings['_id'] }, settings)

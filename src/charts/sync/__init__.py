@@ -1,7 +1,7 @@
 import logging
 import os
 
-
+from data.query import Query
 from charts.sync.repo import GitSync
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine, Return
@@ -16,9 +16,8 @@ def initialize():
         os.getenv('ELASTICKUBE_MONGO_SERVICE_PORT', 27017)
     )
 
-    settings = dict()
-    settings['motor'] = MotorClient(mongo_url)
-    settings['database'] = settings['motor'].elastickube
-    settings['repo'] = 'https://github.com/helm/charts.git'
+    database = MotorClient(mongo_url).elastickube
+    settings = yield Query(database, "Settings").find_one()
+    settings['database'] = database
 
-    yield GitSync(settings).sync()
+    yield GitSync(settings).sync_loop()

@@ -17,7 +17,7 @@ REPO_DIRECTORY = '/var/elastickube/charts'
 class GitSync(object):
 
     def __init__(self, settings):
-        logging.info("Initializing GitSync for '%s'", settings['repo'])
+        logging.info("Initializing GitSync for '%s'", settings['charts']['repo_url'])
 
         self.database = settings['database']
         self.charts = dict()
@@ -26,7 +26,22 @@ class GitSync(object):
             self.repo = Repo(REPO_DIRECTORY)
         except InvalidGitRepositoryError:
             logging.info("Cloning repository in %s", REPO_DIRECTORY)
-            self.repo = Repo.clone_from(settings['repo'], REPO_DIRECTORY)
+            self.repo = Repo.clone_from(settings['charts']['repo_url'], REPO_DIRECTORY)
+
+
+    @coroutine
+    def sync_loop(self):
+        while True:
+            synced_head = self.repo.head
+            try:
+                self.repo.remotes.origin.pull()
+
+                if synced_head != self.repo.head:
+                    yield self.sync()
+            except:
+                logging.exception("Failed to pull repository.")
+
+            yield sleep(5)
 
     @coroutine
     def sync(self):
