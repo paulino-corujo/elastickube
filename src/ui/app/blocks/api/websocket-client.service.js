@@ -97,7 +97,9 @@ class WebsocketClientService {
         };
 
         if (!_.isUndefined(namespace)) {
-            message.namespace = namespace;
+            message.body = {
+                namespace
+            };
         }
 
         return this.sendMessage(message)
