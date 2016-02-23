@@ -4,12 +4,11 @@ import constants from 'constants';
 const SESSION_DESTROYED_EVENT = 'session.destroyed';
 
 class SessionService extends EventEmitter {
-    constructor($cookies, $q, storage) {
+    constructor($q, storage) {
         'ngInject';
 
         super();
 
-        this.$cookies = $cookies;
         this._$q = $q;
         this._storage = storage;
         this._session = {};
@@ -45,7 +44,6 @@ class SessionService extends EventEmitter {
     }
 
     destroy() {
-        this.$cookies.remove(constants.SESSION_TOKEN_NAME);
         this._session = {};
         this._storage.clear();
         this.emit(SESSION_DESTROYED_EVENT);
