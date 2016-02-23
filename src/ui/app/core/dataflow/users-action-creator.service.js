@@ -12,13 +12,7 @@ class UsersActionCreatorService {
             type: this._actions.USERS_SUBSCRIBE
         });
 
-        return this._usersAPI.subscribe()
-            .then((users) => {
-                this._dispatcher.dispatch({
-                    type: this._actions.USERS_SUBSCRIBED,
-                    users
-                });
-            });
+        return this._usersAPI.subscribe();
     }
 }
 

@@ -1,20 +1,13 @@
-import mockUsers from 'mocks/users';
-
 class UsersAPIService {
 
-    constructor($q) {
+    constructor(websocketClient) {
         'ngInject';
 
-        this._$q = $q;
+        this._websocketClient = websocketClient;
     }
 
     subscribe() {
-        const defer = this._$q.defer();
-
-        setTimeout(() => {
-            defer.resolve(mockUsers);
-        }, 0);
-        return defer.promise;
+        return this._websocketClient.subscribeEvent('users');
     }
 }
 

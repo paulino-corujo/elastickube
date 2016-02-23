@@ -1,8 +1,8 @@
-import mockUsers from 'mocks/users';
-
 class OwnersSelectorController {
-    constructor($scope) {
+    constructor($scope, usersStore) {
         'ngInject';
+
+        this._userStoreService = usersStore;
 
         this.selectedOwners = this.selectedOwners || [];
         this.open = true;
@@ -32,7 +32,7 @@ class OwnersSelectorController {
 
 function getOwners(shareables) {
     return _.chain(shareables)
-        .map((x) => _.find(mockUsers, { id: x.owner }))
+        .map((x) => _.find(this._userStoreService.getAll(), { id: x.owner }))
         .uniq()
         .sortBy('id')
         .value();

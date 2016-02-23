@@ -1,15 +1,13 @@
-// FIXME this mock should be removed when user API is ready
-import mockUsers from 'mocks/users';
-
 class PrincipalActionCreatorService {
 
-    constructor($q, actions, dispatcher, principalAPI) {
+    constructor($q, actions, dispatcher, principalAPI, usersStore) {
         'ngInject';
 
         this._$q = $q;
         this._actions = actions;
         this._principalAPI = principalAPI;
         this._dispatcher = dispatcher;
+        this._userStoreService = usersStore;
     }
 
     signup(user) {
@@ -29,13 +27,12 @@ class PrincipalActionCreatorService {
     }
 
     loggedIn() {
-        return this._$q.when(_.find(mockUsers, { id: 'alberto' }))
-            .then((principal) => {
-                this._dispatcher.dispatch({
-                    type: this._actions.PRINCIPAL_LOGGED,
-                    principal
-                });
-            });
+        this._dispatcher.dispatch({
+            type: this._actions.PRINCIPAL_LOGGED,
+            principal: {}
+        });
+
+        // TODO Principal should be queried from the services
     }
 
     logout() {

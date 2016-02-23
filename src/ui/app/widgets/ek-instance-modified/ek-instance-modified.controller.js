@@ -1,8 +1,19 @@
-import mockUsers from 'mocks/users';
-
 class InstanceModifiedController {
-    constructor() {
-        this.owner = _.find(mockUsers, { id: this.instance.owner });
+    constructor($scope, usersStore) {
+        'ngInject';
+
+        const onChange = () => this._userStoreService.get(this.instance.owner);
+
+        this._$scope = $scope;
+        this._userStoreService = usersStore;
+
+        this.owner = this._userStoreService.get(this.instance.owner);
+
+        this._userStoreService.addChangeListener(onChange);
+
+        this._$scope.$on('$destroy', () => {
+            this._userStoreService.removeChangeListener(onChange);
+        });
     }
 }
 
