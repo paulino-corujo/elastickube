@@ -9,7 +9,7 @@ from data.query import Query, ObjectNotFoundException
 
 class UserActions(object):
 
-    def __init__(self, message, settings):
+    def __init__(self, settings):
         logging.info("Initializing UserActions")
         self.database = settings['database']
 

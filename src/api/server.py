@@ -13,6 +13,11 @@ from api.v1.auth import AuthProvidersHandler, SignupHandler, PasswordHandler, Go
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
+# Config tornado.curl_httpclient to use NullHandler
+tornado_logger = logging.getLogger('tornado.curl_httpclient')
+tornado_logger.addHandler(logging.NullHandler())
+tornado_logger.propagate = False
+
 
 if __name__ == "__main__":
 

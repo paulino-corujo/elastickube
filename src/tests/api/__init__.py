@@ -14,3 +14,15 @@ def get_token(io_loop, username="operations@elasticbox.com", password="elasticku
         body=json.dumps(dict(username=username, password=password)))
 
     raise Return(response.body)
+
+
+@coroutine
+def wait_message(connection, correlation):
+    deserialized_message = None
+    while True:
+        message = yield connection.read_message()
+        deserialized_message = json.loads(message)
+        if "correlation" in deserialized_message and deserialized_message["correlation"] == correlation:
+            break
+
+    raise Return(deserialized_message)
