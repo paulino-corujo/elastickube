@@ -21,6 +21,7 @@ import NamespacesStoreService from './dataflow/namespaces-store.service.js';
 import SessionActionCreatorService from './dataflow/session-action-creator.service';
 import SessionStoreService from './dataflow/session-store.service.js';
 import SettingsActionCreatorService from './dataflow/settings-action-creator.service';
+import SettingsStoreService from './dataflow/settings-store.service';
 import PrincipalActionCreatorService from './dataflow/principal-action-creator.service';
 import PrincipalStoreService from './dataflow/principal-store.service.js';
 import UsersActionCreatorService from './dataflow/users-action-creator.service';
@@ -76,6 +77,7 @@ angular
     .service('sessionStore', SessionStoreService)
 
     .service('settingsActionCreator', SettingsActionCreatorService)
+    .service('settingsStore', SettingsStoreService)
 
     .service('usersActionCreator', UsersActionCreatorService)
     .service('usersStore', UsersStoreService)

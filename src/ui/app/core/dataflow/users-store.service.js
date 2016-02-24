@@ -24,6 +24,21 @@ class UsersStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.USERS_UPDATED:
+                    const newUser = action.users;
+                    const oldUser = this.get(newUser.username || newUser);
+
+                    if (!_.isUndefined(oldUser)) {
+                        this._users = _.without(this._users, oldUser);
+                    }
+
+                    if (action.operation !== 'deleted') {
+                        this._users = this._users.concat(newUser);
+                    }
+
+                    this.emit(CHANGE_EVENT);
+                    break;
+
                 default:
             }
         });
@@ -37,8 +52,8 @@ class UsersStoreService extends AbstractStore {
         delete this._users;
     }
 
-    get(id) {
-        return _.find(this._users, { id });
+    get(username) {
+        return _.find(this._users, { username });
     }
 
     getAll() {

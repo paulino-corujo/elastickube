@@ -1,8 +1,9 @@
 class SettingsAPIService {
-    constructor($http) {
+    constructor($http, websocketClient) {
         'ngInject';
 
         this._$http = $http;
+        this._websocketClient = websocketClient;
     }
 
     authProviders() {
@@ -16,6 +17,18 @@ class SettingsAPIService {
 
                 return authProviders;
             });
+    }
+
+    unsubscribe() {
+        return this._websocketClient.unSubscribeEvent('settings');
+    }
+
+    subscribe() {
+        return this._websocketClient.subscribeEvent('settings');
+    }
+
+    update(settings) {
+        return this._websocketClient.updateEvent('settings', settings);
     }
 }
 

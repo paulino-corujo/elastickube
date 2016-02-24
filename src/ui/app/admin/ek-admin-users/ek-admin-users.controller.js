@@ -20,11 +20,22 @@ class AdminUsersController {
             columnDefs: [
                 {
                     name: 'name',
-                    field: 'id',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-user-info user-id="row.entity.id"></ek-user-info>`
+                    cellTemplate: `<ek-user-info username="row.entity.username"></ek-user-info>`,
+                    sortingAlgorithm: (a, b, rowA, rowB) => {
+                        const nameA = `${rowA.entity.firstname} ${rowA.entity.lastname || ''}`.toLowerCase();
+                        const nameB = `${rowB.entity.firstname} ${rowB.entity.lastname || ''}`.toLowerCase();
+
+                        if (nameA > nameB) {
+                            return 1;
+                        } else if (nameA < nameB) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }
                 },
-                { name: 'username', field: 'id', enableColumnMenu: false },
+                { name: 'username', enableColumnMenu: false },
                 { name: 'email', enableColumnMenu: false },
                 {
                     name: 'created',

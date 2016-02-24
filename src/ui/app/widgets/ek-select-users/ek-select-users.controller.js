@@ -7,7 +7,11 @@ class SelectUsersController {
 
     selectUser(user) {
         if (!_.isUndefined(user)) {
-            this.selectedUsers = this.selectedUsers.concat(user.id);
+            this.selectedUsers = _.chain(this.selectedUsers)
+                .concat(user)
+                .sortBy((x) => `${x.firstname} ${x.lastname}`.toLowerCase())
+                .value();
+
             delete this.selectedUser;
             delete this.searchText;
         }
@@ -15,8 +19,8 @@ class SelectUsersController {
 
     querySearch(text) {
         return _.chain(this._usersStore.getAll())
-            .reject((x) => _.includes(this.selectedUsers, x.id))
-            .filter((x) => x.name.indexOf(text) !== -1)
+            .reject((x) => _.includes(this.selectedUsers, x))
+            .filter((x) => `${x.firstname} ${x.lastname}`.toLowerCase().indexOf((text || '').toLowerCase()) !== -1)
             .value();
     }
 }

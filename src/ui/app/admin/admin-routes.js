@@ -26,6 +26,13 @@ const states = [{
                     return actionCreator.settings();
                 }
             }
+        },
+        resolve: {
+            loading: (settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.subscribe();
+            }
         }
     }
 }, {

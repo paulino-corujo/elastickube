@@ -5,6 +5,15 @@
     height: 100%;
     width: 100%;
 
+    &__buttons {
+        width: 600px;
+        padding: 30px 0;
+
+        &__save {
+            margin: 0;
+        }
+    }
+
     &__admins,
     &__authentication,
     &__mail {
@@ -15,25 +24,6 @@
 
         &:last-child {
             margin-bottom: 40px;
-        }
-
-        &__title {
-            margin: 0;
-            margin-bottom: 20px;
-            text-transform: capitalize;
-            font-size: 20px;
-            font-weight: 500;
-        }
-
-        &__subtitle {
-            font-weight: 500;
-
-            &--required {
-                &:after {
-                    content: ' *';
-                    color: red;
-                }
-            }
         }
     }
 
@@ -58,19 +48,36 @@
         }
     }
 
-    &__mail {
-        &__input {
-            margin: 16px 0;
-            padding: 10px;
-            height: 30px;
+    &__title {
+        margin: 0;
+        margin-bottom: 20px;
+        text-transform: capitalize;
+        font-size: 20px;
+        font-weight: 500;
+    }
 
-            &--long {
-                width: 444px;
-            }
+    &__subtitle {
+        font-weight: 500;
 
-            &--short {
-                width: 94px;
+        &--required {
+            &:after {
+                content: ' *';
+                color: red;
             }
+        }
+    }
+
+    &__input {
+        margin: 16px 0;
+        padding: 10px;
+        height: 30px;
+
+        &--long {
+            width: 444px;
+        }
+
+        &--short {
+            width: 94px;
         }
     }
 }

@@ -30,6 +30,10 @@ class WebsocketActionCreatorService {
                 eventName = this._actions.USERS_SUBSCRIBED;
                 break;
 
+            case constants.SETTINGS:
+                eventName = this._actions.SETTINGS_SUBSCRIBED;
+                break;
+
             default:
         }
 
@@ -59,6 +63,10 @@ class WebsocketActionCreatorService {
 
             case constants.USERS:
                 eventName = this._actions.USERS_UNSUBSCRIBED;
+                break;
+
+            case constants.SETTINGS:
+                eventName = this._actions.SETTINGS_UNSUBSCRIBED;
                 break;
 
             default:
@@ -91,11 +99,16 @@ class WebsocketActionCreatorService {
                 eventName = this._actions.USERS_UPDATED;
                 break;
 
+            case constants.SETTINGS:
+                eventName = this._actions.SETTINGS_UPDATED;
+                break;
+
             default:
         }
 
         event.type = eventName;
-        event[message.action] = message.action;
+        event.operation = message.operation;
+        event[message.action] = message.body;
 
         this._dispatcher.dispatch(event);
     }

@@ -6,6 +6,7 @@ function dataFlowInitialization($injector) {
     $injector.get('namespacesStore');
     $injector.get('principalStore');
     $injector.get('sessionStore');
+    $injector.get('settingsStore');
     $injector.get('usersStore');
 }
 
