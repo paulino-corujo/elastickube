@@ -11,6 +11,8 @@ import apiModule from 'blocks/api/module';
 import routerModule from 'blocks/router/module';
 
 import actions from './dataflow/actions';
+import ChartsActionCreatorService from './dataflow/charts-action-creator.service.js';
+import ChartsStoreService from './dataflow/charts-store.service.js';
 import DispatcherService from './dataflow/dispatcher.service.js';
 import InstancesActionCreatorService from './dataflow/instances-action-creator.service.js';
 import InstancesStoreService from './dataflow/instances-store.service.js';
@@ -58,19 +60,22 @@ angular
     .service('login', LoginService)
     .service('multiTransclude', MultiTranscludeService)
 
+    .service('chartsActionCreator', ChartsActionCreatorService)
+    .service('chartsStore', ChartsStoreService)
+
     .service('instancesActionCreator', InstancesActionCreatorService)
     .service('instancesStore', InstancesStoreService)
 
     .service('namespacesActionCreator', NamespacesActionCreatorService)
     .service('namespacesStore', NamespacesStoreService)
 
+    .service('principalActionCreator', PrincipalActionCreatorService)
+    .service('principalStore', PrincipalStoreService)
+
     .service('sessionActionCreator', SessionActionCreatorService)
     .service('sessionStore', SessionStoreService)
 
     .service('settingsActionCreator', SettingsActionCreatorService)
-
-    .service('principalActionCreator', PrincipalActionCreatorService)
-    .service('principalStore', PrincipalStoreService)
 
     .service('usersActionCreator', UsersActionCreatorService)
     .service('usersStore', UsersStoreService)

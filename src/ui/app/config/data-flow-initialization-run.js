@@ -1,6 +1,7 @@
 function dataFlowInitialization($injector) {
     'ngInject';
 
+    $injector.get('chartsStore');
     $injector.get('instancesStore');
     $injector.get('namespacesStore');
     $injector.get('principalStore');

@@ -3,12 +3,13 @@ import constants from 'constants';
 class InitializationService {
 
     /* eslint max-params: 0 */
-    constructor($q, $cookies, namespacesActionCreator, namespacesStore, principalActionCreator, sessionActionCreator, sessionStore,
-                usersActionCreator, websocketClient) {
+    constructor($q, $cookies, chartsActionCreator, namespacesActionCreator, namespacesStore, principalActionCreator,
+                sessionActionCreator, sessionStore, usersActionCreator, websocketClient) {
         'ngInject';
 
         this._$q = $q;
         this._$cookies = $cookies;
+        this._chartsActionCreator = chartsActionCreator;
         this._namespacesActionCreator = namespacesActionCreator;
         this._namespacesStore = namespacesStore;
         this._principalActionCreator = principalActionCreator;
@@ -40,6 +41,7 @@ class InitializationService {
         return this._$q.when(sessionDestroyed)
             .then(() => this._websocketClient.connect())
             .then(() => this._principalActionCreator.loggedIn())
+            .then(() => this._chartsActionCreator.subscribe())
             .then(() => this._namespacesActionCreator.subscribe())
             .then(() => this._usersActionCreator.subscribe())
             .then(() => {

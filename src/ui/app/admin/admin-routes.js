@@ -51,10 +51,10 @@ const states = [{
         }
     }
 }, {
-    state: 'admin.templates',
+    state: 'admin.charts',
     config: {
         template: '<ek-admin-templates></ek-admin-templates>',
-        url: '/templates',
+        url: '/charts',
         data: {
             header: {
                 name: 'admin'

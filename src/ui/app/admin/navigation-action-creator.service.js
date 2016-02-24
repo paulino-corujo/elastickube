@@ -18,8 +18,8 @@ class NavigationActionCreatorService {
         return this._routerHelper.changeToState('admin.namespaces');
     }
 
-    templates() {
-        return this._routerHelper.changeToState('admin.templates');
+    charts() {
+        return this._routerHelper.changeToState('admin.charts');
     }
 
     instances() {

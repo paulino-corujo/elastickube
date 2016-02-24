@@ -11,7 +11,7 @@ import AdminMenuDirective from './ek-admin-menu/ek-admin-menu.directive';
 import AdminSettingsDirective from './ek-admin-settings/ek-admin-settings.directive';
 import AdminUsersDirective from './ek-admin-users/ek-admin-users.directive';
 import AdminNamespacesDirective from './ek-admin-namespaces/ek-admin-namespaces.directive';
-import AdminTemplatesDirective from './ek-admin-templates/ek-admin-templates.directive';
+import AdminChartsDirective from './ek-admin-charts/ek-admin-charts.directive';
 import AdminInstancesDirective from './ek-admin-instances/ek-admin-instances.directive';
 
 const moduleName = 'app.admin';
@@ -31,7 +31,7 @@ angular
     .directive('ekAdminSettings', () => new AdminSettingsDirective())
     .directive('ekAdminUsers', () => new AdminUsersDirective())
     .directive('ekAdminNamespaces', () => new AdminNamespacesDirective())
-    .directive('ekAdminTemplates', () => new AdminTemplatesDirective())
+    .directive('ekAdminTemplates', () => new AdminChartsDirective())
     .directive('ekAdminInstances', () => new AdminInstancesDirective());
 
 export default moduleName;

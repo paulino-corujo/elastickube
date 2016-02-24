@@ -1,6 +1,6 @@
 class NamespacesSelectorController {
 
-    constructor($scope, $state, instancesNavigationActionCreator, templatesNavigationActionCreator, sessionStore, namespacesStore,
+    constructor($scope, $state, instancesNavigationActionCreator, chartsNavigationActionCreator, sessionStore, namespacesStore,
                 sessionActionCreator) {
         'ngInject';
 
@@ -9,7 +9,7 @@ class NamespacesSelectorController {
 
         this._$state = $state;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
-        this._templatesNavigationActionCreator = templatesNavigationActionCreator;
+        this._chartsNavigationActionCreator = chartsNavigationActionCreator;
         this._namespacesStoreService = namespacesStore;
         this._sessionStoreService = sessionStore;
         this._sessionActionCreator = sessionActionCreator;
@@ -33,8 +33,8 @@ class NamespacesSelectorController {
                     case 'private.instances':
                         return this._instancesNavigationActionCreator.instances();
 
-                    case 'private.templates':
-                        return this._templatesNavigationActionCreator.templates();
+                    case 'private.charts':
+                        return this._chartsNavigationActionCreator.charts();
 
                     default:
                 }

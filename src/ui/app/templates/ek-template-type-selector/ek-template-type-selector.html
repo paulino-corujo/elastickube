@@ -1,8 +1,0 @@
-<div class="ek-template-type-selector__type"
-     ng-repeat="type in ctrl.types track by $index"
-     ng-class="{'ek-template-type-selector__type--selected': ctrl.selectedType === type }"
-     ng-click="ctrl.selectType(type)"
-     layout="row" layout-align="space-between center">
-    <span class="ek-template-type-selector__type__name">{{:: type }}</span>
-    <span class="ek-template-type-selector__type__counter">{{ type === 'all' ? ctrl.templates.length : ctrl.typeValues[type] || 0 }}</span>
-</div>
