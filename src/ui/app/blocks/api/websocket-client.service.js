@@ -35,18 +35,19 @@ class WebsocketClientService {
             this._websocket.onmessage = (evt) => {
                 const message = JSON.parse(evt.data);
 
-                if (message.correlation) {
-                    this._$rootScope.$apply(() => {
+                this._$rootScope.$apply(() => {
+                    if (message.correlation) {
                         if (message.status_code >= 400) {
                             this._currentOnGoingMessages[message.correlation].reject(message);
                         } else {
                             this._currentOnGoingMessages[message.correlation].resolve(message);
                         }
+
                         delete this._currentOnGoingMessages[message.correlation];
-                    });
-                } else {
-                    this._websocketActionCreator.updateResource(message);
-                }
+                    } else {
+                        this._websocketActionCreator.updateResource(message);
+                    }
+                });
             };
 
             this._websocket.onerror = () => {
@@ -73,7 +74,7 @@ class WebsocketClientService {
     disconnect() {
         const promises = [];
 
-        this._eventsSubscribed.forEach((value) => promises.push(this.unSubscribeEvent(value)));
+        _.each(this._eventsSubscribed, (value) => promises.push(this.unSubscribeEvent(value)));
 
         return this._$q.all(promises)
             .then(() => {
@@ -128,6 +129,16 @@ class WebsocketClientService {
                     delete this._eventsSubscribed[action];
                     this._websocketActionCreator.unSubscribedResource(response);
                 }));
+    }
+
+    updateEvent(action, body) {
+        const message = {
+            action,
+            body,
+            operation: 'update'
+        };
+
+        return this._$q.when(this.sendMessage(message));
     }
 }
 

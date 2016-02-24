@@ -1,4 +1,4 @@
-<div layout="column" layout-align="start center">
+<div layout="column" layout-align="start center" ng-form="ctrl.form">
 
     <div class="ek-admin-settings__admins" layout="column">
         <h4 class="ek-admin-settings__admins__title">cluster administrators</h4>
@@ -9,8 +9,8 @@
              ng-if="ctrl.admins.length > 0">
             <div class="ek-admin-settings__admins__list__admin"
                  layout="row" layout-align="space-between"
-                 ng-repeat="admin in ctrl.admins">
-                <ek-user-info username="admin"
+                 ng-repeat="admin in ctrl.admins track by admin.username">
+                <ek-user-info username="admin.username"
                               show-username="true"></ek-user-info>
                 <md-icon class="ek-admin-settings__admins__list__admin__clear"
                          ng-click="ctrl.removeAdmin(admin)"
@@ -20,23 +20,38 @@
     </div>
 
     <div class="ek-admin-settings__authentication" layout="column">
-        <h4 class="ek-admin-settings__authentication__title">authentication</h4>
+        <h4 class="ek-admin-settings__title">authentication</h4>
 
-        <span class="ek-admin-settings__authentication__subtitle">what services can users use to login?</span>
+        <span class="ek-admin-settings__subtitle">what services can users use to login?</span>
         <div class="ek-admin-settings__authentication__methods">
 
             <div class="ek-admin-settings__authentication__methods__google"
                  layout="row" layout-align="space-between center">
                 <div layout="row">Google</div>
                 <md-switch class="md-primary" aria-label="Switch Google authentication"
-                           ng-model="ctrl.authentication.google"></md-switch>
+                           ng-model="ctrl.auth.google"
+                           ng-disabled="ctrl.isAuthDisabled('google')"></md-switch>
+            </div>
+            <div ng-if="ctrl.auth.google">
+                <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Key</div>
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                       ng-model="ctrl.auth.google_data.key" required>
+
+                <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Redirect URL</div>
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                       ng-model="ctrl.auth.google_data.redirect_uri" required>
+
+                <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Secret</div>
+                <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long"
+                       ng-model="ctrl.auth.google_data.secret" required>
             </div>
 
             <div class="ek-admin-settings__authentication__methods__github"
                  layout="row" layout-align="space-between center">
                 <div layout="row">GitHub</div>
                 <md-switch class="md-primary" aria-label="Switch GitHub authentication"
-                           ng-model="ctrl.authentication.github" ng-disabled="true"></md-switch>
+                           ng-model="ctrl.auth.github"
+                           ng-disabled="true"></md-switch>
             </div>
 
             <div class="ek-admin-settings__authentication__methods__password"
@@ -44,54 +59,67 @@
                 <div layout="row">Username & Password</div>
 
                 <md-switch class="md-primary" aria-label="Switch Username and Pasword authentication"
-                           ng-model="ctrl.authentication.password"></md-switch>
+                           ng-model="ctrl.auth.password"
+                           ng-disabled="ctrl.isAuthDisabled('password')"></md-switch>
+            </div>
+            <div ng-if="ctrl.auth.password">
+                <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Password Regex</div>
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                       ng-model="ctrl.auth.password_data.regex" required>
             </div>
 
             <div class="ek-admin-settings__authentication__methods__ldap"
                  layout="row" layout-align="space-between center">
                 <div layout="row">LDAP</div>
-
                 <md-switch class="md-primary" aria-label="Switch LDAP authentication"
-                           ng-model="ctrl.authentication.ldap" ng-disabled="true"></md-switch>
+                           ng-model="ctrl.auth.ldap"
+                           ng-disabled="true"></md-switch>
             </div>
 
         </div>
     </div>
 
     <div class="ek-admin-settings__mail" layout="column">
-        <h4 class="ek-admin-settings__mail__title">email</h4>
+        <h4 class="ek-admin-settings__title">email</h4>
 
-        <span class="ek-admin-settings__mail__subtitle">Outbound Email (SMTP)</span>
-        <md-switch class="md-primary" aria-label="Outbound Email"
-                   ng-model="ctrl.mail.outbound"></md-switch>
-        <div ng-if="ctrl.mail.outbound">
-            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">Server Address</div>
-            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
-                   ng-model="ctrl.mail.server.address">
-
-            <div class="ek-admin-settings__mail__subtitle">Port</div>
-            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--short"
-                   ng-model="ctrl.mail.server.port">
-
-            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">No-Reply Address</div>
-            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
-                   ng-model="ctrl.mail.server.noReply">
+        <div layout="row" layout-align="space-between center">
+            <span class="ek-admin-settings__subtitle">Outbound Email (SMTP)</span>
+            <md-switch class="md-primary" aria-label="Outbound Email"
+                       ng-model="ctrl.mail"></md-switch>
         </div>
+        <div ng-if="ctrl.mail">
+            <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Server Address</div>
+            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                   ng-model="ctrl.mail_data.server" required>
 
-        <span class="ek-admin-settings__mail__subtitle">Authentication</span>
-        <md-switch class="md-primary" aria-label="Authentication" ng-model="ctrl.mail.authentication"></md-switch>
-        <div ng-if="ctrl.mail.authentication">
-            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">SMTP Username</div>
-            <input type="text" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
-                   ng-model="ctrl.mail.server.username">
+            <div class="ek-admin-settings__subtitle">Port</div>
+            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--short"
+                   ng-model="ctrl.mail_data.port">
 
-            <div class="ek-admin-settings__mail__subtitle ek-admin-settings__mail__subtitle--required">SMTP Password</div>
-            <input type="password" class="ek-admin-settings__mail__input ek-admin-settings__mail__input--long"
-                   ng-model="ctrl.mail.server.password">
+            <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">No-Reply Address</div>
+            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                   ng-model="ctrl.mail_data.no_reply_address" required>
+
+
+            <div layout="row" layout-align="space-between center">
+                <span class="ek-admin-settings__subtitle">Authentication</span>
+                <md-switch class="md-primary" aria-label="Authentication" ng-model="ctrl.mailAuth"></md-switch>
+            </div>
+            <div ng-if="ctrl.mailAuth">
+                <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SMTP Username</div>
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                       ng-model="ctrl.mailAuth_data.username" required>
+
+                <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SMTP Password</div>
+                <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long"
+                       ng-model="ctrl.mailAuth_data.password" required>
+            </div>
+
+            <div layout="row" layout-align="space-between center">
+                <span class="ek-admin-settings__subtitle">TLS/SSL</span>
+                <md-switch class="md-primary" aria-label="tls/ssl" ng-model="ctrl.mail_data.ssl"></md-switch>
+            </div>
         </div>
-
-        <span class="ek-admin-settings__mail__subtitle">TLS/SSL</span>
-        <md-switch class="md-primary" aria-label="tls/ssl" ng-model="ctrl.tls"></md-switch>
     </div>
 
 </div>

@@ -5,6 +5,7 @@ const constants = {
     INSTANCES: 'instances',
     NAMESPACES: 'namespaces',
     USERS: 'users',
+    SETTINGS: 'settings',
 
     httpStatusCode: {
         OK: 200,
