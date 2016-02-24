@@ -26,6 +26,8 @@ spec:
           mountPath: /opt/elastickube
         - name: elastickube-run
           mountPath: /var/run
+        - name: elasticbox-home-user
+          mountPath: /home/elasticbox
       - name: elastickube-charts
         image: elasticbox/elastickube-charts
         resources:
@@ -63,3 +65,6 @@ spec:
       - name: elastickube-run
         hostPath:
           path: /var/run/elastickube
+      - name: elasticbox-home-user
+        hostPath:
+          path: /home/elasticbox
