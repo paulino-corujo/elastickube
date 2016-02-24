@@ -8,7 +8,7 @@ class WebsocketClientService {
         this._websocketActionCreator = websocketActionCreator;
 
         this._connectionAttempts = 1;
-        this._eventsSubscribed = new Set();
+        this._eventsSubscribed = {};
         this._currentOnGoingMessages = {};
     }
 
@@ -19,9 +19,17 @@ class WebsocketClientService {
             this._websocket = new WebSocket(`ws://${location.hostname}/api/v1/ws`);
 
             this._websocket.onopen = () => {
+                const watcherPromises = [];
+
                 this._connectionAttempts = 1;
                 this._reconnect = true;
-                defer.resolve();
+
+                _.each(this._eventsSubscribed, (watcher) => {
+                    watcherPromises.push(this.sendMessage(watcher)
+                        .then((response) => this._websocketActionCreator.subscribedResource(response)));
+                });
+                this._$q.all(watcherPromises)
+                    .then(() => defer.resolve());
             };
 
             this._websocket.onmessage = (evt) => {
@@ -104,7 +112,7 @@ class WebsocketClientService {
 
         return this.sendMessage(message)
             .then((response) => {
-                this._eventsSubscribed.add(action);
+                this._eventsSubscribed[action] = message;
                 this._websocketActionCreator.subscribedResource(response);
             });
     }
@@ -115,9 +123,9 @@ class WebsocketClientService {
             operation: 'unwatch'
         };
 
-        return this._$q.when(this._eventsSubscribed.has(action) && this.sendMessage(message)
+        return this._$q.when(this._eventsSubscribed[action] && this.sendMessage(message)
                 .then((response) => {
-                    this._eventsSubscribed.delete(action);
+                    delete this._eventsSubscribed[action];
                     this._websocketActionCreator.unSubscribedResource(response);
                 }));
     }
