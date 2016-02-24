@@ -74,7 +74,7 @@ class WebsocketClientService {
     disconnect() {
         const promises = [];
 
-        _.each(this._eventsSubscribed, (value) => promises.push(this.unSubscribeEvent(value)));
+        _.each(this._eventsSubscribed, (value, key) => promises.push(this.unSubscribeEvent(key)));
 
         return this._$q.all(promises)
             .then(() => {
