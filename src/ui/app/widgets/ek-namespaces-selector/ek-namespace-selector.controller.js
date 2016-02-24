@@ -4,7 +4,10 @@ class NamespacesSelectorController {
                 sessionActionCreator) {
         'ngInject';
 
-        const onChange = () => this.namespaces = this._namespacesStoreService.getAll();
+        const onChange = () => {
+            this.namespaces = this._namespacesStoreService.getAll();
+            this.namespace = _.find(this.namespaces, _.matchesProperty('metadata.uid', this.namespace.metadata.uid)) || this.namespaces[0];
+        };
         const onNamespaceChange = () => this.namespace = this._sessionStoreService.getActiveNamespace();
 
         this._$state = $state;
