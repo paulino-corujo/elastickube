@@ -1,6 +1,7 @@
 const constants = {
     SESSION_TOKEN_NAME: 'ElasticKube-Token',
 
+    CHARTS: 'charts',
     INSTANCES: 'instances',
     NAMESPACES: 'namespaces',
     USERS: 'users',

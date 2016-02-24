@@ -11,7 +11,7 @@ class AdminMenuController {
             { icon: icons.IC_SETTINGS_48PX, name: 'settings', state: 'settings' },
             { icon: icons.IC_USERS_48PX, name: 'users', state: 'users' },
             { icon: icons.IC_NAMESPACES_48PX, name: 'namespaces', state: 'namespaces' },
-            { icon: icons.IC_SETTINGS_48PX, name: 'templates', state: 'templates' },
+            { icon: icons.IC_SETTINGS_48PX, name: 'charts', state: 'charts' },
             { icon: icons.IC_SETTINGS_48PX, name: 'instances', state: 'instances' }
         ];
 

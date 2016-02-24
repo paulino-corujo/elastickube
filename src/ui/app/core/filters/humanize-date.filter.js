@@ -1,10 +1,13 @@
 import moment from 'moment';
 
-function humanizeDateFilter(input) {
+const EPOCH = 'epoch';
+
+function humanizeDateFilter(input, format) {
     let formattedDuration;
 
     if (input) {
-        const duration = moment.duration(moment.utc().local().diff(moment.utc(input).local()));
+        const inputDate = format === EPOCH ? moment.unix(input).local() : moment.utc(input).local();
+        const duration = moment.duration(moment.utc().local().diff(inputDate));
 
         formattedDuration = duration < moment.duration(5, 'minutes') ? 'a moment' : duration.humanize();
     } else {

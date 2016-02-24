@@ -1,3 +1,4 @@
+import ChartsAPIService from './charts-api.service';
 import InstancesAPIService from './instances-api.service';
 import NamespacesAPIService from './namespaces-api.service';
 import PrincipalAPIService from './principal-api.service';
@@ -10,6 +11,7 @@ const moduleName = 'blocks.api';
 angular
     .module(moduleName, [])
 
+    .service('chartsAPI', ChartsAPIService)
     .service('instancesAPI', InstancesAPIService)
     .service('namespacesAPI', NamespacesAPIService)
     .service('principalAPI', PrincipalAPIService)

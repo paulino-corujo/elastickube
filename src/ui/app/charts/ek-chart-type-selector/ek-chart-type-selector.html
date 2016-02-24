@@ -1,0 +1,8 @@
+<div class="ek-chart-type-selector__type"
+     ng-repeat="type in ctrl.types track by $index"
+     ng-class="{'ek-chart-type-selector__type--selected': ctrl.selectedType === type }"
+     ng-click="ctrl.selectType(type)"
+     layout="row" layout-align="space-between center">
+    <span class="ek-chart-type-selector__type__name">{{:: type }}</span>
+    <span class="ek-chart-type-selector__type__counter">{{ type === 'all' ? ctrl.charts.length : ctrl.typeValues[type] || 0 }}</span>
+</div>

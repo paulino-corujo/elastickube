@@ -14,6 +14,10 @@ class WebsocketActionCreatorService {
 
         switch (message.action) {
 
+            case constants.CHARTS:
+                eventName = this._actions.CHARTS_SUBSCRIBED;
+                break;
+
             case constants.INSTANCES:
                 eventName = this._actions.INSTANCES_SUBSCRIBED;
                 break;
@@ -41,6 +45,10 @@ class WebsocketActionCreatorService {
 
         switch (message.action) {
 
+            case constants.CHARTS:
+                eventName = this._actions.INSTANCES_UNSUBSCRIBED;
+                break;
+
             case constants.INSTANCES:
                 eventName = this._actions.INSTANCES_UNSUBSCRIBED;
                 break;
@@ -66,6 +74,10 @@ class WebsocketActionCreatorService {
         let eventName;
 
         switch (message.action) {
+
+            case constants.CHARTS:
+                eventName = this._actions.CHARTS_UPDATED;
+                break;
 
             case constants.INSTANCES:
                 eventName = this._actions.INSTANCES_UPDATED;
