@@ -16,7 +16,7 @@ import logging
 from tornado.gen import coroutine, Return
 
 
-WATCHABLE_OPERATIONS = ['i', 'u']
+WATCHABLE_OPERATIONS = ["i", "u", "d"]
 WATCHABLE_COLLECTIONS = [
     "elastickube.Users",
     "elastickube.Namespaces",
@@ -41,7 +41,8 @@ def add_callback(collection, coroutine_callback):
 
 
 @coroutine
-def remove_callback(namespace, coroutine_callback):
+def remove_callback(collection, coroutine_callback):
+    namespace = "elastickube.%s" % collection
     if coroutine_callback in _callbacks[namespace]:
         logging.info("Removing callback from %s namespace.", namespace)
         _callbacks[namespace].remove(coroutine_callback)
@@ -93,7 +94,7 @@ def _dispatch_documents(document):
     if namespace in _callbacks:
         try:
             results = yield dict(
-                [(callback, callback(document['o'])) for callback in _callbacks[namespace]]
+                [(callback, callback(document)) for callback in _callbacks[namespace]]
             )
 
             # Remove all failed callbacks

@@ -38,7 +38,7 @@ class UserActions(object):
 
         user = yield Query(self.database, "Users").find_one({"_id": ObjectId(user_id)})
         if user is not None:
-            user['deleted'] = datetime.utcnow().isoformat()
+            user["metadata"]["deletionTimestamp"] = datetime.utcnow().isoformat()
             yield Query(self.database, "Users").update(user)
         else:
             raise ObjectNotFoundException()

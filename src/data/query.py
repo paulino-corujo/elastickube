@@ -13,7 +13,7 @@ class Query(object):
         self.database = database
         self.collection = collection
 
-        self.default_criteria = {"$and": [{"deleted": None}]}
+        self.default_criteria = {"$and": [{"metadata.deletionTimestamp": None}]}
 
     def _generate_query(self, criteria):
         query = self.default_criteria
@@ -43,8 +43,16 @@ class Query(object):
 
     @coroutine
     def insert(self, document):
-        document["metadata"] = dict(resourceVersion=time.time())
-        document["deleted"] = None
+        if 'metadata' in document:
+            document["metadata"]["resourceVersion"] = time.time()
+            document["metadata"]["creationTimestamp"] = time.time()
+            document["metadata"]["deletionTimestamp"] = None
+        else:
+            document["metadata"] = dict(
+                resourceVersion=time.time(),
+                creationTimestamp=time.time(),
+                deletionTimestamp=None
+            )
 
         document_id = yield self.database[self.collection].insert(document)
         inserted_document = yield self.database[self.collection].find_one({"_id": document_id})
@@ -52,9 +60,16 @@ class Query(object):
 
     @coroutine
     def update(self, document):
-        document["metadata"] = dict(resourceVersion=time.time())
-
+        document["metadata"]["resourceVersion"] = time.time()
         response = yield self.database[self.collection].update({"_id": document["_id"]}, document)
+        raise Return(response)
+
+    @coroutine
+    def update_fields(self, criteria, fields):
+        update = {'$set': fields}
+        update['$set']['metadata.resourceVersion'] = time.time()
+
+        response = yield self.database[self.collection].update(criteria, update)
         raise Return(response)
 
     @coroutine

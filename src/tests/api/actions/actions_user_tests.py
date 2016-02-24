@@ -23,12 +23,12 @@ from tornado.websocket import websocket_connect
 from tests.api import get_token, ELASTICKUBE_TOKEN_HEADER
 
 
-class UserActionTests(testing.AsyncTestCase):
+class ActionsUserTests(testing.AsyncTestCase):
 
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        super(UserActionTests, self).setUp()
+        super(ActionsUserTests, self).setUp()
         self.user_id = None
         self.user_email = "test_%s@elasticbox.com" % str(uuid.uuid4())[:10]
 
@@ -36,7 +36,7 @@ class UserActionTests(testing.AsyncTestCase):
         if self.user_id:
             self._delete_user()
 
-        super(UserActionTests, self).tearDown()
+        super(ActionsUserTests, self).tearDown()
 
     @testing.gen_test
     def _delete_user(self):

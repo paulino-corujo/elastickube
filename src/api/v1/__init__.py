@@ -10,7 +10,7 @@ from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, HTTPError
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from api.v1.sync import sync_namespaces
+from api.v1.sync import SyncNamespaces
 from data import watch, init as initialize_database
 from api.kube import client
 
@@ -36,8 +36,8 @@ def configure(settings):
 @coroutine
 def initialize(settings):
     yield initialize_database(settings['database'])
-    yield sync_namespaces(settings)
 
+    yield SyncNamespaces(settings).start_sync()
     watch.start_monitor(settings['motor'])
 
 

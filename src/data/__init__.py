@@ -24,7 +24,7 @@ def init(database):
                 "resourceVersion": time.time(),
             },
             "charts": {
-              "repo_url": DEFAULT_GITREPO
+                "repo_url": DEFAULT_GITREPO
             },
             "authentication": {
                 "password": {
@@ -57,4 +57,4 @@ def migrate(database, settings):
 
         settings['schema_version'] = 2
 
-    database.Settings.update({ "_id": settings['_id'] }, settings)
+    database.Settings.update({"_id": settings['_id']}, settings)

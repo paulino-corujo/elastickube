@@ -51,7 +51,7 @@ class AuthTests(testing.AsyncTestCase):
         response = yield AsyncHTTPClient(self.io_loop).fetch(
             "http://localhost/api/v1/auth/login",
             method='POST',
-            body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube")))
+            body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube123")))
 
         self.assertTrue(response.body, "Token not included in response body")
         logging.debug("Completed login_success_test")

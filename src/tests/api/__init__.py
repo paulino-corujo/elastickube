@@ -7,7 +7,7 @@ ELASTICKUBE_TOKEN_HEADER = "ElasticKube-Token"
 
 
 @coroutine
-def get_token(io_loop, username="operations@elasticbox.com", password="elastickube"):
+def get_token(io_loop, username="operations@elasticbox.com", password="elastickube123"):
     response = yield AsyncHTTPClient(io_loop).fetch(
         "http://localhost/api/v1/auth/login",
         method="POST",
