@@ -1,6 +1,6 @@
 <div class="ek-chart-card__info" layout="column">
     <div class="ek-chart-card__info__icon" layout="row" layout-align="center">
-        <img ng-src="{{:: ctrl.chart.icon || images.CHART_DEFAULT_ICON }}">
+        <img ng-src="/icons/charts/{{ ctrl.chart._id.$oid }}">
     </div>
     <span class="ek-chart-card__info__name">{{ ctrl.chart.name }}</span>
     <span class="ek-chart-card__info__description">{{ ctrl.chart.description }}</span>
