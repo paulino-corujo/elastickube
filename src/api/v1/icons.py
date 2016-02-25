@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler
 
-from api.common import resources
+from api.resources import resources
 from api.v1 import get_icon_template, load_colors
 from data.query import Query
 
