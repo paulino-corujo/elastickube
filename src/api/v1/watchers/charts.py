@@ -21,25 +21,35 @@ class ChartsWatcher(object):
 
         self.message = message
 
-        users = yield Query(self.settings["database"], "Charts").find()
-        self.callback(dict(
+        charts = yield Query(self.settings["database"], "Charts").find()
+        response = dict(
             action=self.message["action"],
             operation="watched",
-            correlation=self.message["correlation"],
             status_code=200,
-            body=users
-        ))
+            body=charts
+        )
 
+        if "correlation" in self.message:
+            response["correlation"] = self.message["correlation"]
+
+        self.callback(response)
         add_callback("Charts", self.data_callback)
 
     @coroutine
     def data_callback(self, document):
         logging.info("ChartsWatcher data_callback")
+
+        operation = "updated"
+        if document["op"] == "u":
+            operation = "created"
+        elif document["op"] == "d":
+            operation = "deleted"
+
         self.callback(dict(
             action=self.message["action"],
-            operation="watched",
+            operation=operation,
             status_code=200,
-            body=document
+            body=document["o"]
         ))
 
         raise Return()

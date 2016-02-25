@@ -13,8 +13,6 @@ from api.kube.pods import Pods
 from api.kube.replication_controllers import ReplicationControllers
 from api.kube.services import Services
 
-AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
-
 
 class HTTPClient(object):
 
@@ -25,23 +23,23 @@ class HTTPClient(object):
         self.token = token
         self.version = version
 
-        self._base_url = 'https://{0}/api/{1}'.format(self.server, self.version)
+        self._base_url = "https://{0}/api/{1}".format(self.server, self.version)
 
         defaults = dict(validate_cert=False)
         if self.username and self.password:
-            defaults['auth_username'] = self.username
-            defaults['auth_password'] = self.password
+            defaults["auth_username"] = self.username
+            defaults["auth_password"] = self.password
 
-        AsyncHTTPClient.configure(None, defaults=defaults)
+        AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient", defaults=defaults)
 
     def build_url(self, url_path, **kwargs):
-        if url_path.startswith('/'):
+        if url_path.startswith("/"):
             url = self._base_url + url_path
         else:
-            url = self._base_url + '/' + url_path
+            url = self._base_url + "/" + url_path
 
         params = {
-            'namespace': kwargs.pop('namespace', 'default')
+            "namespace": kwargs.pop("namespace", "default")
         }
 
         for param in kwargs.iterkeys():
@@ -51,10 +49,10 @@ class HTTPClient(object):
         return url.format(**params)
 
     def build_params(self, url_path, **kwargs):
-        if url_path.startswith('/'):
+        if url_path.startswith("/"):
             url = self._base_url + url_path
         else:
-            url = self._base_url + '/' + url_path
+            url = self._base_url + "/" + url_path
 
         keys = kwargs.keys()
         for key in keys:
@@ -64,9 +62,9 @@ class HTTPClient(object):
         return kwargs
 
     def build_headers(self, content_type=None):
-        headers = {'Authorization': 'Bearer {0}'.format(self.token)}
+        headers = {"Authorization": "Bearer %s" % self.token}
         if content_type:
-            headers['Content-type'] = content_type
+            headers["Content-type"] = content_type
 
         return headers
 
@@ -77,7 +75,7 @@ class HTTPClient(object):
 
         client = AsyncHTTPClient()
         try:
-            result = yield client.fetch(url, method='GET', headers=self.build_headers())
+            result = yield client.fetch(url, method="GET", headers=self.build_headers())
             raise Return(result)
         finally:
             client.close()
@@ -91,8 +89,8 @@ class HTTPClient(object):
         try:
             result = yield client.fetch(
                 url,
-                method='POST',
-                headers=self.build_headers('application/json'),
+                method="POST",
+                headers=self.build_headers("application/json"),
                 **params)
 
             raise Return(result)
@@ -108,8 +106,8 @@ class HTTPClient(object):
         try:
             result = yield client.fetch(
                 url,
-                method='PUT',
-                headers=self.build_headers('application/json'),
+                method="PUT",
+                headers=self.build_headers("application/json"),
                 **params)
 
             raise Return(result)
@@ -122,7 +120,7 @@ class HTTPClient(object):
         try:
             response = yield client.fetch(
                 self.build_url(url_path, **kwargs),
-                method='DELETE',
+                method="DELETE",
                 headers=self.build_headers())
             raise Return(response)
         finally:
@@ -137,8 +135,8 @@ class HTTPClient(object):
         try:
             result = yield client.fetch(
                 url,
-                method='PATCH',
-                headers=self.build_headers('application/merge-patch+json'),
+                method="PATCH",
+                headers=self.build_headers("application/merge-patch+json"),
                 **params)
 
             raise Return(result)
@@ -161,15 +159,15 @@ class HTTPClient(object):
 
         request = HTTPRequest(
             url=url,
-            method='GET',
+            method="GET",
             headers=self.build_headers(),
             request_timeout=3600,
             streaming_callback=data_callback)
 
         client = AsyncHTTPClient()
         future = WatchFuture()
-        chain_future(client.fetch(request), future)
 
+        chain_future(client.fetch(request), future)
         yield future
 
 
@@ -196,7 +194,7 @@ class KubeClient(object):
             else:
                 return "{0} {1} returned {2}".format(error_method, error_url, error.code)
         else:
-            return 'Watch error'
+            return error.message
 
     @coroutine
     def get(self, url_path, **kwargs):

@@ -77,19 +77,9 @@ class Resources(object):
         raise Return(result)
 
     @coroutine
-    def watch(self, name=None, namespace='default', on_data=None, resource_version=None):
-        params = dict(namespace=namespace)
-
-        if resource_version:
-            params['resourceVersion'] = resource_version
-        else:
-            response = yield self.get(name=name, namespace=namespace)
-
-            for item in response.get('items', []):
-                on_data(item)
-                params['resourceVersion'] = response['metadata']['resourceVersion']
-
+    def watch(self, name=None, namespace='default', resource_version=None, on_data=None):
         url_path = '/watch' + self.base_url_path
+        params = dict(namespace=namespace, resourceVersion=resource_version)
         if name:
             url_path += '/{name}'
             params['name'] = name

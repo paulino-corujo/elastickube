@@ -21,30 +21,40 @@ class SettingsWatcher(object):
 
         self.message = message
 
-        settings = yield Query(self.settings["database"], "Settings").find_one()
-        self.callback(dict(
+        settings = yield Query(self.settings["database"], "Settings").find()
+        response = dict(
             action=self.message["action"],
             operation="watched",
-            correlation=self.message["correlation"],
             status_code=200,
-            body=[settings]
-        ))
+            body=settings
+        )
 
+        if "correlation" in self.message:
+            response["correlation"] = self.message["correlation"]
+
+        self.callback(response)
         add_callback("Settings", self.data_callback)
 
     @coroutine
     def data_callback(self, document):
         logging.debug("SettingsWatcher data_callback")
+
+        operation = "updated"
+        if document["op"] == "u":
+            operation = "created"
+        elif document["op"] == "d":
+            operation = "deleted"
+
         self.callback(dict(
             action=self.message["action"],
-            operation="watched",
+            operation=operation,
             status_code=200,
-            body=document
+            body=document["o"]
         ))
 
         raise Return()
 
     def unwatch(self):
         logging.info("Stopping watch Settings")
-        remove_callback("elastickube.Settings", self.data_callback)
+        remove_callback("Settings", self.data_callback)
         self.message = None

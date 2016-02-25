@@ -8,7 +8,6 @@ from git.repo import Repo
 from git.exc import InvalidGitRepositoryError
 from yaml import load, load_all
 from tornado.gen import coroutine, Return, sleep
-from tornado.iostream import PipeIOStream
 
 
 REPO_DIRECTORY = '/var/elastickube/charts'
@@ -27,7 +26,6 @@ class GitSync(object):
         except InvalidGitRepositoryError:
             logging.info("Cloning repository in %s", REPO_DIRECTORY)
             self.repo = Repo.clone_from(settings['charts']['repo_url'], REPO_DIRECTORY)
-
 
     @coroutine
     def sync_loop(self):

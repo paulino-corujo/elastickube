@@ -68,10 +68,12 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         response = dict(
             action=request["action"],
-            correlation=request["correlation"],
             body={},
             status_code=200
         )
+
+        if "correlation" in request:
+            response["correlation"] = request["correlation"]
 
         if request["operation"] in REST_OPERATIONS:
             action = self.actions_lookup[request["action"]].get("rest", None)
@@ -107,6 +109,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         elif request["operation"] in WATCH_OPERATIONS:
             if request["operation"] == "watch":
+
                 response["operation"] = "watched"
 
                 watcher = self.actions_lookup[request["action"]].get("watchers", None)
@@ -117,6 +120,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                         self.write_message(response)
 
                     else:
+
                         self.current_watchers[request["action"]] = watcher.watch(request)
                 else:
                     response["body"] = {"message": "Action not supported for operation watch."}
