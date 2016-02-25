@@ -1,0 +1,50 @@
+@import "../../colors";
+
+.ek-invite-users {
+
+    &__emails {
+        margin: 5px 0;
+    }
+
+    &__note {
+        border: 1px solid @grey300;
+        padding: 10px;
+        height: 100px;
+        width: 100%;
+        max-height: 100px;
+        min-height: 100px;
+        max-width: 100%;
+        min-width: 100%;
+    }
+
+    md-dialog {
+        width: 540px;
+        max-width: initial;
+
+        md-dialog-content {
+            padding: 40px 30px 10px 30px;
+
+            h2 {
+                margin: 40px 0;
+                font-size: 18px;
+                font-weight: 500;
+            }
+
+            h3 {
+                font-size: 16px;
+                font-weight: 400;
+                color: @grey500;
+                margin: 0;
+            }
+        }
+
+        md-dialog-actions {
+            padding: 10px 30px 30px 30px;
+            width: 540px;
+
+            .md-button {
+                margin: 0 0 0 10px;
+            }
+        }
+    }
+}

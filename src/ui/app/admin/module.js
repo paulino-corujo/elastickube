@@ -13,6 +13,7 @@ import AdminUsersDirective from './ek-admin-users/ek-admin-users.directive';
 import AdminNamespacesDirective from './ek-admin-namespaces/ek-admin-namespaces.directive';
 import AdminChartsDirective from './ek-admin-charts/ek-admin-charts.directive';
 import AdminInstancesDirective from './ek-admin-instances/ek-admin-instances.directive';
+import InviteUsersDirective from './ek-invite-users/ek-invite-users.directive';
 
 const moduleName = 'app.admin';
 
@@ -32,6 +33,7 @@ angular
     .directive('ekAdminUsers', () => new AdminUsersDirective())
     .directive('ekAdminNamespaces', () => new AdminNamespacesDirective())
     .directive('ekAdminTemplates', () => new AdminChartsDirective())
-    .directive('ekAdminInstances', () => new AdminInstancesDirective());
+    .directive('ekAdminInstances', () => new AdminInstancesDirective())
+    .directive('ekInviteUsers', () => new InviteUsersDirective());
 
 export default moduleName;
