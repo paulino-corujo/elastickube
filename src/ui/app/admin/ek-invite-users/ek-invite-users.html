@@ -1,0 +1,24 @@
+<md-dialog>
+    <md-dialog-content>
+
+        <h2>Invite users</h2>
+
+        <h3>People</h3>
+
+        <div layout="row">
+            <ek-insert-emails class="ek-invite-users__emails" emails="ctrl.emails" flex></ek-insert-emails>
+        </div>
+
+        <textarea class="ek-invite-users__note"
+                  ng-model="ctrl.note"
+                  placeholder="Add a note"></textarea>
+
+    </md-dialog-content>
+
+    <md-dialog-actions>
+        <md-button ng-click="ctrl.cancel()">cancel</md-button>
+        <md-button ng-click="ctrl.send()"
+                   ng-disabled="ctrl.emails.length === 0"
+                   class="md-raised md-primary">send</md-button>
+    </md-dialog-actions>
+</md-dialog>

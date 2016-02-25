@@ -21,7 +21,6 @@ class AdminChartsController {
             enableSelectAll: true,
             selectionRowHeaderWidth: 50,
             rowHeight: 50,
-            showGridFooter: true,
             columnDefs: [
                 {
                     name: 'name',

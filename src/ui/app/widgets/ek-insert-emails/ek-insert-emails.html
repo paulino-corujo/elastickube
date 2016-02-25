@@ -1,0 +1,24 @@
+<div class="ek-insert-emails__container" layout="row" layout-wrap ng-form="ctrl.form">
+
+    <div class="ek-chip"
+         ng-repeat="email in ctrl.emails">
+        <md-icon class="ek-insert-emails__person-icon"
+                 md-svg-src="{{:: icons.IC_PERSON_48PX }}"></md-icon>
+        <span>{{ email }}</span>
+        <md-icon class="ek-insert-emails__clear-icon"
+                 md-svg-src="{{:: icons.IC_CLEAR_48PX }}"
+                 ng-click="ctrl.removeEmail(email)"></md-icon>
+    </div>
+
+    <input type="email"
+           name="email"
+           class="ek-insert-emails__input"
+           autocomplete="off"
+           style="min-width:140px"
+           ng-keypress="ctrl.addEmail($event)"
+           ng-model="ctrl.email" placeholder="{{ ctrl.placeholder }}" flex>
+</div>
+
+<div class="ek-insert-emails__error"
+     ng-if="ctrl.emailError">The email is not valid
+</div>

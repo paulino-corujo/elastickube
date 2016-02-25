@@ -13,11 +13,25 @@
             <ek-search-filter collection-to-be-filtered="ctrl.users"
                               filtered-collection="ctrl.filteredUsers"></ek-search-filter>
         </div>
-        <md-button class="md-raised md-primary">new</md-button>
+        <md-button class="md-raised md-primary" ng-click="ctrl.inviteUsers()">invite</md-button>
     </div>
 
-    <div class="ek-admin-users__body" flex>
-        <div class="ek-admin-users__body__table ek-table" ui-grid="ctrl.gridOptions" ui-grid-selection></div>
+    <div class="ek-admin-users__body" flex layout="column">
+        <div class="ek-admin-users__body__table-container"
+             ng-style="{ height: ctrl.filteredUsers.length < 5 ? (ctrl.filteredUsers.length * 50) + 32 + 'px' : '100%'}">
+            <div class="ek-admin-users__body__table-container__table ek-table"
+                 ng-style="{ height: ctrl.filteredUsers.length < 5 ? (ctrl.filteredUsers.length * 50) + 32 + 'px' : '100%'}"
+                 ui-grid="ctrl.gridOptions" ui-grid-selection></div>
+        </div>
+
+        <div class="ek-admin-users__body__invite"
+             ng-if="ctrl.filteredUsers.length < 5"
+             layout="row" layout-align="center center">
+            <div layout="column" layout-align="center center">
+                <h2>Get started by inviting your team</h2>
+                <md-button class="md-raised md-primary" ng-click="ctrl.inviteUsers()">invite</md-button>
+            </div>
+        </div>
     </div>
 </div>
 

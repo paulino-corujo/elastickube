@@ -1,8 +1,10 @@
 import rowTemplate from './ek-admin-users-row.template.html';
 
 class AdminUsersController {
-    constructor($scope, usersStore) {
+    constructor($scope, adminNavigationActionCreator, usersStore) {
         'ngInject';
+
+        this._adminNavigationActionCreator = adminNavigationActionCreator;
 
         this.bulkActions = 'Bulk Actions';
         this.users = usersStore.getAll();
@@ -16,7 +18,6 @@ class AdminUsersController {
             enableSelectAll: true,
             selectionRowHeaderWidth: 50,
             rowHeight: 50,
-            showGridFooter: true,
             columnDefs: [
                 {
                     name: 'name',
@@ -53,6 +54,10 @@ class AdminUsersController {
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
             }
         };
+    }
+
+    inviteUsers() {
+        return this._adminNavigationActionCreator.inviteUsers();
     }
 }
 
