@@ -1,7 +1,6 @@
-import __main__
 import os
 
-ROOT_PATH = os.path.dirname(getattr(__main__, '__file__', '.'))
+ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 IF_MODIFIED_HEADER = 'If-Modified-Since'
 ACCEPT_HEADER = 'Accept'
