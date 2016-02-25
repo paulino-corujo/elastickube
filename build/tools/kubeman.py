@@ -38,12 +38,14 @@ def add_user(arguments):
             password=arguments.password,
             firstname=arguments.first,
             lastname=arguments.last,
-            role="administrator",
+            role=arguments.role,
             schema="http://elasticbox.net/schemas/user",
             email_validated_at=datetime.utcnow().isoformat(),
-            created=datetime.utcnow().isoformat(),
-            updated=datetime.utcnow().isoformat(),
-            deleted=None
+            metadata=dict(
+                resourceVersion=time.time(),
+                creationTimestamp=time.time(),
+                deletionTimestamp=None
+            )
         )
 
         database.Users.insert(user)
@@ -146,6 +148,13 @@ if __name__ == '__main__':
         required=False,
         dest='password',
         help='User password')
+    add_user_parser.add_argument(
+        '-r',
+        '--role',
+        default='administrator',
+        required=False,
+        dest='role',
+        help='User role')
 
     database_parser = subparsers.add_parser('database', help='Database management command')
     database_parser.add_argument(

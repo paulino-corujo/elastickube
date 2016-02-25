@@ -11,6 +11,9 @@ class NamespaceActions(object):
         logging.info("Initializing UserActions")
         self.kube_client = settings['kube']
 
+    def check_permissions(self, user, operation, body):
+        return True
+
     @coroutine
     def create(self, namespace):
         logging.info("Creating namespace")

@@ -72,18 +72,18 @@ class ActionsUserTests(testing.AsyncTestCase):
 
         message = yield connection.read_message()
         deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message['status_code'] == 200,
-                        "Status code is %d instead of 200" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message['correlation'] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message['correlation'])
-        self.assertTrue(deserialized_message['operation'] == "created",
-                        "Operation is %s instead of created" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "users",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(deserialized_message['body']['email'] == self.user_email,
-                        "Email is %s instead of '%s'" % (deserialized_message['body']['username'], self.user_email))
+        self.assertTrue(deserialized_message["status_code"] == 200,
+                        "Status code is %d instead of 200" % deserialized_message["status_code"])
+        self.assertTrue(deserialized_message["correlation"] == 123,
+                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
+        self.assertTrue(deserialized_message["operation"] == "created",
+                        "Operation is %s instead of created" % deserialized_message["operation"])
+        self.assertTrue(deserialized_message["action"] == "users",
+                        "Action is %s instead of users" % deserialized_message["action"])
+        self.assertTrue(isinstance(deserialized_message["body"], dict),
+                        "Body is not a dict but %s" % type(deserialized_message["body"]))
+        self.assertTrue(deserialized_message["body"]["email"] == self.user_email,
+                        "Email is %s instead of '%s'" % (deserialized_message["body"]["username"], self.user_email))
 
         self.user_id = deserialized_message["body"]["_id"]["$oid"]
         connection.write_message(json.dumps({
@@ -95,16 +95,16 @@ class ActionsUserTests(testing.AsyncTestCase):
 
         message = yield connection.read_message()
         deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message['status_code'] == 200,
-                        "Status code is %d instead of 200" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message['correlation'] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message['correlation'])
-        self.assertTrue(deserialized_message['operation'] == "deleted",
-                        "Operation is %s instead of deleted" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "users",
-                        "Action is %s instead of users" % deserialized_message['action'])
+        self.assertTrue(deserialized_message["status_code"] == 200,
+                        "Status code is %d instead of 200" % deserialized_message["status_code"])
+        self.assertTrue(deserialized_message["correlation"] == 123,
+                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
+        self.assertTrue(deserialized_message["operation"] == "deleted",
+                        "Operation is %s instead of deleted" % deserialized_message["operation"])
+        self.assertTrue(deserialized_message["action"] == "users",
+                        "Action is %s instead of users" % deserialized_message["action"])
         self.assertIsNone(deserialized_message["body"],
-                          "Body is not a None but %s" % deserialized_message['body'])
+                          "Body is not a None but '%s'" % deserialized_message["body"])
 
         connection.write_message(json.dumps({
             "action": "users",
@@ -116,18 +116,18 @@ class ActionsUserTests(testing.AsyncTestCase):
         message = yield connection.read_message()
         deserialized_message = json.loads(message)
         expected_message = "users %s not found." % self.user_id
-        self.assertTrue(deserialized_message['status_code'] == 404,
-                        "Status code is %d instead of 404" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message['correlation'] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message['correlation'])
-        self.assertTrue(deserialized_message['operation'] == "deleted",
-                        "Operation is %s instead of deleted" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "users",
-                        "Action is %s instead of users" % deserialized_message['action'])
+        self.assertTrue(deserialized_message["status_code"] == 404,
+                        "Status code is %d instead of 404" % deserialized_message["status_code"])
+        self.assertTrue(deserialized_message["correlation"] == 123,
+                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
+        self.assertTrue(deserialized_message["operation"] == "deleted",
+                        "Operation is %s instead of deleted" % deserialized_message["operation"])
+        self.assertTrue(deserialized_message["action"] == "users",
+                        "Action is %s instead of users" % deserialized_message["action"])
         self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
+                        "Body is not a dict but %s" % type(deserialized_message["body"]))
         self.assertTrue(deserialized_message["body"]["message"] == expected_message,
-                        "Message is %s instead of '%s'" % (deserialized_message['body']["message"], expected_message))
+                        "Message is %s instead of '%s'" % (deserialized_message["body"]["message"], expected_message))
 
         connection.close()
         logging.debug("Completed create_user_test")
@@ -161,18 +161,18 @@ class ActionsUserTests(testing.AsyncTestCase):
 
         message = yield connection.read_message()
         deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message['status_code'] == 200,
-                        "Status code is %d instead of 200" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message['correlation'] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message['correlation'])
-        self.assertTrue(deserialized_message['operation'] == "created",
-                        "Operation is %s instead of created" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "users",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(deserialized_message['body']['email'] == self.user_email,
-                        "Email is %s instead of '%s'" % (deserialized_message['body']['username'], self.user_email))
+        self.assertTrue(deserialized_message["status_code"] == 200,
+                        "Status code is %d instead of 200" % deserialized_message["status_code"])
+        self.assertTrue(deserialized_message["correlation"] == 123,
+                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
+        self.assertTrue(deserialized_message["operation"] == "created",
+                        "Operation is %s instead of created" % deserialized_message["operation"])
+        self.assertTrue(deserialized_message["action"] == "users",
+                        "Action is %s instead of users" % deserialized_message["action"])
+        self.assertTrue(isinstance(deserialized_message["body"], dict),
+                        "Body is not a dict but %s" % type(deserialized_message["body"]))
+        self.assertTrue(deserialized_message["body"]["email"] == self.user_email,
+                        "Email is %s instead of '%s'" % (deserialized_message["body"]["username"], self.user_email))
 
         self.user_id = deserialized_message["body"]["_id"]["$oid"]
         connection.write_message(json.dumps({
@@ -192,25 +192,25 @@ class ActionsUserTests(testing.AsyncTestCase):
 
         message = yield connection.read_message()
         deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message['status_code'] == 409,
-                        "Status code is %d instead of 409" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message['correlation'] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message['correlation'])
-        self.assertTrue(deserialized_message['operation'] == "created",
-                        "Operation is %s instead of created" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "users",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
+        self.assertTrue(deserialized_message["status_code"] == 409,
+                        "Status code is %d instead of 409" % deserialized_message["status_code"])
+        self.assertTrue(deserialized_message["correlation"] == 123,
+                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
+        self.assertTrue(deserialized_message["operation"] == "created",
+                        "Operation is %s instead of created" % deserialized_message["operation"])
+        self.assertTrue(deserialized_message["action"] == "users",
+                        "Action is %s instead of users" % deserialized_message["action"])
+        self.assertTrue(isinstance(deserialized_message["body"], dict),
+                        "Body is not a dict but %s" % type(deserialized_message["body"]))
 
-        expected_message = 'E11000 duplicate key error collection: elastickube.Users index: email_1 dup '\
-            'key: { : "%s" }' % self.user_email
+        expected_message = "E11000 duplicate key error collection: elastickube.Users index: email_1 dup "\
+            "key: { : \"%s\" }" % self.user_email
 
-        self.assertTrue(deserialized_message['body']['message'] == expected_message,
-                        "Message is %s instead of '%s'" % (deserialized_message['body']["message"], expected_message))
+        self.assertTrue(deserialized_message["body"]["message"] == expected_message,
+                        "Message is %s instead of '%s'" % (deserialized_message["body"]["message"], expected_message))
 
         logging.debug("Completed duplicate_user_test")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     testing.main()

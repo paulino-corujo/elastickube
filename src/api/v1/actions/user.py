@@ -13,6 +13,9 @@ class UserActions(object):
         logging.info("Initializing UserActions")
         self.database = settings['database']
 
+    def check_permissions(self, user, operation, body):
+        return True
+
     @coroutine
     def create(self, document):
         logging.info("Creating user")

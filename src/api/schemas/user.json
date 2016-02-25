@@ -4,10 +4,8 @@
   "type": "object",
   "required": [
     "_id",
-    "deleted",
     "email",
     "firstname",
-    "last_login",
     "lastname",
     "metadata",
     "role",
@@ -20,9 +18,6 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 36
-    },
-    "deleted": {
-      "type": "string"
     },
     "email": {
       "type": "string",
@@ -56,6 +51,12 @@
     "metadata": {
       "type": "object",
       "properties": {
+        "creationTimestamp": {
+          "type": "number"
+        },
+        "deletionTimestamp": {
+          "type": "number"
+        },
         "resourceVersion": {
           "type": "number"
         }
