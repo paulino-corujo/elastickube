@@ -2,7 +2,7 @@ import logging
 
 from bson.json_util import loads
 from pymongo.errors import DuplicateKeyError
-from tornado.gen import coroutine, Return
+from tornado.gen import coroutine, Return, Future
 
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.charts import ChartsWatcher
@@ -49,12 +49,11 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             )
         )
 
-    @coroutine
     def open(self):
         logging.info("Initializing MainWebSocketHandler")
 
         try:
-            yield super(MainWebSocketHandler, self).open()
+            super(MainWebSocketHandler, self).open()
         except Exception as e:
             logging.exception(e)
             self.write_message({"error": {"message": "Cannot open connection"}})
@@ -62,6 +61,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
     @coroutine
     def on_message(self, message):
+        # Wait the user to be authenticated before accepting message
+        if isinstance(self.user, Future):
+            self.user = yield self.user
+
         request = yield self.validate_message(message)
         if not request:
             raise Return()
@@ -76,32 +79,49 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         if request["operation"] in REST_OPERATIONS:
             action = self.actions_lookup[request["action"]].get("rest", None)
             if action:
-                if request["operation"] == "create":
-                    response["operation"] = "created"
+                if (not hasattr(type(action), request["operation"]) or
+                        not callable(getattr(type(action), request["operation"]))):
+                    response["status_code"] = 405
+                    response["operation"] = request["operation"]
+                    response["body"] = {
+                        "message": "Operation %s not supported for action %s." % (
+                            request["operation"], request["action"])
+                    }
+                else:
+                    if not action.check_permissions(self.user, request["operation"], request["body"]):
+                        response["status_code"] = 403
+                        response["operation"] = request["operation"]
+                        response["body"] = {
+                            "message": "Operation %s forbidden for action %s." % (
+                                request["operation"], request["action"])
+                        }
+                    else:
+                        if request["operation"] == "create":
+                            response["operation"] = "created"
 
-                    try:
-                        response["body"] = yield action.create(request["body"])
-                    except DuplicateKeyError as e:
-                        response["body"] = {"message": e.message}
-                        response["status_code"] = 409
+                            try:
+                                response["body"] = yield action.create(request["body"])
+                            except DuplicateKeyError as e:
+                                response["body"] = {"message": e.message}
+                                response["status_code"] = 409
 
-                elif request["operation"] == "update":
-                    response["operation"] = "updated"
-                    response["body"] = yield action.update(request["body"])
+                        elif request["operation"] == "update":
+                            response["operation"] = "updated"
+                            response["body"] = yield action.update(request["body"])
 
-                elif request["operation"] == "delete":
-                    response["operation"] = "deleted"
+                        elif request["operation"] == "delete":
+                            response["operation"] = "deleted"
 
-                    try:
-                        response["body"] = yield action.delete(request["body"]["_id"])
-                    except ObjectNotFoundException:
-                        response["body"] = {"message": "%s %s not found." % (request["action"], request["body"]["_id"])}
-                        response["status_code"] = 404
+                            try:
+                                response["body"] = yield action.delete(request["body"]["_id"])
+                            except ObjectNotFoundException:
+                                response["body"] = {"message": "%s %s not found." % (
+                                    request["action"], request["body"]["_id"])}
+                                response["status_code"] = 404
             else:
                 response["status_code"] = 400
-                response["body"] = {
-                    "message": "Operation %s not supported for action %s." % (request["operation"], request["action"])
-                }
+                response["operation"] = request["operation"]
+                response["body"] = {"message": "Action %s does not support operations." % request["action"]}
 
             self.write_message(response)
 

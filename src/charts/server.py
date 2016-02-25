@@ -3,6 +3,7 @@ import logging
 
 from tornado import autoreload
 from tornado.ioloop import IOLoop
+
 from charts.sync import initialize
 
 

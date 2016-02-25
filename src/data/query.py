@@ -61,7 +61,7 @@ class Query(object):
     @coroutine
     def update(self, document):
         document["metadata"]["resourceVersion"] = time.time()
-        response = yield self.database[self.collection].update({"_id": document["_id"]}, document)
+        response = yield self.database[self.collection].update({"_id": document["_id"]}, document, upsert=True)
         raise Return(response)
 
     @coroutine

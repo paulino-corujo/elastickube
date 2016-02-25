@@ -26,7 +26,7 @@ class IconGenerator(RequestHandler):
             self.set_status(httplib.BAD_REQUEST)
             raise Return()
 
-        if not entity_id in ICON_ENTITIES:
+        if entity_id not in ICON_ENTITIES:
             self.set_status(httplib.NOT_FOUND)
             raise Return()
 

@@ -14,14 +14,15 @@ def init(database):
 
     yield setup_indexes(database)
 
-    settings = yield database.Settings.find_one({"deleted": None})
+    settings = yield database.Settings.find_one({"metadata.deletionTimestamp": None})
 
     if not settings:
         result = yield database.Settings.insert({
-            "deleted": None,
             "schema": "http://elasticbox.net/schemas/settings",
             "metadata": {
                 "resourceVersion": time.time(),
+                "creationTimestamp": time.time(),
+                "deletionTimestamp": None
             },
             "charts": {
                 "repo_url": DEFAULT_GITREPO
@@ -44,7 +45,7 @@ def init(database):
 def setup_indexes(database):
     yield database.Users.ensure_index(key_or_list="email", unique=True, sparse=True)
     yield database.Users.ensure_index(key_or_list="username", unique=True, sparse=True)
-    yield database.Users.ensure_index(key_or_list="deleted", unique=False, sparse=True)
+    yield database.Users.ensure_index(key_or_list="metadata.deletionTimestamp", unique=False, sparse=True)
 
 
 def migrate(database, settings):

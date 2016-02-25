@@ -51,7 +51,6 @@ class SecureWebSocketHandler(WebSocketHandler):
         self.user = None
         self.ping_timeout_handler = None
 
-    @coroutine
     def open(self):
         self.ping_timeout_handler = IOLoop.current().add_timeout(PING_FREQUENCY, self.send_ping)
 
@@ -65,7 +64,7 @@ class SecureWebSocketHandler(WebSocketHandler):
                 raise HTTPError(401, "Invalid token.")
 
             token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
-            self.user = yield self.settings["database"].Users.find_one({"username": token["username"]})
+            self.user = self.settings["database"].Users.find_one({"username": token["username"]})
 
             if self.user is None:
                 logging.debug("User not found.")
