@@ -1,13 +1,15 @@
+import datetime
 import logging
+import json
 import jwt
 import os
 
 from bson.json_util import dumps
 from datetime import timedelta
 from motor.motor_tornado import MotorClient
-from tornado.gen import coroutine, Return
+from tornado.gen import coroutine
 from tornado.ioloop import IOLoop
-from tornado.web import RequestHandler, HTTPError
+from tornado.web import HTTPError
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from api.v1.sync import SyncNamespaces
@@ -109,3 +111,23 @@ class SecureWebSocketHandler(WebSocketHandler):
 
     def data_received(self, _origin):
         return True
+
+
+def get_icon_template(icon_template_file):
+    with open(icon_template_file, 'r') as box_icon:
+        template = box_icon.read()
+
+    timestamp = os.path.getmtime(icon_template_file)
+
+    return {
+        "template": template,
+        "last_modified": datetime.datetime.utcfromtimestamp(timestamp)
+    }
+
+
+def load_colors(color_definition_template):
+    colors = {}
+    with open(color_definition_template) as colors_file:
+        for color_name, color_value in json.load(colors_file).iteritems():
+            colors[color_name] = color_value
+    return colors
