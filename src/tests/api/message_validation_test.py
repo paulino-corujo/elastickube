@@ -61,6 +61,16 @@ class MessageValidationTest(testing.AsyncTestCase):
                            " does not contain 'operation'\""
         self.assertTrue(message == expected_message, "Received %s instead of '%s'" % (message, expected_message))
 
+        connection.write_message(json.dumps({
+            "action": "users",
+            "operation": "create"
+        }))
+
+        message = yield connection.read_message()
+        expected_message = "\"Message {\\\"action\\\": \\\"users\\\", \\\"operation\\\": \\\"create\\\"}" \
+                           " does not contain 'correlation'\""
+        self.assertTrue(message == expected_message, "Received %s instead of '%s'" % (message, expected_message))
+
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
             "action": "fake_action",

@@ -22,17 +22,14 @@ class NamespacesWatcher(object):
         self.message = message
 
         namespaces = yield Query(self.settings["database"], "Namespaces").find()
-        response = dict(
+        self.callback(dict(
             action=self.message["action"],
             operation="watched",
+            correlation=self.message["correlation"],
             status_code=200,
             body=namespaces
-        )
+        ))
 
-        if "correlation" in self.message:
-            response["correlation"] = self.message["correlation"]
-
-        self.callback(response)
         add_callback("Namespaces", self.data_callback)
 
     @coroutine

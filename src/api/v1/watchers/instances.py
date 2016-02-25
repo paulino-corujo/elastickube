@@ -110,17 +110,13 @@ class InstancesWatcher(object):
         self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
         items.extend(result.get("items", []))
 
-        response = dict(
+        self.callback(dict(
             action=self.message["action"],
             operation="watched",
+            correlation=self.message["correlation"],
             status_code=200,
             body=items
-        )
-
-        if "correlation" in self.message:
-            response["correlation"] = self.message["correlation"]
-
-        self.callback(response)
+        ))
 
     def unwatch(self):
         logging.info("Stopping watch Instances for namespace %s" % self.namespace)
