@@ -15,7 +15,7 @@ import logging
 import uuid
 
 from tornado import testing
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
+from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
 from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
@@ -57,6 +57,7 @@ class WatchSettingsTest(testing.AsyncTestCase):
         self.assertTrue(isinstance(deserialized_message["body"], list),
                         "Body is not a list but %s" % type(deserialized_message["body"]))
         self.assertTrue(len(deserialized_message["body"]) > 0, "No Settings returned as part of the response")
+        self.assertTrue(len(deserialized_message["body"]) < 2, "Multiple Settings returned as part of the response")
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({

@@ -183,6 +183,9 @@ class KubeClient(object):
         self.replication_controllers = ReplicationControllers(self)
         self.services = Services(self)
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
     def format_error(self, error):
         if error.code != 599:
             error_message = error.response.body

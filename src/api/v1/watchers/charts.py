@@ -53,5 +53,5 @@ class ChartsWatcher(object):
 
     def unwatch(self):
         logging.info("Stopping watch Charts")
-        remove_callback("elastickube.Charts", self.data_callback)
+        remove_callback("Charts", self.data_callback)
         self.message = None

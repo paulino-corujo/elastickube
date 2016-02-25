@@ -62,7 +62,11 @@ class Query(object):
     def update(self, document):
         document["metadata"]["resourceVersion"] = time.time()
         response = yield self.database[self.collection].update({"_id": document["_id"]}, document, upsert=True)
-        raise Return(response)
+        if response['n'] == 0:
+            raise ObjectNotFoundException()
+
+        inserted_document = yield self.database[self.collection].find_one({"_id": document["_id"]})
+        raise Return(inserted_document)
 
     @coroutine
     def update_fields(self, criteria, fields):

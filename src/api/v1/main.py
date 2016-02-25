@@ -6,6 +6,7 @@ from tornado.gen import coroutine, Return, Future
 
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.charts import ChartsWatcher
+from api.v1.watchers.instance import InstanceWatcher
 from api.v1.watchers.instances import InstancesWatcher
 from api.v1.watchers.namespaces import NamespacesWatcher
 from api.v1.watchers.settings import SettingsWatcher
@@ -17,7 +18,7 @@ from data.query import ObjectNotFoundException
 
 REST_OPERATIONS = ["create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
-SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "charts"]
+SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instance", "instances", "charts"]
 
 
 class MainWebSocketHandler(SecureWebSocketHandler):
@@ -31,6 +32,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         self.actions_lookup = dict(
             instances=dict(
                 watchers=InstancesWatcher(self.settings, self.write_message)
+            ),
+            instance=dict(
+                watchers=InstanceWatcher(self.settings, self.write_message)
             ),
             charts=dict(
                 watchers=ChartsWatcher(self.settings, self.write_message)

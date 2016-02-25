@@ -37,9 +37,13 @@ class Resources(object):
             params['name'] = name
 
         if self.selector:
-            params['labelSelector'] = ''
-            for k, v in self.selector.iteritems():
-                params['labelSelector'] = params['labelSelector'] + k + '=' + v
+            for selector, selector_values in self.selector.iteritems():
+                params[selector] = ''
+                for index, (key, value) in enumerate(selector_values.iteritems()):
+                    if index == 0:
+                        params[selector] = '%s=%s' % (key, value)
+                    else:
+                        params[selector] += ',%s=%s' % (key, value)
 
         result = yield self.api.get(url_path, **params)
         raise Return(result)
@@ -85,9 +89,13 @@ class Resources(object):
             params['name'] = name
 
         if self.selector:
-            params['labelSelector'] = ''
-            for k, v in self.selector.iteritems():
-                params['labelSelector'] = params['labelSelector'] + k + '=' + v
+            for selector, selector_values in self.selector.iteritems():
+                params[selector] = ''
+                for index, (key, value) in enumerate(selector_values.iteritems()):
+                    if index == 0:
+                        params[selector] = '%s=%s' % (key, value)
+                    else:
+                        params[selector] += ',%s=%s' % (key, value)
 
         yield self.api.watch(url_path, on_data, **params)
 
