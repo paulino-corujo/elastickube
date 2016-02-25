@@ -22,17 +22,14 @@ class SettingsWatcher(object):
         self.message = message
 
         settings = yield Query(self.settings["database"], "Settings").find()
-        response = dict(
+        self.callback(dict(
             action=self.message["action"],
             operation="watched",
+            correlation=self.message["correlation"],
             status_code=200,
             body=settings
-        )
+        ))
 
-        if "correlation" in self.message:
-            response["correlation"] = self.message["correlation"]
-
-        self.callback(response)
         add_callback("Settings", self.data_callback)
 
     @coroutine
@@ -40,7 +37,7 @@ class SettingsWatcher(object):
         logging.debug("SettingsWatcher data_callback")
 
         operation = "updated"
-        if document["op"] == "u":
+        if document["op"] == "i":
             operation = "created"
         elif document["op"] == "d":
             operation = "deleted"

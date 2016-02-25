@@ -68,12 +68,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         response = dict(
             action=request["action"],
+            correlation=request["correlation"],
             body={},
             status_code=200
         )
-
-        if "correlation" in request:
-            response["correlation"] = request["correlation"]
 
         if request["operation"] in REST_OPERATIONS:
             action = self.actions_lookup[request["action"]].get("rest", None)
@@ -165,6 +163,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         if "operation" not in request:
             self.write_message("Message %s does not contain 'operation'" % message)
+            raise Return(None)
+
+        if "correlation" not in request:
+            self.write_message("Message %s does not contain 'correlation'" % message)
             raise Return(None)
 
         if request["action"] not in SUPPORTED_ACTIONS:
