@@ -1,7 +1,11 @@
-class PrincipalAPIService {
+import AbstractAPI from './abstract-api';
 
-    constructor($http) {
+class PrincipalAPIService extends AbstractAPI {
+
+    constructor($http, websocketClient) {
         'ngInject';
+
+        super('principal', websocketClient);
 
         this._$http = $http;
     }

@@ -11,17 +11,13 @@ class PrincipalActionCreatorService {
     }
 
     signup(user) {
-        this._dispatcher.dispatch({
-            type: this._actions.PRINCIPAL_SIGN_UP
-        });
+        this._dispatcher.dispatch({ type: this._actions.PRINCIPAL_SIGN_UP });
 
         return this._principalAPI.signup(user);
     }
 
     login(user) {
-        this._dispatcher.dispatch({
-            type: this._actions.PRINCIPAL_LOGIN
-        });
+        this._dispatcher.dispatch({ type: this._actions.PRINCIPAL_LOGIN });
 
         return this._principalAPI.login(user);
     }
@@ -36,10 +32,7 @@ class PrincipalActionCreatorService {
     }
 
     logout() {
-        return this._$q
-            .when(this._dispatcher.dispatch({
-                type: this._actions.PRINCIPAL_LOGOUT
-            }));
+        return this._$q.when(this._dispatcher.dispatch({ type: this._actions.PRINCIPAL_LOGOUT }));
     }
 }
 

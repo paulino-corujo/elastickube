@@ -1,9 +1,13 @@
-class SettingsAPIService {
+import AbstractAPI from './abstract-api';
+
+class SettingsAPIService extends AbstractAPI {
+
     constructor($http, websocketClient) {
         'ngInject';
 
+        super('settings', websocketClient);
+
         this._$http = $http;
-        this._websocketClient = websocketClient;
     }
 
     authProviders() {
@@ -17,18 +21,6 @@ class SettingsAPIService {
 
                 return authProviders;
             });
-    }
-
-    unsubscribe() {
-        return this._websocketClient.unSubscribeEvent('settings');
-    }
-
-    subscribe() {
-        return this._websocketClient.subscribeEvent('settings');
-    }
-
-    update(settings) {
-        return this._websocketClient.updateEvent('settings', settings);
     }
 }
 

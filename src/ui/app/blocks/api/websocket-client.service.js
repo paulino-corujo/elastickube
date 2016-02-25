@@ -1,11 +1,16 @@
-class WebsocketClientService {
+import { EventEmitter } from 'events';
 
-    constructor($q, $rootScope, websocketActionCreator) {
+const EVENT = 'EVENT';
+
+class WebsocketClientService extends EventEmitter {
+
+    constructor($q, $rootScope) {
         'ngInject';
+
+        super();
 
         this._$q = $q;
         this._$rootScope = $rootScope;
-        this._websocketActionCreator = websocketActionCreator;
 
         this._connectionAttempts = 1;
         this._eventsSubscribed = {};
@@ -24,10 +29,10 @@ class WebsocketClientService {
                 this._connectionAttempts = 1;
                 this._reconnect = true;
 
-                _.each(this._eventsSubscribed, (watcher) => {
+                _.each(this._eventsSubscribed, (watcher) =>
                     watcherPromises.push(this.sendMessage(watcher)
-                        .then((response) => this._websocketActionCreator.subscribedResource(response)));
-                });
+                        .then((response) => this.emit(EVENT, response))));
+
                 this._$q.all(watcherPromises)
                     .then(() => defer.resolve());
             };
@@ -45,14 +50,12 @@ class WebsocketClientService {
 
                         delete this._currentOnGoingMessages[message.correlation];
                     } else {
-                        this._websocketActionCreator.updateResource(message);
+                        this.emit(EVENT, message);
                     }
                 });
             };
 
-            this._websocket.onerror = () => {
-                defer.reject();
-            };
+            this._websocket.onerror = () => defer.reject();
 
             this._websocket.onclose = () => {
                 if (this._reconnect) {
@@ -74,7 +77,7 @@ class WebsocketClientService {
     disconnect() {
         const promises = [];
 
-        _.each(this._eventsSubscribed, (value, key) => promises.push(this.unSubscribeEvent(key)));
+        _.each(this._eventsSubscribed, (value, key) => promises.push(this.unsubscribeEvent(key)));
 
         return this._$q.all(promises)
             .then(() => {
@@ -114,21 +117,19 @@ class WebsocketClientService {
         return this.sendMessage(message)
             .then((response) => {
                 this._eventsSubscribed[action] = message;
-                this._websocketActionCreator.subscribedResource(response);
+
+                return response;
             });
     }
 
-    unSubscribeEvent(action) {
+    unsubscribeEvent(action) {
         const message = {
             action,
             operation: 'unwatch'
         };
 
         return this._$q.when(this._eventsSubscribed[action] && this.sendMessage(message)
-                .then((response) => {
-                    delete this._eventsSubscribed[action];
-                    this._websocketActionCreator.unSubscribedResource(response);
-                }));
+                .then(() => delete this._eventsSubscribed[action]));
     }
 
     updateEvent(action, body) {
@@ -139,6 +140,34 @@ class WebsocketClientService {
         };
 
         return this._$q.when(this.sendMessage(message));
+    }
+
+    deleteEvent(action, body) {
+        const message = {
+            action,
+            body,
+            operation: 'delete'
+        };
+
+        return this._$q.when(this.sendMessage(message));
+    }
+
+    createEvent(action, body) {
+        const message = {
+            action,
+            body,
+            operation: 'create'
+        };
+
+        return this._$q.when(this.sendMessage(message));
+    }
+
+    addEventListener(callback) {
+        this.on(EVENT, callback);
+    }
+
+    removeEventListener(callback) {
+        this.removeListener(EVENT, callback);
     }
 }
 

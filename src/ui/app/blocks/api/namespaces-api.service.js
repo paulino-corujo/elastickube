@@ -1,13 +1,11 @@
-class NamespacesAPIService {
+import AbstractAPI from './abstract-api';
+
+class NamespacesAPIService extends AbstractAPI {
 
     constructor(websocketClient) {
         'ngInject';
 
-        this._websocketClient = websocketClient;
-    }
-
-    subscribe() {
-        return this._websocketClient.subscribeEvent('namespaces');
+        super('namespaces', websocketClient);
     }
 }
 
