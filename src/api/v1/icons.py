@@ -12,8 +12,8 @@ from api.resources import resources
 from api.v1 import get_icon_template, load_colors
 from data.query import Query
 
-CHART_ICON_TEMPLATE = get_icon_template(os.path.join(resources.ROOT_PATH, 'resources/icon_template.svg'))
-COLORS = load_colors(os.path.join(resources.ROOT_PATH, 'resources/colors.json'))
+CHART_ICON_TEMPLATE = get_icon_template(os.path.join(resources.ROOT_PATH, 'icon_template.svg'))
+COLORS = load_colors(os.path.join(resources.ROOT_PATH, 'colors.json'))
 ICON_ENTITIES = {'charts', 'instances'}
 
 
