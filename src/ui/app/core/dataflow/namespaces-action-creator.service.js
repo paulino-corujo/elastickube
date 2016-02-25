@@ -8,10 +8,10 @@ class NamespacesActionCreatorService {
     }
 
     subscribe() {
-        this._dispatcher.dispatch({
-            type: this._actions.NAMESPACES_SUBSCRIBE
-        });
-        return this._namespacesAPI.subscribe();
+        this._dispatcher.dispatch({ type: this._actions.NAMESPACES_SUBSCRIBE });
+
+        return this._namespacesAPI.subscribe()
+            .then((namespaces) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_SUBSCRIBED, namespaces }));
     }
 }
 

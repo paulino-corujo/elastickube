@@ -8,10 +8,10 @@ class ChartsActionCreatorService {
     }
 
     subscribe() {
-        this._dispatcher.dispatch({
-            type: this._actions.CHARTS_SUBSCRIBE
-        });
-        return this._chartsAPI.subscribe();
+        this._dispatcher.dispatch({ type: this._actions.CHARTS_SUBSCRIBE });
+
+        return this._chartsAPI.subscribe()
+            .then((charts) => this._dispatcher.dispatch({ type: this._actions.CHARTS_SUBSCRIBED, charts }));
     }
 }
 

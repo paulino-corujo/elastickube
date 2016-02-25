@@ -1,17 +1,11 @@
-class UsersAPIService {
+import AbstractAPI from './abstract-api';
+
+class UsersAPIService extends AbstractAPI {
 
     constructor(websocketClient) {
         'ngInject';
 
-        this._websocketClient = websocketClient;
-    }
-
-    subscribe() {
-        return this._websocketClient.subscribeEvent('users');
-    }
-
-    update(user) {
-        return this._websocketClient.updateEvent('users', user);
+        super('users', websocketClient);
     }
 }
 

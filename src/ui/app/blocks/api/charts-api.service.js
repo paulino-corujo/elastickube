@@ -1,13 +1,11 @@
-class ChartsAPIService {
+import AbstractAPI from './abstract-api';
+
+class ChartsAPIService extends AbstractAPI {
 
     constructor(websocketClient) {
         'ngInject';
 
-        this._websocketClient = websocketClient;
-    }
-
-    subscribe() {
-        return this._websocketClient.subscribeEvent('charts');
+        super('charts', websocketClient);
     }
 }
 

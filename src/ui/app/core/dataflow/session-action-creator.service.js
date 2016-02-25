@@ -11,48 +11,30 @@ class SessionActionCreatorService {
     }
 
     storeSessionToken(sessionToken) {
-        this._dispatcher.dispatch({
-            type: this._actions.SESSION_TOKEN_STORE,
-            sessionToken
-        });
+        this._dispatcher.dispatch({ type: this._actions.SESSION_TOKEN_STORE, sessionToken });
 
         return this._session.setItem(constants.SESSION_TOKEN, sessionToken)
-            .then(() => {
-                this._dispatcher.dispatch({
-                    type: this._actions.SESSION_TOKEN_STORED
-                });
-            });
+            .then(() => this._dispatcher.dispatch({ type: this._actions.SESSION_TOKEN_STORED }));
     }
 
     selectNamespace(namespace) {
-        this._dispatcher.dispatch({
-            type: this._actions.NAMESPACE_CHANGE,
-            namespace
-        });
+        this._dispatcher.dispatch({ type: this._actions.NAMESPACE_CHANGE, namespace });
 
         return this._session.setItem(constants.ACTIVE_NAMESPACE, namespace.metadata.uid)
             .then(() => {
-                this._dispatcher.dispatch({
-                    type: this._actions.NAMESPACE_CHANGED
-                });
+                this._dispatcher.dispatch({ type: this._actions.NAMESPACE_CHANGED });
+
                 return this._instancesAPI.unsubscribe();
             })
-            .then(() => {
-                return this._instancesAPI.subscribe(namespace.metadata.name);
-            });
+            .then(() => this._instancesAPI.subscribe(namespace.metadata.name))
+            .then((instances) => this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBED, instances }));
     }
 
     destroy() {
-        this._dispatcher.dispatch({
-            type: this._actions.SESSION_DESTROY
-        });
+        this._dispatcher.dispatch({ type: this._actions.SESSION_DESTROY });
 
         return this._session.destroy()
-            .then(() => {
-                this._dispatcher.dispatch({
-                    type: this._actions.SESSION_DESTROYED
-                });
-            });
+            .then(() => this._dispatcher.dispatch({ type: this._actions.SESSION_DESTROYED }));
     }
 }
 

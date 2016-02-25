@@ -9,36 +9,30 @@ class SettingsActionCreatorService {
     }
 
     authProviders() {
-        this._dispatcher.dispatch({
-            type: this._actions.SETTINGS_AUTH_PROVIDERS_OBTAIN
-        });
+        this._dispatcher.dispatch({ type: this._actions.SETTINGS_AUTH_PROVIDERS_OBTAIN });
 
         return this._settingsAPI.authProviders();
     }
 
     subscribe() {
-        this._dispatcher.dispatch({
-            type: this._actions.SETTINGS_SUBSCRIBE
-        });
+        this._dispatcher.dispatch({ type: this._actions.SETTINGS_SUBSCRIBE });
 
-        return this._settingsAPI.subscribe();
+        return this._settingsAPI.subscribe()
+            .then((settings) => this._dispatcher.dispatch({ type: this._actions.SETTINGS_SUBSCRIBED, settings }));
     }
 
     unsubscribe() {
-        this._dispatcher.dispatch({
-            type: this._actions.SETTINGS_UNSUBSCRIBE
-        });
+        this._dispatcher.dispatch({ type: this._actions.SETTINGS_UNSUBSCRIBE });
 
-        return this._settingsAPI.unsubscribe();
+        return this._settingsAPI.unsubscribe()
+            .then(() => this._dispatcher.dispatch({ type: this._actions.SETTINGS_UNSUBSCRIBED }));
     }
 
     update(settings) {
-        this._dispatcher.dispatch({
-            type: this._actions.SETTINGS_UPDATE,
-            settings
-        });
+        this._dispatcher.dispatch({ type: this._actions.SETTINGS_UPDATE, settings });
 
-        return this._settingsAPI.update(settings);
+        return this._settingsAPI.update(settings)
+            .then((updatedSettings) => this._dispatcher.dispatch({ type: this._actions.SETTINGS_UPDATE, updatedSettings }));
     }
 }
 

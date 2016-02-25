@@ -26,7 +26,6 @@ import PrincipalActionCreatorService from './dataflow/principal-action-creator.s
 import PrincipalStoreService from './dataflow/principal-store.service.js';
 import UsersActionCreatorService from './dataflow/users-action-creator.service';
 import UsersStoreService from './dataflow/users-store.service.js';
-import WebsocketActionCreatorService from './dataflow/websocket-action-creator.service';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
 import InitializationService from './services/initialization.service';
@@ -80,8 +79,6 @@ angular
     .service('settingsStore', SettingsStoreService)
 
     .service('usersActionCreator', UsersActionCreatorService)
-    .service('usersStore', UsersStoreService)
-
-    .service('websocketActionCreator', WebsocketActionCreatorService);
+    .service('usersStore', UsersStoreService);
 
 export default moduleName;
