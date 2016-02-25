@@ -32,11 +32,11 @@
     </form>
 
     <div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && ctrl.authProviders.google">
-        <div class="divider"><span>OR</span></div>
+        <div class="ek-login__divider"><span>OR</span></div>
     </div>
 
     <div layout="row" layout-align="center" ng-if="ctrl.authProviders.google">
         <md-button href="/api/v1/auth/google" target="_self"
-                   class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: images.GOOGLE_G_LOGO }}">Login with Google</md-button>
+                   class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Login with Google</md-button>
     </div>
 </div>

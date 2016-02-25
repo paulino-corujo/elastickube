@@ -10,6 +10,8 @@ from tornado.web import RequestHandler, HTTPError
 from data.query import Query
 from api.v1 import ELASTICKUBE_TOKEN_HEADER
 
+ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
+
 
 class AuthHandler(RequestHandler):
 
@@ -59,6 +61,11 @@ class AuthProvidersHandler(RequestHandler):
                 providers['password'] = dict(
                     regex=settings["authentication"]["password"]["regex"]
                 )
+
+            validation_token = self.request.headers.get(ELASTICKUBE_VALIDATION_TOKEN_HEADER)
+            if validation_token is not None:
+                # TODO recover email from DB
+                providers['email'] = "test@email.com"
 
             self.write(providers)
 

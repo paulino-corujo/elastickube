@@ -1,13 +1,11 @@
+import controller from './login-routes.controller'
+
 const states = [{
     state: 'anonymous.login',
     config: {
-        template: '<ek-login auth-providers="authProviders"></ek-login>',
+        controller,
         url: '/login',
-        controller: ($scope, authProviders) => {
-            'ngInject';
-
-            $scope.authProviders = authProviders;
-        },
+        template: '<ek-login auth-providers="authProviders"></ek-login>',
         resolve: {
             authProviders: (settingsActionCreator) => {
                 'ngInject';
@@ -19,8 +17,16 @@ const states = [{
 }, {
     state: 'anonymous.signup',
     config: {
-        template: '<ek-signup></ek-signup>',
-        url: '/signup'
+        controller,
+        url: '/signup',
+        template: '<ek-signup auth-providers="authProviders"></ek-signup>',
+        resolve: {
+            authProviders: ($location, settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.authProviders($location.hash());
+            }
+        }
     }
 }];
 

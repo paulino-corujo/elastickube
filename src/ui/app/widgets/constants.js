@@ -1,4 +1,3 @@
-import GOOGLE_G_LOGO from 'images/google-g-logo.svg';
 import CHART_DEFAULT_ICON from 'images/chart-noicon.png';
 
 import IC_ARROW_DROP_DOWN_18PX from 'material-design-icons/navigation/svg/production/ic_arrow_drop_down_18px.svg';
@@ -12,8 +11,7 @@ import IC_SEARCH_48PX from 'material-design-icons/action/svg/production/ic_searc
 
 const constants = {
     images: {
-        CHART_DEFAULT_ICON,
-        GOOGLE_G_LOGO
+        CHART_DEFAULT_ICON
     },
 
     icons: {
