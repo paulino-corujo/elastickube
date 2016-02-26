@@ -7,11 +7,15 @@ class NavigationActionCreatorService {
     }
 
     login() {
-        return this._routerHelper.changeToState('anonymous.login');
+        return this._routerHelper.changeToState('login');
     }
 
     signup() {
-        return this._routerHelper.changeToState('anonymous.signup');
+        return this._routerHelper.changeToState('signup');
+    }
+
+    validateUser() {
+        return this._routerHelper.changeToState('validate-user');
     }
 }
 

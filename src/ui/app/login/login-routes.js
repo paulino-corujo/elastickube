@@ -1,13 +1,12 @@
-const states = [{
-    state: 'anonymous.login',
-    config: {
-        template: '<ek-login auth-providers="authProviders"></ek-login>',
-        url: '/login',
-        controller: ($scope, authProviders) => {
-            'ngInject';
+import controller from './login-routes.controller';
 
-            $scope.authProviders = authProviders;
-        },
+const states = [{
+    state: 'login',
+    config: {
+        controller,
+        url: '/login',
+        parent: 'anonymous',
+        template: '<ek-login auth-providers="authProviders"></ek-login>',
         resolve: {
             authProviders: (settingsActionCreator) => {
                 'ngInject';
@@ -17,10 +16,34 @@ const states = [{
         }
     }
 }, {
-    state: 'anonymous.signup',
+    state: 'signup',
     config: {
+        controller,
+        url: '/signup',
+        parent: 'anonymous',
         template: '<ek-signup></ek-signup>',
-        url: '/signup'
+        resolve: {
+            authProviders: (settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.authProviders();
+            }
+        }
+    }
+}, {
+    state: 'validate',
+    config: {
+        controller,
+        url: '/invite/:code',
+        parent: 'anonymous',
+        template: '<ek-validate-user auth-providers="authProviders"></ek-validate-user>',
+        resolve: {
+            authProviders: ($stateParams, settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.authProviders($stateParams.code);
+            }
+        }
     }
 }];
 

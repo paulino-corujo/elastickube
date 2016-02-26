@@ -8,10 +8,10 @@ class SettingsActionCreatorService {
         this._settingsAPI = settingsAPI;
     }
 
-    authProviders() {
+    authProviders(code) {
         this._dispatcher.dispatch({ type: this._actions.SETTINGS_AUTH_PROVIDERS_OBTAIN });
 
-        return this._settingsAPI.authProviders();
+        return this._settingsAPI.authProviders(code);
     }
 
     subscribe() {
@@ -32,7 +32,7 @@ class SettingsActionCreatorService {
         this._dispatcher.dispatch({ type: this._actions.SETTINGS_UPDATE, settings });
 
         return this._settingsAPI.update(settings)
-            .then((updatedSettings) => this._dispatcher.dispatch({ type: this._actions.SETTINGS_UPDATE, updatedSettings }));
+            .then((updatedSettings) => this._dispatcher.dispatch({ type: this._actions.SETTINGS_UPDATE, settings: updatedSettings }));
     }
 }
 

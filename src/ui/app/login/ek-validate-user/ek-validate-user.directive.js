@@ -1,11 +1,10 @@
-import './ek-login.less';
-import Directive from 'directive';
-import Controller from './ek-login.controller';
+import './ek-validate-user.less';
 import icons from '../icons';
-import template from './ek-login.html';
+import Directive from 'directive';
+import Controller from './ek-validate-user.controller';
+import template from './ek-validate-user.html';
 
-class LoginDirective extends Directive {
-
+class SignupDirective extends Directive {
     constructor() {
         super({ Controller, template });
 
@@ -16,11 +15,11 @@ class LoginDirective extends Directive {
 
     compile(tElement) {
         tElement
-            .addClass('ek-login')
+            .addClass('ek-validate-user')
             .attr('layout', 'column');
 
         return ($scope) => $scope.icons = icons;
     }
 }
 
-export default LoginDirective;
+export default SignupDirective;

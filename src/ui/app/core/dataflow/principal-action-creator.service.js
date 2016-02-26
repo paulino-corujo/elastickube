@@ -10,10 +10,10 @@ class PrincipalActionCreatorService {
         this._userStoreService = usersStore;
     }
 
-    signup(user) {
+    signup(user, code) {
         this._dispatcher.dispatch({ type: this._actions.PRINCIPAL_SIGN_UP });
 
-        return this._principalAPI.signup(user);
+        return this._principalAPI.signup(user, code);
     }
 
     login(user) {

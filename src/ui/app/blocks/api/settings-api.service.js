@@ -10,8 +10,15 @@ class SettingsAPIService extends AbstractAPI {
         this._$http = $http;
     }
 
-    authProviders() {
-        return this._$http.get('/api/v1/auth/providers')
+    authProviders(code) {
+        const options = {
+            headers: {
+                'ElasticKube-Validation-Token': code
+            }
+        };
+
+        /* eslint no-undefined: 0 */
+        return this._$http.get('/api/v1/auth/providers', code ? options : undefined)
             .then((x) => {
                 const authProviders = x.data;
 

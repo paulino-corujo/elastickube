@@ -10,8 +10,15 @@ class PrincipalAPIService extends AbstractAPI {
         this._$http = $http;
     }
 
-    signup(user) {
-        return this._$http.post('/api/v1/auth/signup', user);
+    signup(user, code) {
+        const options = {
+            headers: {
+                'ElasticKube-Validation-Token': code
+            }
+        };
+
+        /* eslint no-undefined: 0 */
+        return this._$http.post('/api/v1/auth/signup', user, code ? options : undefined);
     }
 
     login(user) {

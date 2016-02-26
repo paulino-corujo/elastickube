@@ -1,10 +1,10 @@
 <div layout="column" layout-align="center center">
-    <h2 class="ek-signup__title">Create an admin account</h2>
+    <h2 class="ek-validate-user__title">Validate your account</h2>
 
-    <form ng-submit="ctrl.submit()" name="signupForm">
+    <form ng-submit="ctrl.submit()" name="signupForm" ng-if="ctrl.authProviders.password">
 
         <div layout="row">
-            <md-input-container class="ek-signup__name md-block animate">
+            <md-input-container class="ek-validate-user__name md-block animate">
                 <label>Your Name</label>
                 <input ng-model="user.firstname" name="firstname" required>
                 <div ng-messages="signupForm.firstname.$error">
@@ -14,7 +14,7 @@
         </div>
 
         <div layout="row">
-            <md-input-container class="ek-signup__name md-block animate">
+            <md-input-container class="ek-validate-user__name md-block animate">
                 <label>Your Lastname</label>
                 <input ng-model="user.lastname" name="lastname" required>
                 <div ng-messages="signupForm.lastname.$error">
@@ -24,9 +24,9 @@
         </div>
 
         <div layout="row">
-            <md-input-container class="ek-signup__email md-block animate">
+            <md-input-container class="ek-validate-user__email md-block animate">
                 <label>Your Email</label>
-                <input ng-model="user.email" name="email" type="email" required>
+                <input ng-model="user.email" name="email" type="email" disabled required>
                 <div ng-messages="signupForm.email.$error">
                     <div ng-message="required">Your email is required.</div>
                     <div ng-message="email">Your email is invalid.</div>
@@ -35,7 +35,7 @@
         </div>
 
         <div layout="row">
-            <md-input-container class="ek-signup__password md-block animate">
+            <md-input-container class="ek-validate-user__password md-block animate">
                 <label>Create Password</label>
                 <input ng-model="user.password"
                        ng-pattern="ctrl.authProviders.password.regex"
@@ -48,7 +48,7 @@
         </div>
 
         <div layout="row">
-            <md-input-container class="ek-signup__password-confirm md-block animate">
+            <md-input-container class="ek-validate-user__password-confirm md-block animate">
                 <label>Confirm Password</label>
                 <input ng-model="user.confirm" name="confirm" type="password" match-password="password" required>
                 <div ng-messages="signupForm.confirm.$error">
@@ -59,9 +59,20 @@
         </div>
 
         <div layout="row" layout-align="center">
-            <md-button type="submit" class="ek-signup__submit-btn md-raised md-primary"
-                       ng-disabled="signupForm.$invalid">sign up
+            <md-button type="submit" class="ek-validate-user__submit-btn md-raised md-primary"
+                       ng-disabled="signupForm.$invalid">validate
             </md-button>
         </div>
     </form>
+
+    <div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && ctrl.authProviders.google">
+        <div class="ek-validate-user__divider"><span>OR</span></div>
+    </div>
+
+    <div layout="row" layout-align="center" ng-if="ctrl.authProviders.google">
+        <md-button href="/api/v1/auth/google" target="_self"
+                   class="ek-validate-user__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Validate with your
+            Google account
+        </md-button>
+    </div>
 </div>

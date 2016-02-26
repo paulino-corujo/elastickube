@@ -1,15 +1,17 @@
 class LoginController {
-    constructor($scope, login, principalActionCreator) {
+    constructor($scope, initialization, instancesNavigationActionCreator, principalActionCreator) {
         'ngInject';
 
         this._$scope = $scope;
-        this._login = login;
+        this._initialization = initialization;
+        this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._principalActionCreator = principalActionCreator;
     }
 
     submit() {
-        this._principalActionCreator.login(this.user)
-            .then(() => this._login.execute())
+        return this._principalActionCreator.login(this.user)
+            .then(() => this._initialization.initializeLoggedInUser())
+            .then(() => this._instancesNavigationActionCreator.instances())
             .catch(() => console.warn('Invalid User or Password.'));
     }
 }
