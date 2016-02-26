@@ -3,8 +3,8 @@ import constants from 'constants';
 class InitializationService {
 
     /* eslint max-params: 0 */
-    constructor($q, $cookies, chartsActionCreator, namespacesActionCreator, namespacesStore, principalActionCreator,
-                sessionActionCreator, sessionStore, usersActionCreator, websocketClient) {
+    constructor($q, $cookies, chartsActionCreator, namespacesActionCreator, namespacesStore, principalActionCreator, sessionActionCreator,
+                sessionStore, usersActionCreator, websocketClient) {
         'ngInject';
 
         this._$q = $q;

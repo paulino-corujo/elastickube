@@ -6,8 +6,20 @@ class NavigationActionCreatorService {
         this._sessionStore = sessionStore;
     }
 
+    instance({ namespace, instanceId } = {}) {
+        if (_.isUndefined(namespace)) {
+            throw Error('namespace parameter is mandatory');
+        }
+
+        if (_.isUndefined(instanceId)) {
+            throw Error('instanceId parameter is mandatory');
+        }
+
+        return this._routerHelper.changeToState('instance', { namespace, instanceId });
+    }
+
     instances(namespace = this._sessionStore.getActiveNamespace()) {
-        return this._routerHelper.changeToState('private.instances', { namespace: namespace.metadata.name });
+        return this._routerHelper.changeToState('instances', { namespace: namespace.metadata.name });
     }
 
     newInstance() {

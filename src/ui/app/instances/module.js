@@ -6,6 +6,7 @@ import instancesRoutes from './instances-routes';
 
 import NavigationActionCreator from './navigation-action-creator.service';
 
+import InstanceDirective from './ek-instance/ek-instance.directive';
 import ChooseChartDirective from './ek-choose-chart/ek-choose-chart.directive';
 import ChooseChartCardDirective from './ek-choose-chart-card/ek-choose-chart-card.directive';
 import ChooseChartGridDirective from './ek-choose-chart-grid/ek-choose-chart-grid.directive';
@@ -28,6 +29,7 @@ angular
 
     .service('instancesNavigationActionCreator', NavigationActionCreator)
 
+    .directive('ekInstance', () => new InstanceDirective())
     .directive('ekChooseChart', () => new ChooseChartDirective())
     .directive('ekChooseChartCard', () => new ChooseChartCardDirective())
     .directive('ekChooseChartGrid', () => new ChooseChartGridDirective())

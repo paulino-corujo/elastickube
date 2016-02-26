@@ -3,6 +3,7 @@
         <!--<img class="ek-instance-name__icon" ng-src="{{ instance.icon }}">-->
     </div>
     <div>
-        <p class="mt0 mb0">{{ instance.metadata.name }}</p>
+        <a class="mt0 mb0" ui-sref="instance({ namespace: instance.metadata.namespace, instanceId: instance.metadata.uid })">{{
+            instance.metadata.name }}</a>
     </div>
 </div>
