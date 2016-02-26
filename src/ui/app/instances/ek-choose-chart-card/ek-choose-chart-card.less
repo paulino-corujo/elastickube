@@ -1,0 +1,41 @@
+@import '../../colors';
+
+.ek-choose-chart-card {
+    width: 152px;
+    height: 160px;
+    margin: 10px;
+    background-color: @white;
+    border: 1px solid @grey350;
+    border-radius: 2px;
+    cursor: pointer;
+
+    &--selected {
+        border: 2px solid @cyan500;
+        cursor: default;
+    }
+
+    &__info {
+        padding: 0 15px;
+
+        &__icon {
+            margin-top: 20px;
+
+            img {
+                width: 76px;
+                height: 76px;
+            }
+        }
+
+        &__name {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        &__description {
+            margin-top: 5px;
+            color: @grey600;
+            font-size: 11px;
+        }
+    }
+}

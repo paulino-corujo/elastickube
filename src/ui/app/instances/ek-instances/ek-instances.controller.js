@@ -1,9 +1,10 @@
 class InstancesController {
-    constructor($scope, instancesStore) {
+    constructor($scope, instancesNavigationActionCreator, instancesStore) {
         'ngInject';
 
         const onChange = () => this.instances = this._instancesStore.getAll();
 
+        this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._instancesStore = instancesStore;
         this._instancesStore.addChangeListener(onChange);
 
@@ -20,6 +21,10 @@ class InstancesController {
 
     selectView(name) {
         this.selectedView = name;
+    }
+
+    newInstance() {
+        this._instancesNavigationActionCreator.newInstance();
     }
 }
 

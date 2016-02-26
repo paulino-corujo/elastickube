@@ -11,6 +11,7 @@ class SearchFilterDirective extends Directive {
         this.bindToController = {
             collectionToBeFiltered: '=',
             filteredCollection: '=',
+            iconAlignment: '@',
             searchField: '@'
         };
     }
@@ -18,7 +19,12 @@ class SearchFilterDirective extends Directive {
     compile(tElement) {
         tElement.addClass('ek-search-filter');
 
-        return ($scope) => _.extend($scope, constants);
+        return ($scope, $element, attrs) => {
+            if (attrs.iconAlignment === 'left') {
+                $element.addClass('ek-search-filter--lefticon');
+            }
+            _.extend($scope, constants);
+        };
     }
 }
 

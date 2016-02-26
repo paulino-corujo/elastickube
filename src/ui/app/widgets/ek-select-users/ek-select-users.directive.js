@@ -1,4 +1,3 @@
-import './ek-select-users.less';
 import Directive from 'directive';
 import Controller from './ek-select-users.controller';
 import template from './ek-select-users.html';

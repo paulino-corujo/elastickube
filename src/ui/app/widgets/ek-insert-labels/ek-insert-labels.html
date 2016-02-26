@@ -1,0 +1,18 @@
+<div class="ek-insert-labels__container" layout="row" layout-wrap ng-form="ctrl.form">
+
+    <div class="ek-chip"
+         ng-repeat="label in ctrl.labels">
+        <span>{{ label }}</span>
+        <md-icon class="ek-insert-labels__clear-icon"
+                 md-svg-src="{{:: icons.IC_CLEAR_48PX }}"
+                 ng-click="ctrl.removeLabel(label)"></md-icon>
+    </div>
+
+    <input type="label"
+           name="label"
+           class="ek-insert-labels__input"
+           autocomplete="off"
+           style="min-width:140px"
+           ng-keypress="ctrl.addLabel($event)"
+           ng-model="ctrl.label" placeholder="{{ ctrl.placeholder }}" flex>
+</div>
