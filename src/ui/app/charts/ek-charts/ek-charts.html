@@ -1,12 +1,12 @@
 <ek-header-layout title="charts">
     <div transclude-to="header" layout="row" layout-align="start center">
-        <ek-search-filter collection-to-be-filtered="ctrl.chartsFilteredByOwnerAndType"
+        <ek-search-filter collection-to-be-filtered="ctrl.charts"
                           filtered-collection="ctrl.chartsFilteredBySearch"></ek-search-filter>
 
         <div layout="row" layout-align="end center" flex>
             <ek-chart-sorter ng-show="ctrl.selectedView === 'grid'"
-                                 collection-to-sort="ctrl.chartsFilteredBySearch"
-                                 sorted-collection="ctrl.chartsSortedByType"></ek-chart-sorter>
+                             collection-to-sort="ctrl.chartsFilteredBySearch"
+                             sorted-collection="ctrl.chartsSortedByType"></ek-chart-sorter>
 
             <ek-button-group>
                 <button ng-class="{'ek-button-group--selected' : ctrl.selectedView === 'list'}"
@@ -24,26 +24,18 @@
     </div>
 
     <div transclude-to="body" layout="column">
-        <ek-sidenav-layout>
-            <div transclude-to="sidenav">
-                <button class="ek-charts__new">New</button>
-                <ek-chart-filters charts-to-filter="ctrl.charts"
-                                     filtered-charts="ctrl.chartsFilteredByOwnerAndType"></ek-chart-filters>
+        <div class="ek-charts__body" transclude-to="body">
+            <div class="ek-charts__body__not-found-message"
+                 layout="column" layout-align="center center"
+                 ng-if="ctrl.showEmpty">No charts found
             </div>
 
-            <div class="ek-charts__body" transclude-to="body">
-                <div class="ek-charts__body__not-found-message"
-                     layout="column" layout-align="center center"
-                     ng-if="ctrl.showEmpty">No charts found
-                </div>
-
-                <div ng-if="!ctrl.showEmpty" ng-switch="ctrl.selectedView">
-                    <ek-chart-grid ng-switch-when="grid"
-                                      charts="ctrl.chartsSortedByType"></ek-chart-grid>
-                    <ek-chart-list ng-switch-default
-                                      charts="ctrl.chartsFilteredBySearch"></ek-chart-list>
-                </div>
+            <div ng-if="!ctrl.showEmpty" ng-switch="ctrl.selectedView">
+                <ek-chart-grid ng-switch-when="grid"
+                               charts="ctrl.chartsSortedByType"></ek-chart-grid>
+                <ek-chart-list ng-switch-default
+                               charts="ctrl.chartsFilteredBySearch"></ek-chart-list>
             </div>
-        </ek-sidenav-layout>
+        </div>
     </div>
 </ek-header-layout>

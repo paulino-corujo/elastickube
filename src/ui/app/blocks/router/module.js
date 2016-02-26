@@ -1,4 +1,4 @@
-import 'ui-router';
+import 'angular-ui-router';
 
 import routerHelperProvider from './router-helper.provider';
 
