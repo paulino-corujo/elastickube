@@ -1,19 +1,24 @@
 import constants from 'constants';
 
 class SignupController {
-    constructor($scope, adminNavigationActionCreator, initialization, principalActionCreator) {
+    constructor($scope, $stateParams, initialization, instancesNavigationActionCreator, principalActionCreator) {
         'ngInject';
 
         this._$scope = $scope;
-        this._adminNavigationActionCreator = adminNavigationActionCreator;
         this._initialization = initialization;
+        this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._principalActionCreator = principalActionCreator;
+        this._code = $stateParams.code;
+
+        $scope.user = {
+            email: this.authProviders.email
+        };
     }
 
     submit() {
-        return this._principalActionCreator.signup(this._$scope.user)
+        return this._principalActionCreator.signup(this._$scope.user, this._code)
             .then(() => this._initialization.initializeLoggedInUser())
-            .then(() => this._adminNavigationActionCreator.settings())
+            .then(() => this._instancesNavigationActionCreator.instances())
             .catch((response) => {
                 switch (response.status) {
                     case constants.httpStatusCode.BAD_REQUEST:

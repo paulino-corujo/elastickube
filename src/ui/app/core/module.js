@@ -29,8 +29,6 @@ import UsersStoreService from './dataflow/users-store.service.js';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
 import InitializationService from './services/initialization.service';
-import LoginService from './services/login.service';
-import SignupService from './services/signup.service';
 import MultiTranscludeService from './services/multi-transclude.service';
 import AuthService from './security/auth.service';
 import SessionService from './services/session.service';
@@ -58,8 +56,6 @@ angular
     .service('auth', AuthService)
     .service('dispatcher', DispatcherService)
     .service('initialization', InitializationService)
-    .service('login', LoginService)
-    .service('signup', SignupService)
     .service('multiTransclude', MultiTranscludeService)
 
     .service('chartsActionCreator', ChartsActionCreatorService)

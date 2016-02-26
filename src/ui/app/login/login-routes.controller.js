@@ -3,12 +3,12 @@ class LoginRouterController {
     constructor($scope, $state, authProviders, loginNavigationActionCreator) {
         'ngInject';
 
-        if ($state.current.name === 'anonymous.login') {
-            if (!hasValues(authProviders)) {
-                loginNavigationActionCreator.signup();
+        if (hasValues(authProviders)) {
+            if ($state.current.name === 'signup') {
+                loginNavigationActionCreator.login();
             }
-        } else if (hasValues(authProviders) && !_.has(authProviders, 'email')) {
-            loginNavigationActionCreator.login();
+        } else if ($state.current.name === 'login') {
+            loginNavigationActionCreator.signup();
         }
 
         $scope.authProviders = authProviders;

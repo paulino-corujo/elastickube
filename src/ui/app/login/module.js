@@ -8,6 +8,7 @@ import NavigationActionCreator from './navigation-action-creator.service';
 
 import LoginDirective from './ek-login/ek-login.directive';
 import SignupDirective from './ek-signup/ek-signup.directive';
+import ValidateUserDirective from './ek-validate-user/ek-validate-user.directive';
 
 const moduleName = 'app.login';
 
@@ -21,6 +22,7 @@ angular
     .service('loginNavigationActionCreator', NavigationActionCreator)
 
     .directive('ekLogin', () => new LoginDirective())
-    .directive('ekSignup', () => new SignupDirective());
+    .directive('ekSignup', () => new SignupDirective())
+    .directive('ekValidateUser', () => new ValidateUserDirective());
 
 export default moduleName;
