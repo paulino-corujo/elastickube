@@ -1,0 +1,16 @@
+<ek-header-layout title="instances > new">
+    <div transclude-to="body">
+        <div layout="row" layout-align="center">
+            <div layout="row">
+
+                <div layout="column" layout-align="start center" class="ek-new-instance__container">
+                    <ek-choose-chart step="ctrl.step" on-selection="ctrl.chartSelected()"></ek-choose-chart>
+                    <ek-customize-deployment step="ctrl.step"></ek-customize-deployment>
+                </div>
+                <div class="ek-new-instance__deploy" layout="row" layout-align="center center">
+                    <md-button class="md-raised md-primary" ng-disabled="ctrl.isDisabled()" ng-click="ctrl.deploy()">Deploy</md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ek-header-layout>

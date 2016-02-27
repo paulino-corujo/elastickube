@@ -5,7 +5,7 @@
 
     input {
         height: 30px;
-        width: 360px;
+        width: 100%;
         padding: 0 34px 0 14px;
         border-radius: 2px;
         border: 1px solid @grey400;
@@ -13,11 +13,23 @@
 
         &:hover {
             border-color: #bdbdbd;
-            box-shadow: inset 0px 1px 1px rgba(0,0,0,0.08);
+            box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.08);
         }
         &:focus {
             border-color: @cyan400;
-            box-shadow: inset 0px 1px 1px rgba(0,0,0,0.08);
+            box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    &--lefticon {
+
+        input {
+            text-indent: 15px;
+        }
+
+        .ek-search-filter__icon {
+            left: 8px;
+            right: initial;
         }
     }
 

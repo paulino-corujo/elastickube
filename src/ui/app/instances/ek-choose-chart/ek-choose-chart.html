@@ -1,0 +1,31 @@
+<div layout="column">
+    <div ng-if="ctrl.step === 1">
+        <div class="ek-choose-chart__toolbar" layout="row">
+            <div class="ek-choose-chart__toolbar__step" flex="5">
+                <h2 class="ek-choose-chart__toolbar__step__number">1</h2>
+            </div>
+            <div class="ek-choose-chart__toolbar__content" layout="column" flex="85">
+                <h2 class="ek-choose-chart__toolbar__content__title">Choose chart</h2>
+                <ek-search-filter collection-to-be-filtered="ctrl.charts" icon-alignment="left"
+                                  filtered-collection="ctrl.filteredCharts"></ek-search-filter>
+            </div>
+        </div>
+        <ek-choose-chart-grid charts="ctrl.filteredCharts" selected-chart="ctrl.selectedChart" on-selection="ctrl.selectChart()"></ek-choose-chart-grid>
+        <div class="ek-choose-chart__footer" layout="row" layout-align="end">
+            <md-button class="md-raised md-primary" ng-disabled="ctrl.chartNotSelected()" ng-click="ctrl.chartSelected()">Select</md-button>
+        </div>
+    </div>
+    <div ng-if="ctrl.step !== 1">
+        <div class="ek-choose-chart__toolbar" layout="row">
+            <div class="ek-choose-chart__toolbar__step" flex="5">
+                <h2>1</h2>
+            </div>
+            <div class="ek-choose-chart__toolbar__content" layout="row" flex="95" layout-align="start center">
+                <h2 flex="40">Choose chart</h2>
+                <img class="ek-choose-chart__toolbar__content__charticon" ng-src="/icons/charts/{{ ctrl.selectedChart._id.$oid }}">
+                <div flex="60" class="ek-choose-chart__toolbar__content__chartname">{{ ctrl.selectedChart.name }}</div>
+                <md-icon class="ek-choose-chart__toolbar__content__edit" ng-click="ctrl.editChart()" md-svg-src="{{:: icons.IC_CREATE_48PX }}"></md-icon>
+            </div>
+        </div>
+    </div>
+</div>

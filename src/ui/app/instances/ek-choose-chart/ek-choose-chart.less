@@ -1,0 +1,63 @@
+@import "../../colors";
+
+.ek-choose-chart {
+    & {
+        background-color: @white;
+        border: 1px solid #d9d9d9;
+        width: 805px;
+    }
+
+    &--active {
+        .ek-choose-chart__toolbar {
+            padding-bottom: 35px;
+        }
+    }
+
+    &__toolbar {
+        background-color: @white;
+        border-bottom: 1px solid #d9d9d9;
+        font-weight: bold;
+        padding-bottom: 0;
+        &__step {
+            margin-left: 20px;
+
+            &__number {
+                color: @cyan500;
+            }
+        }
+
+        &__content {
+            margin-left: 5px;
+
+            &__title {
+                color: @cyan500;
+            }
+
+            &__charticon {
+                height: 30px;
+                width: 30px;
+            }
+
+            &__chartname {
+                margin-left: 10px;
+            }
+
+            &__edit {
+                color: @grey450;
+                margin-right: 20px;
+            }
+        }
+    }
+
+    &__footer {
+        border-top: 1px solid #d9d9d9;
+        height: 70px;
+
+        .md-button {
+            height: 30px;
+            min-height: 0;
+            line-height: 30px;
+            margin: 20px 20px 0 0;
+        }
+    }
+}

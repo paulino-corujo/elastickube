@@ -21,7 +21,7 @@ class InsertEmailsController {
     }
 
     addEmail(event) {
-        if (_.isEqual(ENTER, _.pick(event, _.keys(ENTER)))) {
+        if (_.size(this.email) > 0 && _.isEqual(ENTER, _.pick(event, _.keys(ENTER)))) {
             event.preventDefault();
 
             this.emailError = !_.isUndefined(this.form.$error.email);
@@ -30,7 +30,6 @@ class InsertEmailsController {
                 this.emails = _.chain(this.emails)
                     .concat((this.email || '').toLowerCase())
                     .uniq()
-                    .sort()
                     .value();
 
                 this._checkPlaceholder();
