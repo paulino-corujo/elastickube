@@ -11,6 +11,7 @@ import chartsModule from 'charts/module';
 
 import baseRoutes from './config/base-routes';
 import animateConfig from './config/animate-config';
+import eventsConfig from './config/events-config';
 import routerConfig from './config/router-config';
 import themeConfig from './config/theme-config';
 import authConfig from './config/auth-run';
@@ -33,6 +34,7 @@ angular
 
     .config(baseRoutes)
     .config(animateConfig)
+    .config(eventsConfig)
     .config(routerConfig)
     .config(themeConfig)
 

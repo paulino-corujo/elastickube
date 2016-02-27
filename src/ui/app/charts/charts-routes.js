@@ -1,6 +1,7 @@
 const states = [{
-    state: 'private.charts',
+    state: 'charts',
     config: {
+        parent: 'private',
         template: '<ek-charts></ek-charts>',
         url: '/:namespace/charts',
         data: {

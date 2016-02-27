@@ -4,6 +4,8 @@ class AdminUsersController {
     constructor($scope, adminNavigationActionCreator, usersStore) {
         'ngInject';
 
+        const onRowSelectionChanged = () => this.hasRowsSelected = !_.isEmpty(this.gridApi.selection.getSelectedRows());
+
         this._adminNavigationActionCreator = adminNavigationActionCreator;
 
         this.bulkActions = 'Bulk Actions';
@@ -47,11 +49,8 @@ class AdminUsersController {
             onRegisterApi: (gridApi) => {
                 this.gridApi = gridApi;
 
-                gridApi.selection.on.rowSelectionChanged($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-
-                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+                gridApi.selection.on.rowSelectionChanged($scope, onRowSelectionChanged);
+                gridApi.selection.on.rowSelectionChangedBatch($scope, onRowSelectionChanged);
             }
         };
     }

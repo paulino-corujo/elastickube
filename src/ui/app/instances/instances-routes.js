@@ -34,7 +34,7 @@ function instancesRoutes(routerHelperProvider) {
     }, {
         state: 'instance',
         config: {
-            url: '/:namespace/instances/:instanceId',
+            url: '/:namespace/instances/{instanceId:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}}',
             parent: 'private',
             template: '<ek-instance instance="instance"></ek-instance>',
             controller: ($scope, $stateParams, checkNamespace, instancesStore) => {
@@ -65,9 +65,16 @@ function instancesRoutes(routerHelperProvider) {
         config: {
             url: '/instances/new',
             parent: 'private',
-            template: '<ek-new-instance></ek-new-instance>'
+            template: '<ek-new-instance></ek-new-instance>',
+            data: {
+                header: {
+                    name: 'instances'
+                }
+            }
         }
     }]);
 }
+
+// a234a27a-da15-11e5-8bc0-0800277146a7
 
 export default instancesRoutes;

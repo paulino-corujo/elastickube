@@ -2,4 +2,31 @@
 
 .ek-instance {
 
+    .ek-header-layout__header {
+        padding-bottom: 0;
+    }
+
+    &__title {
+        min-width: 190px;
+        text-transform: none;
+
+        span {
+            margin-right: 20px;
+        }
+    }
+
+    &__body {
+
+        .ek-sidenav-layout > [layout] > [transclude-id="sidenav"] {
+            border: none;
+        }
+
+        &__sidenav,
+        &__content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: @grey100;
+        }
+    }
 }

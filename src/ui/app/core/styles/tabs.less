@@ -1,0 +1,27 @@
+@import "../../colors";
+
+.ek-tabs {
+
+    .ek-tab {
+
+        & {
+            text-transform: uppercase;
+            width: 160px;
+            height: 50px;
+            display: flex;
+            font-size: 14px;
+            font-weight: 500;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        &--selected {
+            cursor: default;
+            color: @cyan500;
+            border-bottom: 3px solid @cyan500;
+        }
+    }
+}
+

@@ -1,1 +1,27 @@
-test
+<ek-header-layout>
+
+    <div class="ek-instance__header" transclude-to="header">
+        <div layout="row" layout-align="start center">
+            <h3 class="ek-instance__title ek-title"><span>{{:: ctrl.instance.metadata.name }}</span></h3>
+            <ek-instance-state instance="ctrl.instance"></ek-instance-state>
+        </div>
+
+        <div class="ek-tabs" layout="row" layout-align="center end">
+            <div class="ek-tab ek-tab--selected">overview</div>
+            <div class="ek-tab">events</div>
+            <div class="ek-tab">containers</div>
+        </div>
+    </div>
+
+    <div class="ek-instance__body" transclude-to="body">
+
+        <ek-sidenav-layout>
+
+            <div class="ek-instance__body__sidenav" transclude-to="sidenav">edeee</div>
+            <div class="ek-instance__body__content" transclude-to="body">asdfsdfas</div>
+
+        </ek-sidenav-layout>
+
+    </div>
+
+</ek-header-layout>
