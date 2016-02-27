@@ -58,7 +58,7 @@ spec:
       volumes:
       - name: elastickube-code
         hostPath:
-          path: /opt/elastickube
+          path: /opt/elastickube/src
       - name: elastickube-charts
         hostPath:
           path: /var/elastickube/charts
