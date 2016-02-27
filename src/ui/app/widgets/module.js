@@ -4,6 +4,7 @@ import coreModule from 'core/module';
 
 import AvatarDirective from './ek-avatar/ek-avatar.directive';
 import ButtonGroupDirective from './ek-button-group/ek-button-group.directive';
+import DonutChartDirective from './ek-donut-chart/ek-donut-chart.directive';
 import HeaderDirective from './ek-header/ek-header.directive';
 import InsertEmailsDirective from './ek-insert-emails/ek-insert-emails.directive';
 import InsertLabelsDirective from './ek-insert-labels/ek-insert-labels.directive';
@@ -26,6 +27,7 @@ angular
     ])
     .directive('ekAvatar', () => new AvatarDirective())
     .directive('ekButtonGroup', () => new ButtonGroupDirective())
+    .directive('ekDonutChart', () => new DonutChartDirective())
     .directive('ekHeader', () => new HeaderDirective())
     .directive('ekInsertEmails', () => new InsertEmailsDirective())
     .directive('ekInsertLabels', () => new InsertLabelsDirective())
