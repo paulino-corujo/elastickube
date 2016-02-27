@@ -4,6 +4,12 @@ from tornado.gen import coroutine, Return
 
 from api.kube.exceptions import WatchDisconnectedException
 
+RESOURCES_LIST_MAP = {
+    'PodList': 'pods',
+    'ReplicationControllerList': 'replication_controllers',
+    'ServiceList': 'services'
+}
+
 
 class InstancesWatcher(object):
 
@@ -27,14 +33,16 @@ class InstancesWatcher(object):
                 logging.exception(future.exception())
 
             if self.connected and isinstance(future.exception(), WatchDisconnectedException):
-                for k, v in self.watchers.items():
-                    if v['watcher'] == future:
-                        self.watchers[k]['watcher'] = self.settings["kube"].pods.watch(
+                for watcher_key, watcher_value in self.watchers.iteritems():
+                    if watcher_value['watcher'] == future:
+                        resource_name = RESOURCES_LIST_MAP[watcher_key]
+                        self.watchers[watcher_key]['watcher'] = self.settings["kube"][resource_name].watch(
                             on_data=self.data_callback,
                             namespace=self.namespace,
-                            resource_version=self.watchers['PodList']['resourceVersion'])
+                            resource_version=self.watchers[watcher_key]['resourceVersion'])
 
-                        self.watchers[k]['watcher'].add_done_callback(done_callback)
+                        self.watchers[watcher_key]['watcher'].add_done_callback(done_callback)
+                        logging.debug("Reconnected watcher for %s " % watcher_key)
 
         logging.info("Starting watch Instances")
         self.message = message
@@ -50,21 +58,23 @@ class InstancesWatcher(object):
         try:
             logging.debug('Starting watch Instances connected')
 
-            self.watchers['PodList']['watcher'] = self.settings["kube"].pods.watch(
-                on_data=self.data_callback,
-                namespace=self.namespace,
-                resource_version=self.watchers['PodList']['resourceVersion']
-            )
+            for resource_list, resource in RESOURCES_LIST_MAP.iteritems():
+                self.watchers[resource_list]['watcher'] = self.settings["kube"][resource].watch(
+                    on_data=self.data_callback,
+                    namespace=self.namespace,
+                    resource_version=self.watchers[resource_list]['resourceVersion']
+                )
 
-            self.watchers['PodList']['watcher'].add_done_callback(done_callback)
+                self.watchers[resource_list]['watcher'].add_done_callback(done_callback)
+                logging.debug("Added watcher for %s " % resource_list)
 
-            self.watchers['ReplicationControllerList']['watcher'] = self.settings["kube"].pods.watch(
+            self.watchers['ServiceList']['watcher'] = self.settings["kube"].services.watch(
                 namespace=self.namespace,
-                resource_version=self.watchers['ReplicationControllerList']['resourceVersion'],
+                resource_version=self.watchers['ServiceList']['resourceVersion'],
                 on_data=self.data_callback
             )
 
-            self.watchers['ReplicationControllerList']['watcher'].add_done_callback(done_callback)
+            self.watchers['ServiceList']['watcher'].add_done_callback(done_callback)
 
         except Exception as e:
             logging.exception(e)
@@ -81,8 +91,8 @@ class InstancesWatcher(object):
     def data_callback(self, data):
         logging.info("InstancesWatcher data_callback")
 
-        watcher_key = data['object']['kind'] + "List"
-        self.watchers[watcher_key]["resourceVersion"] = data['object']['metadata']['resourceVersion']
+        resource_list = data['object']['kind'] + "List"
+        self.watchers[resource_list]["resourceVersion"] = data['object']['metadata']['resourceVersion']
 
         operation = "updated"
         if data["type"] == "ADDED":
@@ -102,11 +112,14 @@ class InstancesWatcher(object):
 
     @coroutine
     def initialize_data(self):
-        result = yield self.settings["kube"].pods.get(namespace=self.namespace)
-        self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
-        items = result.get("items", [])
+        items = []
 
-        result = yield self.settings["kube"].replication_controllers.get(namespace=self.namespace)
+        for resource in RESOURCES_LIST_MAP.itervalues():
+            result = yield self.settings["kube"][resource].get(namespace=self.namespace)
+            self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
+            items.extend(result.get("items", []))
+
+        result = yield self.settings["kube"].services.get(namespace=self.namespace)
         self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
         items.extend(result.get("items", []))
 
