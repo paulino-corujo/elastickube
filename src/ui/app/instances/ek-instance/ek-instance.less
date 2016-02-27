@@ -2,6 +2,10 @@
 
 .ek-instance {
 
+    .ek-tabs {
+        margin-top: 20px;
+    }
+
     .ek-header-layout__header {
         padding-bottom: 0;
     }
@@ -19,9 +23,20 @@
 
         .ek-sidenav-layout > [layout] > [transclude-id="sidenav"] {
             border: none;
+            background-color: @grey100;
         }
 
-        &__sidenav,
+        &__sidenav {
+            position: absolute;
+            width: 100%;
+            top: -50px;
+
+            .ek-ikon {
+                width: 170px;
+                height: 170px;
+            }
+        }
+
         &__content {
             position: absolute;
             width: 100%;

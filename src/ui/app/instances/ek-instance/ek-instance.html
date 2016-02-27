@@ -17,8 +17,16 @@
 
         <ek-sidenav-layout>
 
-            <div class="ek-instance__body__sidenav" transclude-to="sidenav">edeee</div>
-            <div class="ek-instance__body__content" transclude-to="body">asdfsdfas</div>
+            <div class="ek-instance__body__sidenav"
+                 transclude-to="sidenav"
+                 layout="column" layout-align="start center">
+
+                <ek-ikon name="ctrl.instance.metadata.name"></ek-ikon>
+
+            </div>
+            <div class="ek-instance__body__content" transclude-to="body">
+                <ek-instance-overview instance="ctrl.instance"></ek-instance-overview>
+            </div>
 
         </ek-sidenav-layout>
 

@@ -7,6 +7,10 @@ import instancesRoutes from './instances-routes';
 import NavigationActionCreator from './navigation-action-creator.service';
 
 import InstanceDirective from './ek-instance/ek-instance.directive';
+import InstanceOverviewDirective from './ek-instance-overview/ek-instance-overview.directive';
+import InstanceOverviewDetailsDirective from './ek-instance-overview-details/ek-instance-overview-details.directive';
+import InstanceOverviewLabelsDirective from './ek-instance-overview-labels/ek-instance-overview-labels.directive';
+import InstanceOverviewEventsDirective from './ek-instance-overview-events/ek-instance-overview-events.directive';
 import ChooseChartDirective from './ek-choose-chart/ek-choose-chart.directive';
 import ChooseChartCardDirective from './ek-choose-chart-card/ek-choose-chart-card.directive';
 import ChooseChartGridDirective from './ek-choose-chart-grid/ek-choose-chart-grid.directive';
@@ -30,6 +34,10 @@ angular
     .service('instancesNavigationActionCreator', NavigationActionCreator)
 
     .directive('ekInstance', () => new InstanceDirective())
+    .directive('ekInstanceOverview', () => new InstanceOverviewDirective())
+    .directive('ekInstanceOverviewDetails', () => new InstanceOverviewDetailsDirective())
+    .directive('ekInstanceOverviewLabels', () => new InstanceOverviewLabelsDirective())
+    .directive('ekInstanceOverviewEvents', () => new InstanceOverviewEventsDirective())
     .directive('ekChooseChart', () => new ChooseChartDirective())
     .directive('ekChooseChartCard', () => new ChooseChartCardDirective())
     .directive('ekChooseChartGrid', () => new ChooseChartGridDirective())
