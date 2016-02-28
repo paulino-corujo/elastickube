@@ -96,6 +96,9 @@
         }
       }
     },
+    "hostname": {
+      "type": "string"
+    },
     "metadata": {
       "type": "object",
       "properties": {

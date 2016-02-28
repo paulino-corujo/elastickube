@@ -83,6 +83,9 @@
         "user"
       ]
     },
+    "invite_token": {
+      "type": "string"
+    },
     "schema": {
       "type": "string",
       "enum": [

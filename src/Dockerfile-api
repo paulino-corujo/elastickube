@@ -10,7 +10,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927 && \
 
 RUN apt-get update -y && \
     apt-get install mongodb-org-shell && \
-    pip install --no-compile tornado motor PyJWT pycurl cairosvg passlib && \
+    pip install --no-compile tornado motor PyJWT pycurl cairosvg futures passlib && \
     apt-get clean
 
 ADD data ${ELASTICKUBE_PATH}/data
