@@ -3,7 +3,7 @@
 .idea
 
 # build files
-/build/ui
+/src/build
 .vagrant
 *.box
 *.iso

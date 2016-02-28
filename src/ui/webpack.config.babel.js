@@ -81,7 +81,7 @@ const webpackConfig = {
     ],
 
     output: {
-        path: path.join(__dirname, process.env.BUILD_FOLDER || '../../build/ui'),
+        path: path.join(__dirname, process.env.BUILD_FOLDER || '../build/ui'),
         publicPath: '/',
         filename: isProduction ? 'assets/js/[name]-[chunkhash].js' : 'assets/js/[name].js'
     },
