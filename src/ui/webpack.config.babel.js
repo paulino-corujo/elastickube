@@ -20,6 +20,7 @@ const webpackConfig = {
             'angular-password',
             'angular-ui-router',
             'angular-ui-grid/ui-grid',
+            'd3',
             'flux',
             'lodash',
             'moment',
