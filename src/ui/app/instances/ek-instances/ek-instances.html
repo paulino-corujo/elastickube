@@ -1,6 +1,9 @@
-<ek-header-layout title="instances">
+<ek-header-layout>
     <div transclude-to="header" layout="row" layout-align="start center">
-        <ek-search-filter class="ek-instances__search" collection-to-be-filtered="ctrl.instancesFilteredByOwnerAndStatus"
+        <h3 class="ek-instances__title ek-title"><span>instances</span></h3>
+
+        <ek-search-filter class="ek-instances__search"
+                          collection-to-be-filtered="ctrl.instancesFilteredByOwnerAndStatus"
                           filtered-collection="ctrl.instancesFilteredBySearch"></ek-search-filter>
 
         <div layout="row" layout-align="end center" flex>

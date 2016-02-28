@@ -1,0 +1,8 @@
+<h3>labels</h3>
+
+<div layout="row" layout-align="start center" layout-wrap>
+    <div class="ek-instance-overview-labels__label"
+         ng-repeat="(name, value) in ctrl.instance.metadata.labels track by name">
+        {{:: name }}={{:: value }}
+    </div>
+</div>

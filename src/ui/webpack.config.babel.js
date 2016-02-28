@@ -40,6 +40,7 @@ const webpackConfig = {
     module: {
         loaders: [
             { test: require.resolve('jquery'), loader: 'expose?jQuery' },
+            { test: /\.json$/, exclude: /\/(node_modules)\//, loader: 'json' },
             { test: /\.js$/, exclude: /\/(node_modules)\//, loader: 'ng-annotate!babel!eslint' },
             { test: /\.css/, loader: ExtractTextPlugin.extract('style', 'css') },
             { test: /\.less/, loader: ExtractTextPlugin.extract('style', 'css!postcss!less') },

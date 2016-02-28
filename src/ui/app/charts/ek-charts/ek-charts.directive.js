@@ -7,6 +7,10 @@ import template from './ek-charts.html';
 class ChartsDirective extends Directive {
     constructor() {
         super({ Controller, template });
+
+        this.bindToController = {
+            instance: '='
+        };
     }
 
     compile(tElement) {

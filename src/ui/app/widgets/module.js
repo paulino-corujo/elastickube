@@ -5,6 +5,7 @@ import coreModule from 'core/module';
 import AvatarDirective from './ek-avatar/ek-avatar.directive';
 import ButtonGroupDirective from './ek-button-group/ek-button-group.directive';
 import HeaderDirective from './ek-header/ek-header.directive';
+import IkonDirective from './ek-ikon/ek-ikon.directive';
 import InsertEmailsDirective from './ek-insert-emails/ek-insert-emails.directive';
 import InsertLabelsDirective from './ek-insert-labels/ek-insert-labels.directive';
 import InstanceLabelsDirective from './ek-instance-labels/ek-instance-labels.directive';
@@ -27,6 +28,7 @@ angular
     .directive('ekAvatar', () => new AvatarDirective())
     .directive('ekButtonGroup', () => new ButtonGroupDirective())
     .directive('ekHeader', () => new HeaderDirective())
+    .directive('ekIkon', () => new IkonDirective())
     .directive('ekInsertEmails', () => new InsertEmailsDirective())
     .directive('ekInsertLabels', () => new InsertLabelsDirective())
     .directive('ekInstanceLabels', () => new InstanceLabelsDirective())

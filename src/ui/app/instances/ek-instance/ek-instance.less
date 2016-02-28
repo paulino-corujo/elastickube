@@ -1,0 +1,47 @@
+@import "../../colors";
+
+.ek-instance {
+
+    .ek-tabs {
+        margin-top: 20px;
+    }
+
+    .ek-header-layout__header {
+        padding-bottom: 0;
+    }
+
+    &__title {
+        min-width: 190px;
+        text-transform: none;
+
+        span {
+            margin-right: 20px;
+        }
+    }
+
+    &__body {
+
+        .ek-sidenav-layout > [layout] > [transclude-id="sidenav"] {
+            border: none;
+            background-color: @grey100;
+        }
+
+        &__sidenav {
+            position: absolute;
+            width: 100%;
+            top: -50px;
+
+            .ek-ikon {
+                width: 170px;
+                height: 170px;
+            }
+        }
+
+        &__content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: @grey100;
+        }
+    }
+}

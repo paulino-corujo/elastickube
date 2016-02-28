@@ -7,7 +7,7 @@ class NavigationActionCreatorService {
     }
 
     charts(namespace = this._sessionStore.getActiveNamespace()) {
-        return this._routerHelper.changeToState('private.charts', { namespace: namespace.metadata.name });
+        return this._routerHelper.changeToState('charts', { namespace: namespace.metadata.name });
     }
 }
 

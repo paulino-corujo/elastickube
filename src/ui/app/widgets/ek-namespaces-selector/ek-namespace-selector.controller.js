@@ -33,10 +33,12 @@ class NamespacesSelectorController {
         return this._sessionActionCreator.selectNamespace(this.namespace)
             .then(() => {
                 switch (this._$state.current.name) {
-                    case 'private.instances':
+
+                    case 'instance':
+                    case 'instances':
                         return this._instancesNavigationActionCreator.instances();
 
-                    case 'private.charts':
+                    case 'charts':
                         return this._chartsNavigationActionCreator.charts();
 
                     default:

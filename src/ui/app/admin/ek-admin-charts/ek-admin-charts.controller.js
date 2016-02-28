@@ -25,7 +25,8 @@ class AdminChartsController {
                 {
                     name: 'name',
                     field: 'name',
-                    enableColumnMenu: false
+                    enableColumnMenu: false,
+                    cellTemplate: `<ek-chart-name chart="row.entity"></ek-chart-name>`
                 },
                 {
                     name: 'maintainers',

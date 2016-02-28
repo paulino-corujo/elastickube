@@ -1,6 +1,9 @@
-<ek-header-layout title="charts">
+<ek-header-layout>
     <div transclude-to="header" layout="row" layout-align="start center">
-        <ek-search-filter class="ek-charts__search" collection-to-be-filtered="ctrl.charts"
+        <h3 class="ek-charts__title ek-title"><span>charts</span></h3>
+
+        <ek-search-filter class="ek-charts__search"
+                          collection-to-be-filtered="ctrl.charts"
                           filtered-collection="ctrl.chartsFilteredBySearch"></ek-search-filter>
 
         <div layout="row" layout-align="end center" flex>

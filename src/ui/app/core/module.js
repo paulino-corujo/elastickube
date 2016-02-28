@@ -31,6 +31,7 @@ import humanizeDateFilter from './filters/humanize-date.filter';
 import InitializationService from './services/initialization.service';
 import MultiTranscludeService from './services/multi-transclude.service';
 import AuthService from './security/auth.service';
+import CheckNamespaceService from './services/check-namespace.service';
 import SessionService from './services/session.service';
 
 const moduleName = 'app.core';
@@ -54,6 +55,7 @@ angular
 
     .service('session', SessionService)
     .service('auth', AuthService)
+    .service('checkNamespace', CheckNamespaceService)
     .service('dispatcher', DispatcherService)
     .service('initialization', InitializationService)
     .service('multiTransclude', MultiTranscludeService)
