@@ -1,6 +1,6 @@
 class NewInstanceController {
     constructor(instancesActionCreator, instancesNavigationActionCreator) {
-        'ng-inject';
+        'ngInject';
 
         this._instancesActionCreator = instancesActionCreator;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
