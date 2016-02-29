@@ -4,7 +4,7 @@ class InstanceLabelsController {
     }
 
     countLabels() {
-        return _.size(this.instance.metadata.labels);
+        return _.size(this.labels);
     }
 }
 

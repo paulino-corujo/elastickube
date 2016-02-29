@@ -1,20 +1,20 @@
-import './ek-instance-labels.less';
+import './ek-labels.less';
 import Directive from 'directive';
 import constants from '../constants';
-import template from './ek-instance-labels.html';
-import Controller from './ek-instance-labels.controller';
+import template from './ek-labels.html';
+import Controller from './ek-labels.controller';
 
 class InstanceLabelsDirective extends Directive {
     constructor() {
         super({ Controller, template });
 
         this.bindToController = {
-            instance: '='
+            labels: '='
         };
     }
 
     compile(tElement) {
-        tElement.addClass('ek-instance-labels');
+        tElement.addClass('ek-labels');
 
         return ($scope) => _.extend($scope, constants);
     }
