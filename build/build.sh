@@ -1,8 +1,11 @@
-#!/bin/bash
+#!/bin/bash -e
 
-ELASTICKUBE_VERSION=1.0.${BUILD_NUMBER-0}
-
+ELASTICKUBE_VERSION=0.1.0.${BUILD_NUMBER-0}
 REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Build the UI
+cd /opt/elastickube/src/ui
+npm install && npm start > /var/log/elastickube/ui.log
 
 docker login --username="${DOCKER_USERNAME}" --password="${DOCKER_PASSWORD}" --email="${DOCKER_EMAIL}"
 
