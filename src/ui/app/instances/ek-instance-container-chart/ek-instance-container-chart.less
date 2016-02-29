@@ -1,0 +1,46 @@
+@import "../../colors";
+
+.ek-instance-container-chart {
+    display: block;
+
+    &__chart {
+        width: 120px;
+        height: 120px;
+    }
+
+    .ek-instance-container-chart__legend {
+        &-cpu,
+        &-memory {
+            span {
+                margin-right: 5px;
+                width: 8px;
+                height: 8px;
+                border-radius: 25px;
+            }
+        }
+
+        &-cpu {
+            span {
+                background: @purple;
+            }
+        }
+        &-memory {
+            span {
+                background: @indigo500
+            }
+        }
+    }
+
+    &__name {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .ek-donut-chart__container-chart__cpu {
+        .ek-donut-chart__current {
+            fill: @purple
+        }
+    }
+
+}

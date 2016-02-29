@@ -24,12 +24,12 @@ class DonutChartController {
             .data(this.dataset)
             .enter()
             .append('g')
-            .attr('class', (d) => `${COMPONENT_NAME}--${this.chartId}--${_.keys(d)[0]}`);
+            .attr('class', (d) => `${COMPONENT_NAME}__${this.chartId}__${_.keys(d)[0]}`);
 
         pathGroups.selectAll('path')
             .data((d) => pie(getPercent(_.values(d))))
             .enter().append('path')
-            .attr('class', (d, i) => `${COMPONENT_NAME}--${i === 1 ? 'rest' : 'current'}`)
+            .attr('class', (d, i) => `${COMPONENT_NAME}__${i === 1 ? 'rest' : 'current'}`)
             .attr('d', (d, i, j) => {
                 if (j > 0 && currentElement !== j) {
                     radius += this.marginBetweenCircles + this.strokeWidth;

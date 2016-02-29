@@ -1,0 +1,6 @@
+<h3>Containers</h3>
+<div layout="row" layout-wrap layout-align="space-around center">
+    <div class="ek-instance-overview-containers__container" ng-repeat="container in ctrl.instance.spec.containers">
+        <ek-instance-container-chart container="container"></ek-instance-container-chart>
+    </div>
+</div>

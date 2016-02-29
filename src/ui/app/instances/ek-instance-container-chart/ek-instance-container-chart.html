@@ -1,0 +1,19 @@
+<div class="ek-instance-container-chart__chart">
+    <ek-donut-chart
+            chart-id="container-chart"
+            dataset="ctrl.dataset"
+            stroke-width="12"
+            margin-between-circles="2"></ek-donut-chart>
+</div>
+<div layout="column" layout-align="center center">
+    <div class="ek-instance-container-chart__name">{{ ctrl.container.name }}</div>
+    <div class="ek-instance-container-chart__legend-cpu" layout="row" layout-align="center center">
+        <span></span>
+        <div>CPU: {{ ctrl.dataset[0].cpu }}%</div>
+    </div>
+    <div class="ek-instance-container-chart__legend-memory" layout="row" layout-align="center center">
+        <span></span>
+        <div>Memory: {{ ctrl.dataset[1].memory }}%</div>
+    </div>
+</div>
+
