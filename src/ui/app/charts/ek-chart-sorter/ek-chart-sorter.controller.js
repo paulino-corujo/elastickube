@@ -2,9 +2,9 @@ class ChartSorterController {
     constructor($scope, usersStore) {
         'ngInject';
 
-        this._userStoreService = usersStore;
+        this._userStore = usersStore;
 
-        this.sortTypes = ['name', 'most recent', 'owner'];
+        this.sortTypes = ['name', 'most recent'];
         this.sortType = _.first(this.sortTypes);
 
         $scope.$watch('ctrl.sortType', (x) => this.sortedCollection = sortByType(this.collectionToSort, x));
@@ -32,7 +32,7 @@ function sortByMostRecent(collectionToSort) {
 }
 
 function sortByOwner(collectionToSort) {
-    return _.sortBy(collectionToSort, (x) => _.find(this._userStoreService.getAll(), { id: x.owner }).name);
+    return _.sortBy(collectionToSort, (x) => _.find(this._userStore.getAll(), { id: x.owner }).name);
 }
 
 export default ChartSorterController;

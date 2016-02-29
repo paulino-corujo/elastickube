@@ -8,22 +8,8 @@
                           filtered-collection="ctrl.chartsFilteredBySearch"></ek-search-filter>
 
         <div layout="row" layout-align="end center" flex>
-            <ek-chart-sorter ng-show="ctrl.selectedView === 'grid'"
-                             collection-to-sort="ctrl.chartsFilteredBySearch"
+            <ek-chart-sorter collection-to-sort="ctrl.chartsFilteredBySearch"
                              sorted-collection="ctrl.chartsSortedByType"></ek-chart-sorter>
-
-            <ek-button-group>
-                <button ng-class="{'ek-button-group--selected' : ctrl.selectedView === 'list'}"
-                        ng-click="ctrl.selectView('list')"
-                        aria-label="view list">
-                    <md-icon md-svg-src="{{:: icons.IC_VIEW_LIST_48PX }}"></md-icon>
-                </button>
-                <button ng-class="{'ek-button-group--selected' : ctrl.selectedView === 'grid'}"
-                        ng-click="ctrl.selectView('grid')"
-                        aria-label="view grid">
-                    <md-icon md-svg-src="{{:: icons.IC_VIEW_MODULE_48PX }}"></md-icon>
-                </button>
-            </ek-button-group>
         </div>
     </div>
 
@@ -34,12 +20,7 @@
                  ng-if="ctrl.showEmpty">No charts found
             </div>
 
-            <div ng-if="!ctrl.showEmpty" ng-switch="ctrl.selectedView">
-                <ek-chart-grid ng-switch-when="grid"
-                               charts="ctrl.chartsSortedByType"></ek-chart-grid>
-                <ek-chart-list ng-switch-default
-                               charts="ctrl.chartsFilteredBySearch"></ek-chart-list>
-            </div>
+            <ek-chart-grid charts="ctrl.chartsSortedByType"></ek-chart-grid>
         </div>
     </div>
 </ek-header-layout>

@@ -7,7 +7,7 @@ class PrincipalActionCreatorService {
         this._actions = actions;
         this._principalAPI = principalAPI;
         this._dispatcher = dispatcher;
-        this._userStoreService = usersStore;
+        this._userStore = usersStore;
     }
 
     signup(user, code) {

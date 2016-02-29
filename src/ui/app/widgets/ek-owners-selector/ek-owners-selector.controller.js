@@ -2,7 +2,7 @@ class OwnersSelectorController {
     constructor($scope, usersStore) {
         'ngInject';
 
-        this._userStoreService = usersStore;
+        this._userStore = usersStore;
 
         this.selectedOwners = this.selectedOwners || [];
         this.open = true;
@@ -32,7 +32,7 @@ class OwnersSelectorController {
 
 function getOwners(shareables) {
     return _.chain(shareables)
-        .map((x) => _.find(this._userStoreService.getAll(), { id: x.owner }))
+        .map((x) => _.find(this._userStore.getAll(), { id: x.owner }))
         .uniq()
         .sortBy('id')
         .value();
