@@ -1,4 +1,6 @@
 function themeConfiguration($mdThemingProvider) {
+    'ngInject';
+
     const ekPalette = $mdThemingProvider.extendPalette('cyan', {
         contrastDefaultColor: 'light'
     });

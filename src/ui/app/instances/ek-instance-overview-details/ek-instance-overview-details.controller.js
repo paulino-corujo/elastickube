@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment';
 
 class InstanceOverviewDetailsController {
     constructor(instancesStore) {
@@ -6,12 +6,10 @@ class InstanceOverviewDetailsController {
 
         this._instancesStore = instancesStore;
 
-        this.details = {};
-
         if (_.has(this.instance, 'status.replicas')) {
-            this._createReplicationControllerDetails();
+            this.details = this._createReplicationControllerDetails();
         } else {
-            this._createPodDetails();
+            this.details = this._createPodDetails();
         }
     }
 
@@ -23,7 +21,7 @@ class InstanceOverviewDetailsController {
         details['Start Time'] = moment.utc(this.instance.metadata.creationTimestamp).local().format('ddd, D MMM GGGG HH:mm:ss');
         details['IP(s)'] = this.instance.status.podIP;
 
-        this.details = _.omitBy(details, _.isEmpty);
+        return _.omitBy(details, _.isEmpty);
     }
 
     _createReplicationControllerDetails() {
@@ -35,7 +33,7 @@ class InstanceOverviewDetailsController {
         details['Start Time'] = moment.utc(this.instance.metadata.creationTimestamp).local().format('ddd, D MMM GGGG HH:mm:ss');
         details['IP(s)'] = _.chain(pods).map((x) => x.status.podIP).uniq().join('/').value();
 
-        this.details = _.omitBy(details, _.isEmpty);
+        return _.omitBy(details, _.isEmpty);
     }
 }
 

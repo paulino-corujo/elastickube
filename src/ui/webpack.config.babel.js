@@ -91,7 +91,7 @@ const webpackConfig = {
     },
 
     eslint: {
-        failOnWarning: isProduction
+        failOnWarning: /* isProduction */ false
     }
 };
 

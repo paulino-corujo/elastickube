@@ -15,7 +15,7 @@
     "start": "parallelshell 'npm run build' 'npm-watch'",
     "clean-dependencies": "npm install && npm prune",
     "build": "webpack --progress --colors --devtool=eval --watch",
-    "build:production": "NODE_ENV=production webpack -p --progress --colors --bail"
+    "build:production": "NODE_ENV=production webpack -p --progress --devtool=sourcemap --colors"
   },
   "dependencies": {
     "angular": "~1.4.9",
