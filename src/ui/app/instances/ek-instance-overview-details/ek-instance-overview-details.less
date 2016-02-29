@@ -1,5 +1,15 @@
 @import "../../colors";
 
 .ek-instance-overview-details {
+    &__detail {
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
 
+        h4 {
+            color: @grey500;
+            margin: 0;
+            font-weight: 400;
+        }
+    }
 }
