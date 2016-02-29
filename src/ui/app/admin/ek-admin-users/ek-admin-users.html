@@ -10,8 +10,10 @@
 
             <div class="separator" ng-if="ctrl.hasRowsSelected"></div>
 
-            <ek-search-filter class="ek-admin-users__search" collection-to-be-filtered="ctrl.users"
-                              filtered-collection="ctrl.filteredUsers"></ek-search-filter>
+            <ek-search-filter class="ek-admin-users__search"
+                              collection-to-be-filtered="ctrl.users"
+                              filtered-collection="ctrl.filteredUsers"
+                              search-field="username"></ek-search-filter>
         </div>
         <md-button class="md-raised md-primary" ng-click="ctrl.inviteUsers()">invite</md-button>
     </div>

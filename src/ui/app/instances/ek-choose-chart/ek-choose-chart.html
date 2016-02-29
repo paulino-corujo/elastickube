@@ -6,8 +6,10 @@
             </div>
             <div class="ek-choose-chart__toolbar__content" layout="column" flex="85">
                 <h2 class="ek-choose-chart__toolbar__content__title">Choose chart</h2>
-                <ek-search-filter collection-to-be-filtered="ctrl.charts" icon-alignment="left"
-                                  filtered-collection="ctrl.filteredCharts"></ek-search-filter>
+                <ek-search-filter collection-to-be-filtered="ctrl.charts"
+                                  icon-alignment="left"
+                                  filtered-collection="ctrl.filteredCharts"
+                                  search-field="name"></ek-search-filter>
             </div>
         </div>
         <ek-choose-chart-grid charts="ctrl.filteredCharts" selected-chart="ctrl.selectedChart" on-selection="ctrl.selectChart()"></ek-choose-chart-grid>
