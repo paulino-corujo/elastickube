@@ -2,7 +2,7 @@ const NEW_INSTANCE_STEP = 2;
 
 class CustomizeDeploymentController {
     constructor($scope, $element) {
-        'ng-inject';
+        'ngInject';
 
         this._$element = $element;
         this.deploymentInfo = {
