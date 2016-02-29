@@ -9,45 +9,42 @@ SUPPORTED_KIND = ["Pod"]
 
 class InstanceWatcher(object):
 
-    def __init__(self, settings, callback):
+    def __init__(self, message, settings, callback):
         logging.info("Initializing InstanceWatcher")
 
         self.watchers = dict()
-        self.connected = False
-        self.message = None
         self.params = dict()
+        self.connected = False
 
         self.settings = settings
         self.callback = callback
+        self.message = message
+
+        self.validate_message()
 
     @coroutine
-    def watch(self, message):
+    def watch(self):
         logging.info("Starting watch Instance")
 
-        self.message = message
-        if self.validate_message():
-            if len(self.watchers.keys()) > 0:
-                self.unwatch()
+        yield self.initialize_data()
 
-            yield self.initialize_data()
+        self.connected = True
+        try:
+            logging.debug("Starting watch Instance connected with params %s" % self.params)
 
-            self.connected = True
-            try:
-                logging.debug("Starting watch Instance connected with params %s" % self.params)
+            if self.params["kind"] == "Pod":
+                self._watch_pod()
 
-                if self.params["kind"] == "Pod":
-                    self._watch_pod()
-
-            except Exception as e:
-                logging.exception(e)
-                if self.connected:
-                    self.callback(dict(
-                        action=self.message["action"],
-                        operation="watched",
-                        status_code=400,
-                        correlation=self.message["correlation"],
-                        body={"error": {"message": "Failed to connect to event source."}},
-                    ))
+        except Exception as e:
+            logging.exception(e)
+            if self.connected:
+                self.callback(dict(
+                    action=self.message["action"],
+                    operation="watched",
+                    status_code=400,
+                    correlation=self.message["correlation"],
+                    body={"error": {"message": "Failed to connect to event source."}},
+                ))
 
     @coroutine
     def initialize_data(self):

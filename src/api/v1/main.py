@@ -5,12 +5,9 @@ from pymongo.errors import DuplicateKeyError
 from tornado.gen import coroutine, Return, Future
 
 from api.v1 import SecureWebSocketHandler
-from api.v1.watchers.charts import ChartsWatcher
+from api.v1.watchers.cursor import CursorWatcher
 from api.v1.watchers.instance import InstanceWatcher
 from api.v1.watchers.instances import InstancesWatcher
-from api.v1.watchers.namespaces import NamespacesWatcher
-from api.v1.watchers.settings import SettingsWatcher
-from api.v1.watchers.users import UsersWatcher
 from api.v1.actions.namespace import NamespaceActions
 from api.v1.actions.setting import SettingActions
 from api.v1.actions.user import UserActions
@@ -31,25 +28,25 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         self.actions_lookup = dict(
             instances=dict(
-                watchers=InstancesWatcher(self.settings, self.write_message)
+                watcher_cls=InstancesWatcher
             ),
             instance=dict(
-                watchers=InstanceWatcher(self.settings, self.write_message)
+                watcher_cls=InstanceWatcher
             ),
             charts=dict(
-                watchers=ChartsWatcher(self.settings, self.write_message)
+                watcher_cls=CursorWatcher
             ),
             namespaces=dict(
                 rest=NamespaceActions(self.settings),
-                watchers=NamespacesWatcher(self.settings, self.write_message)
+                watcher_cls=CursorWatcher
             ),
             settings=dict(
                 rest=SettingActions(self.settings),
-                watchers=SettingsWatcher(self.settings, self.write_message)
+                watcher_cls=CursorWatcher
             ),
             users=dict(
                 rest=UserActions(self.settings),
-                watchers=UsersWatcher(self.settings, self.write_message)
+                watcher_cls=CursorWatcher
             )
         )
 
@@ -68,6 +65,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         # Wait the user to be authenticated before accepting message
         if isinstance(self.user, Future):
             self.user = yield self.user
+
+        if not self.user:
+            raise Return()
 
         request = yield self.validate_message(message)
         if not request:
@@ -130,20 +130,28 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             self.write_message(response)
 
         elif request["operation"] in WATCH_OPERATIONS:
-            if request["operation"] == "watch":
+            watcher_key = self._get_watcher_key(request)
 
+            if request["operation"] == "watch":
                 response["operation"] = "watched"
 
-                watcher = self.actions_lookup[request["action"]].get("watchers", None)
-                if watcher:
-                    if request["action"] in self.current_watchers.keys():
+                watcher_cls = self.actions_lookup[request["action"]].get("watcher_cls", None)
+                if watcher_cls:
+                    if watcher_key in self.current_watchers.keys():
                         response["body"] = {"message": "Action already watched."}
                         response["status_code"] = 400
                         self.write_message(response)
 
                     else:
+                        watcher = watcher_cls(request, self.settings, self.write_message)
+                        try:
+                            yield watcher.watch()
+                        except Exception as e:
+                            logging.exception(e)
+                            logging.error(request)
+                            raise
 
-                        self.current_watchers[request["action"]] = watcher.watch(request)
+                        self.current_watchers[watcher_key] = watcher
                 else:
                     response["body"] = {"message": "Action not supported for operation watch."}
                     response["status_code"] = 400
@@ -152,10 +160,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             elif request["operation"] == "unwatch":
                 response["operation"] = "unwatched"
 
-                if request["action"] in self.current_watchers.keys():
-                    watcher = self.actions_lookup[request["action"]].get("watchers", None)
-                    watcher.unwatch()
-                    del self.current_watchers[request["action"]]
+                if watcher_key in self.current_watchers.keys():
+                    self.current_watchers[watcher_key].unwatch()
+                    del self.current_watchers[watcher_key]
 
                     self.write_message(response)
                 else:
@@ -167,8 +174,8 @@ class MainWebSocketHandler(SecureWebSocketHandler):
     def on_close(self):
         logging.info("Closing MainWebSocketHandler")
 
-        for watcher_key in self.current_watchers.keys():
-            watcher = self.actions_lookup[watcher_key].get("watchers", None)
+        for key, watcher in self.current_watchers.iteritems():
+            logging.debug("Closing watcher %s", key)
             watcher.unwatch()
 
         yield super(MainWebSocketHandler, self).on_close()
@@ -216,3 +223,18 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             raise Return(None)
 
         raise Return(request)
+
+    def _get_watcher_key(self, message):
+        watcher_key = message["action"]
+
+        if "body" in message:
+            if "namespace" in message["body"]:
+                watcher_key += ".%s" % message["body"]["namespace"]
+
+            if "kind" in message["body"]:
+                watcher_key += ".%s" % message["body"]["kind"]
+
+            if "name" in message["body"]:
+                watcher_key += ".%s" % message["body"]["name"]
+
+        return watcher_key
