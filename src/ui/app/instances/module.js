@@ -7,7 +7,9 @@ import instancesRoutes from './instances-routes';
 import NavigationActionCreator from './navigation-action-creator.service';
 
 import InstanceDirective from './ek-instance/ek-instance.directive';
+import InstanceContainerChartDirective from './ek-instance-container-chart/ek-instance-container-chart.directive';
 import InstanceOverviewDirective from './ek-instance-overview/ek-instance-overview.directive';
+import InstanceOverviewContainersDirective from './ek-instance-overview-containers/ek-instance-overview-containers.directive';
 import InstanceOverviewDetailsDirective from './ek-instance-overview-details/ek-instance-overview-details.directive';
 import InstanceOverviewLabelsDirective from './ek-instance-overview-labels/ek-instance-overview-labels.directive';
 import InstanceOverviewEventsDirective from './ek-instance-overview-events/ek-instance-overview-events.directive';
@@ -34,7 +36,9 @@ angular
     .service('instancesNavigationActionCreator', NavigationActionCreator)
 
     .directive('ekInstance', () => new InstanceDirective())
+    .directive('ekInstanceContainerChart', () => new InstanceContainerChartDirective())
     .directive('ekInstanceOverview', () => new InstanceOverviewDirective())
+    .directive('ekInstanceOverviewContainers', () => new InstanceOverviewContainersDirective())
     .directive('ekInstanceOverviewDetails', () => new InstanceOverviewDetailsDirective())
     .directive('ekInstanceOverviewLabels', () => new InstanceOverviewLabelsDirective())
     .directive('ekInstanceOverviewEvents', () => new InstanceOverviewEventsDirective())
