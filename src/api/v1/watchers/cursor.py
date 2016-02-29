@@ -65,7 +65,7 @@ class CursorWatcher(object):
 
     def validate_message(self):
         if self.message["action"] not in ACTIONS_TO_COLLECTIONS_MAP.keys():
-            self.write_message(dict(
+            self.callback(dict(
                 action=self.message["action"],
                 operation=self.message["operation"],
                 correlation=self.message["correlation"],

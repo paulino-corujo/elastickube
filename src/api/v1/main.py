@@ -6,8 +6,7 @@ from tornado.gen import coroutine, Return, Future
 
 from api.v1 import SecureWebSocketHandler
 from api.v1.watchers.cursor import CursorWatcher
-from api.v1.watchers.instance import InstanceWatcher
-from api.v1.watchers.instances import InstancesWatcher
+from api.v1.watchers.kube import KubeWatcher
 from api.v1.actions.namespace import NamespaceActions
 from api.v1.actions.setting import SettingActions
 from api.v1.actions.user import UserActions
@@ -28,10 +27,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         self.actions_lookup = dict(
             instances=dict(
-                watcher_cls=InstancesWatcher
+                watcher_cls=KubeWatcher
             ),
             instance=dict(
-                watcher_cls=InstanceWatcher
+                watcher_cls=KubeWatcher
             ),
             charts=dict(
                 watcher_cls=CursorWatcher
@@ -144,13 +143,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
                     else:
                         watcher = watcher_cls(request, self.settings, self.write_message)
-                        try:
-                            yield watcher.watch()
-                        except Exception as e:
-                            logging.exception(e)
-                            logging.error(request)
-                            raise
-
+                        yield watcher.watch()
                         self.current_watchers[watcher_key] = watcher
                 else:
                     response["body"] = {"message": "Action not supported for operation watch."}
@@ -159,11 +152,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
             elif request["operation"] == "unwatch":
                 response["operation"] = "unwatched"
-
                 if watcher_key in self.current_watchers.keys():
                     self.current_watchers[watcher_key].unwatch()
                     del self.current_watchers[watcher_key]
-
                     self.write_message(response)
                 else:
                     response["body"] = {"message": "Action not previously watch."}
@@ -224,7 +215,8 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         raise Return(request)
 
-    def _get_watcher_key(self, message):
+    @staticmethod
+    def _get_watcher_key(message):
         watcher_key = message["action"]
 
         if "body" in message:

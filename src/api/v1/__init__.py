@@ -38,6 +38,7 @@ def configure(settings):
 @coroutine
 def initialize(settings):
     yield initialize_database(settings['database'])
+    yield settings["kube"].build_resources()
 
     yield SyncNamespaces(settings).start_sync()
     watch.start_monitor(settings['motor'])

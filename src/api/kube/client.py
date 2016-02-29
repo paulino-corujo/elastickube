@@ -7,11 +7,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
 from tornado.httputil import url_concat
 
 from api.kube.exceptions import KubernetesException, WatchDisconnectedException, NotFoundException
-from api.kube.events import Events
-from api.kube.namespaces import Namespaces
-from api.kube.pods import Pods
-from api.kube.replication_controllers import ReplicationControllers
-from api.kube.services import Services
+from api.kube.resources import Resource, NamespacedResource
 
 
 class HTTPClient(object):
@@ -176,15 +172,28 @@ class KubeClient(object):
     def __init__(self, endpoint, username=None, password=None, token=None, version='v1'):
         self.version = version
         self.http_client = HTTPClient(endpoint, username, password, token)
-
-        self.events = Events(self)
-        self.namespaces = Namespaces(self)
-        self.pods = Pods(self)
-        self.replication_controllers = ReplicationControllers(self)
-        self.services = Services(self)
+        self.resources = {}
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+    def __getattr__(self, item):
+        return self.resources[item]
+
+    @coroutine
+    def build_resources(self):
+        response = yield self.http_client.get("/")
+        for resource in json.loads(response.body).get("resources", []):
+            # FIXME: Also build methods endpoint
+            if "/" in resource["name"]:
+                continue
+
+            if resource["namespaced"]:
+                self.resources[resource["name"]] = NamespacedResource(self, resource["name"])
+            else:
+                self.resources[resource["name"]] = Resource(self, resource["name"])
+
+        raise Return()
 
     def format_error(self, error):
         if error.code != 599:
