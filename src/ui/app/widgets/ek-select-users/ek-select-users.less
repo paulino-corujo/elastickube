@@ -1,0 +1,51 @@
+@import "../../colors";
+
+.ek-select-users {
+    position: relative;
+    display: block;
+    width: 100%;
+
+    md-autocomplete button {
+        margin: 0 3px;
+
+        md-icon {
+            transform: translate3d(-50%, -50%, 0);
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    &__search-icon {
+        color: @grey500;
+        position: absolute;
+        right: 10px;
+        top: 6px;
+        width: 18px;
+        height: 18px;
+        opacity: 0.6;
+    }
+
+    &__input {
+        background: @white;
+        height: 30px;
+        border: 1px solid @grey300;
+
+        .layout-row {
+            box-shadow: none;
+            height: 30px;
+
+            input {
+                height: 30px;
+                line-height: 30px;
+            }
+        }
+    }
+
+    &__menu {
+        li {
+            height: 40px;
+            background-color: @white;
+            line-height: 40px;
+        }
+    }
+}

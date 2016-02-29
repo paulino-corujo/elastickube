@@ -1,4 +1,5 @@
-<md-autocomplete md-no-cache="true"
+<md-autocomplete class="ek-select-users__input"
+                 md-no-cache="true"
                  md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
                  md-search-text="ctrl.searchText"
                  md-selected-item-change="ctrl.selectUser(user)"
@@ -6,9 +7,12 @@
                  md-item-text="user.name"
                  md-min-length="0"
                  placeholder="Add user as an administrator..."
-                 md-menu-class="autocomplete-custom-template">
-
+                 md-menu-class="ek-select-users__menu">
     <md-item-template>
         <ek-user-info username="user.username"></ek-user-info>
     </md-item-template>
 </md-autocomplete>
+
+<md-icon class="ek-select-users__search-icon"
+         ng-if="!ctrl.searchText || ctrl.searchText.length === 0"
+         md-svg-src="{{:: icons.IC_SEARCH_48PX }}"></md-icon>

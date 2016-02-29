@@ -1,3 +1,5 @@
+import './ek-select-users.less';
+import constants from '../constants';
 import Directive from 'directive';
 import Controller from './ek-select-users.controller';
 import template from './ek-select-users.html';
@@ -13,6 +15,8 @@ class SelectUsersDirective extends Directive {
 
     compile(tElement) {
         tElement.addClass('ek-select-users');
+
+        return ($scope) => _.extend($scope, constants);
     }
 }
 

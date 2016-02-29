@@ -30,11 +30,13 @@
     &__admins {
         &__list {
             border: 1px solid @grey300;
+            border-top: 0;
             max-height: 210px;
             overflow-y: auto;
 
             &__admin {
-                padding: 10px;
+                padding: 0 10px;
+                line-height: 40px;
 
                 &:not(:last-child) {
                     border-bottom: 1px solid @grey300;
@@ -42,6 +44,8 @@
 
                 &__clear {
                     margin: 0;
+                    height: 18px;
+                    width: 18px;
                     cursor: pointer;
                 }
             }

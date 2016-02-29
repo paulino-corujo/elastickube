@@ -1,14 +1,14 @@
 <div layout="column" layout-align="start center" ng-form="ctrl.form">
 
     <div class="ek-admin-settings__admins" layout="column">
-        <h4 class="ek-admin-settings__admins__title">cluster administrators</h4>
+        <h4 class="ek-admin-settings__title">cluster administrators</h4>
 
         <ek-select-users selected-users="ctrl.admins"></ek-select-users>
 
         <div class="ek-admin-settings__admins__list" layout="column"
              ng-if="ctrl.admins.length > 0">
             <div class="ek-admin-settings__admins__list__admin"
-                 layout="row" layout-align="space-between"
+                 layout="row" layout-align="space-between center"
                  ng-repeat="admin in ctrl.admins track by admin.username">
                 <ek-user-info username="admin.username"
                               show-username="true"></ek-user-info>
