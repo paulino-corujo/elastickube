@@ -3,6 +3,6 @@
         <ek-ikon name="ctrl.chart.name" icon="ctrl.chart.icon"></ek-ikon>
     </div>
     <span class="ek-chart-card__info__name">{{ ctrl.chart.name }}</span>
-    <span class="ek-chart-card__info__description">{{ ctrl.chart.description }}</span>
+    <span class="ek-chart-card__info__description">{{ ctrl.chart.maintainers[0].split("<")[0] }} · {{ ctrl.chart.committed_date | ekHumanizeDate: 'epoch' }} ago</span>
 </div>
 
