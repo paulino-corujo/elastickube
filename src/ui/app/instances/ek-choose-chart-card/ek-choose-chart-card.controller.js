@@ -1,5 +1,7 @@
 class ChooseChartCardController {
     constructor($scope, $element) {
+        'ngInject';
+
         this._$element = $element;
 
         $scope.$watch('ctrl.selected', (selected) => {
