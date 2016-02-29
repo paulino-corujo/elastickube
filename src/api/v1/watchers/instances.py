@@ -68,14 +68,6 @@ class InstancesWatcher(object):
                 self.watchers[resource_list]['watcher'].add_done_callback(done_callback)
                 logging.debug("Added watcher for %s " % resource_list)
 
-            self.watchers['ServiceList']['watcher'] = self.settings["kube"].services.watch(
-                namespace=self.namespace,
-                resource_version=self.watchers['ServiceList']['resourceVersion'],
-                on_data=self.data_callback
-            )
-
-            self.watchers['ServiceList']['watcher'].add_done_callback(done_callback)
-
         except Exception as e:
             logging.exception(e)
             if self.connected:
@@ -117,11 +109,13 @@ class InstancesWatcher(object):
         for resource in RESOURCES_LIST_MAP.itervalues():
             result = yield self.settings["kube"][resource].get(namespace=self.namespace)
             self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
-            items.extend(result.get("items", []))
 
-        result = yield self.settings["kube"].services.get(namespace=self.namespace)
-        self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
-        items.extend(result.get("items", []))
+            resources = []
+            for item in result.get("items", []):
+                item["kind"] = result["kind"].replace("List", "")
+                resources.append(item)
+
+            items.extend(resources)
 
         self.callback(dict(
             action=self.message["action"],
