@@ -110,6 +110,7 @@ metadata:
   labels:
     name: elastickube-server
 spec:
+  type: LoadBalancer
   ports:
   - port: 80
     targetPort: 80
