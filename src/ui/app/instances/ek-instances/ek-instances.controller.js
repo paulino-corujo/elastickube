@@ -1,12 +1,14 @@
 class InstancesController {
-    constructor($scope, instancesNavigationActionCreator, instancesStore) {
+    constructor($scope, instancesNavigationActionCreator, instancesStore, sessionStore) {
         'ngInject';
 
         const onChange = () => this.instances = this._instancesStore.getAll();
+        const removeInstancesListener = () => this._instancesStore.removeChangeListener(onChange);
 
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._instancesStore = instancesStore;
         this._instancesStore.addChangeListener(onChange);
+        sessionStore.addNamespaceChangeListener(removeInstancesListener);
 
         this.instances = this._instancesStore.getAll();
         this.selectedView = 'list';
@@ -16,7 +18,10 @@ class InstancesController {
 
         $scope.$watchCollection('ctrl.instancesFilteredBySearch', (x) => this.showEmpty = _.isEmpty(x));
 
-        $scope.$on('$destroy', () => this._instancesStore.removeChangeListener(onChange));
+        $scope.$on('$destroy', () => {
+            removeInstancesListener();
+            sessionStore.removeNamespaceChangeListener(removeInstancesListener);
+        });
     }
 
     selectView(name) {
