@@ -156,7 +156,12 @@ class InstanceWatcher(object):
         })).get(namespace=self.params["namespace"])
 
         self.watchers[result["kind"]] = dict(resourceVersion=result["metadata"]["resourceVersion"])
-        items.extend(result.get("items", []))
+        events = []
+        for item in result.get("items", []):
+            item["kind"] = result["kind"].replace("List", "")
+            events.append(item)
+
+        items.extend(events)
 
         raise Return(items)
 
