@@ -33,14 +33,26 @@ class AdminInstancesController {
                     name: 'labels',
                     field: 'metadata.labels',
                     enableColumnMenu: false,
-                    cellTemplate: `<p>{{ row.entity.metadata.name }}</p>`
+                    cellTemplate: `<ek-labels labels="row.entity.metadata.labels"></ek-labels>`,
+                    sortingAlgorithm: (a, b) => {
+                        const sizeA = _.size(a);
+                        const sizeB = _.size(b);
+
+                        if (sizeA > sizeB) {
+                            return 1;
+                        } else if (sizeA < sizeB) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }
                 },
                 {
                     name: 'serviceId',
                     displayName: 'Service ID',
                     field: 'metadata.name',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-instance-labels instance="row.entity"></ek-instance-labels>`
+                    cellTemplate: `<p>{{ row.entity.metadata.name }}</p>`
                 },
                 {
                     name: 'modified',
