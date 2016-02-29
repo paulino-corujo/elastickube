@@ -69,8 +69,8 @@ class AbstractAPI extends EventEmitter {
         return this._ws.deleteEvent(this._name, ...params);
     }
 
-    create(...params) {
-        return this._ws.createEvent(this._name, ...params)
+    create(body) {
+        return this._ws.createEvent(this._name, body)
             .then((x) => x && x.body);
     }
 
