@@ -9,13 +9,13 @@ class SearchFilterController {
 
     search() {
         this.filteredCollection = _.size(this.text.trim()) > 0
-            ? filter(this.collectionToBeFiltered, this.text)
+            ? this._filter(this.collectionToBeFiltered, this.text)
             : this.collectionToBeFiltered;
     }
-}
 
-function filter(collectionToBeFiltered, text) {
-    return _.filter(collectionToBeFiltered, (x) => x.name.toLowerCase().indexOf(text.toLowerCase()) !== -1);
+    _filter(collectionToBeFiltered, text) {
+        return _.filter(collectionToBeFiltered, (x) => _.get(x, this.searchField).toLowerCase().indexOf(text.toLowerCase()) !== -1);
+    }
 }
 
 export default SearchFilterController;

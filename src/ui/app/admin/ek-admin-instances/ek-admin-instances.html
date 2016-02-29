@@ -10,8 +10,11 @@
 
             <div class="separator" ng-if="ctrl.hasRowsSelected"></div>
 
-            <ek-search-filter class="ek-admin-instances__search" collection-to-be-filtered="ctrl.instances"
-                              filtered-collection="ctrl.filteredInstances"></ek-search-filter>
+            <ek-search-filter class="ek-admin-instances__search"
+                              collection-to-be-filtered="ctrl.instances"
+                              filtered-collection="ctrl.filteredInstances"
+                              search-field="metadata.name">
+            </ek-search-filter>
         </div>
         <md-button class="md-raised md-primary">new</md-button>
     </div>
