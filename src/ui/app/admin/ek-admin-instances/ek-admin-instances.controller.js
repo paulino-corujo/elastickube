@@ -56,9 +56,9 @@ class AdminInstancesController {
                 },
                 {
                     name: 'modified',
-                    field: 'status.startTime',
+                    field: 'metadata.creationTimestamp',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-instance-modified instance="row.entity"></ek-instance-modified>`
+                    cellTemplate: `<div>{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>`
                 }
             ],
             onRegisterApi: (gridApi) => {
