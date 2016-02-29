@@ -1,24 +1,29 @@
 @import '../../colors';
 
 .ek-choose-chart-card {
-    width: 152px;
+    width: 155px;
     height: 160px;
     margin: 10px;
     background-color: @white;
     border: 1px solid @grey350;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
     border-radius: 2px;
     cursor: pointer;
 
     &--selected {
-        border: 2px solid @cyan500;
+        border: 3px solid @cyan500;
         cursor: default;
+        background: @blue50;
+        .ek-choose-chart-card__info__icon {
+            margin-top: 23px;
+        }
     }
 
     &__info {
         padding: 0 15px;
 
         &__icon {
-            margin-top: 20px;
+            margin-top: 25px;
 
             svg {
                 width: 76px;
@@ -28,7 +33,7 @@
 
         &__name {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 15px;
             font-weight: 500;
         }
 

@@ -3,19 +3,20 @@
 .ek-choose-chart {
     & {
         background-color: @white;
-        border: 1px solid #d9d9d9;
+        border: 1px solid @grey300;
+        border-radius: 2px;        
         width: 805px;
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.06);
     }
 
     &--active {
         .ek-choose-chart__toolbar {
-            padding-bottom: 35px;
+            padding-bottom: 30px;
         }
     }
 
     &__toolbar {
-        background-color: @white;
-        border-bottom: 1px solid #d9d9d9;
+        border-bottom: 1px solid @grey350;
         font-weight: bold;
         padding-bottom: 0;
         &__step {
@@ -23,6 +24,9 @@
 
             &__number {
                 color: @cyan500;
+                font-size: 16px;
+                font-weight: 500;
+                margin: 30px 0 25px 10px;
             }
         }
 
@@ -31,6 +35,9 @@
 
             &__title {
                 color: @cyan500;
+                font-size: 16px;
+                font-weight: 500;
+                margin: 30px 30px 25px 0;
             }
 
             &__charticon {
@@ -46,18 +53,30 @@
                 color: @grey450;
                 margin-right: 20px;
             }
+            input {
+                font-weight: normal;
+            }
         }
     }
 
     &__footer {
-        border-top: 1px solid #d9d9d9;
+        border-top: 1px solid @grey300;
         height: 70px;
 
         .md-button {
             height: 30px;
             min-height: 0;
-            line-height: 30px;
             margin: 20px 20px 0 0;
+            box-shadow: none;
+            line-height: 29px;
+            font-weight: bold;
+            font-size: 13px;
+            &.md-raised:not([disabled]) {
+                box-shadow: none;
+                font-weight: bold;
+                color: #fff;
+                font-size: 13px;
+            }
         }
     }
 }
