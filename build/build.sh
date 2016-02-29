@@ -6,6 +6,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 # Build the UI
 cd ${REPO_ROOT}/src/ui
 npm install
+npm run build:production
 
 docker login --username="${DOCKER_USERNAME}" --password="${DOCKER_PASSWORD}" --email="${DOCKER_EMAIL}"
 
