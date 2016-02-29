@@ -27,7 +27,10 @@
 
             <div class="ek-admin-settings__authentication__methods__google"
                  layout="row" layout-align="space-between center">
-                <div layout="row">Google</div>
+                <div layout="row" layout-align="start center">
+                    <img class="ek-admin-settings__authentication__icon" ng-src="{{:: icons.GOOGLE_G_LOGO }}">
+                    <span>Google</span>
+                </div>
                 <md-switch class="md-primary" aria-label="Switch Google authentication"
                            ng-model="ctrl.auth.google"
                            ng-disabled="ctrl.isAuthDisabled('google')"></md-switch>
@@ -46,17 +49,13 @@
                        ng-model="ctrl.auth.google_data.secret" required>
             </div>
 
-            <div class="ek-admin-settings__authentication__methods__github"
-                 layout="row" layout-align="space-between center">
-                <div layout="row">GitHub</div>
-                <md-switch class="md-primary" aria-label="Switch GitHub authentication"
-                           ng-model="ctrl.auth.github"
-                           ng-disabled="true"></md-switch>
-            </div>
-
             <div class="ek-admin-settings__authentication__methods__password"
                  layout="row" layout-align="space-between center">
-                <div layout="row">Username & Password</div>
+                <div layout="row" layout-align="start center">
+                    <md-icon class="ek-admin-settings__authentication__icon ek-admin-settings__authentication__icon__password"
+                             md-svg-icon="{{:: icons.IC_PERSON_48PX }}"></md-icon>
+                    <span>Username & Password</span>
+                </div>
 
                 <md-switch class="md-primary" aria-label="Switch Username and Pasword authentication"
                            ng-model="ctrl.auth.password"
@@ -66,14 +65,6 @@
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Password Regex</div>
                 <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
                        ng-model="ctrl.auth.password_data.regex" required>
-            </div>
-
-            <div class="ek-admin-settings__authentication__methods__ldap"
-                 layout="row" layout-align="space-between center">
-                <div layout="row">LDAP</div>
-                <md-switch class="md-primary" aria-label="Switch LDAP authentication"
-                           ng-model="ctrl.auth.ldap"
-                           ng-disabled="true"></md-switch>
             </div>
 
         </div>
