@@ -13,19 +13,18 @@ RESOURCES_LIST_MAP = {
 
 class InstancesWatcher(object):
 
-    def __init__(self, settings, callback):
+    def __init__(self, message, settings, callback):
         logging.info("Initializing InstancesWatcher")
 
         self.watchers = dict()
         self.connected = False
-        self.message = None
-        self.namespace = 'default'
 
         self.settings = settings
         self.callback = callback
+        self.message = message
 
     @coroutine
-    def watch(self, message):
+    def watch(self):
         def done_callback(future):
             logging.warn("Disconnected from kubeclient.")
 
@@ -38,20 +37,13 @@ class InstancesWatcher(object):
                         resource_name = RESOURCES_LIST_MAP[watcher_key]
                         self.watchers[watcher_key]['watcher'] = self.settings["kube"][resource_name].watch(
                             on_data=self.data_callback,
-                            namespace=self.namespace,
+                            namespace=self.message["body"]["namespace"],
                             resource_version=self.watchers[watcher_key]['resourceVersion'])
 
                         self.watchers[watcher_key]['watcher'].add_done_callback(done_callback)
                         logging.debug("Reconnected watcher for %s " % watcher_key)
 
         logging.info("Starting watch Instances")
-        self.message = message
-        if 'body' in self.message and 'namespace' in self.message['body']:
-            self.namespace = self.message['body']['namespace']
-
-        if len(self.watchers.keys()) > 0:
-            self.unwatch()
-
         yield self.initialize_data()
 
         self.connected = True
@@ -61,7 +53,7 @@ class InstancesWatcher(object):
             for resource_list, resource in RESOURCES_LIST_MAP.iteritems():
                 self.watchers[resource_list]['watcher'] = self.settings["kube"][resource].watch(
                     on_data=self.data_callback,
-                    namespace=self.namespace,
+                    namespace=self.message["body"]["namespace"],
                     resource_version=self.watchers[resource_list]['resourceVersion']
                 )
 
@@ -107,7 +99,7 @@ class InstancesWatcher(object):
         items = []
 
         for resource in RESOURCES_LIST_MAP.itervalues():
-            result = yield self.settings["kube"][resource].get(namespace=self.namespace)
+            result = yield self.settings["kube"][resource].get(namespace=self.message["body"]["namespace"])
             self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
 
             resources = []
@@ -126,12 +118,33 @@ class InstancesWatcher(object):
         ))
 
     def unwatch(self):
-        logging.info("Stopping watch Instances for namespace %s" % self.namespace)
+        logging.info("Stopping watch Instances for namespace %s" % self.message["body"]["namespace"])
         for watcher in self.watchers.values():
             if 'watcher' in watcher:
                 watcher['watcher'].cancel()
 
         self.watchers = dict()
         self.connected = False
-        self.message = None
-        self.namespace = 'default'
+
+    def validate_message(self):
+        if 'body' not in self.message:
+            self.write_message(dict(
+                action=self.message["action"],
+                operation=self.message["operation"],
+                correlation=self.message["correlation"],
+                body={"message": "Request is missing body"},
+                status_code=400
+            ))
+
+            raise RuntimeError()
+
+        if 'namespace' in self.message['body']:
+            self.write_message(dict(
+                action=self.message["action"],
+                operation=self.message["operation"],
+                correlation=self.message["correlation"],
+                body={"message": "Body is missing namespace property"},
+                status_code=400
+            ))
+
+            raise RuntimeError()

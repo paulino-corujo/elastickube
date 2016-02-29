@@ -61,7 +61,8 @@ class WatchInstancesTest(testing.AsyncTestCase):
         connection.write_message(json.dumps({
             "action": "instances",
             "operation": "watch",
-            "correlation": correlation
+            "correlation": correlation,
+            "body": {"namespace": "kube-system"}
         }))
 
         deserialized_message = yield wait_message(connection, correlation)
@@ -82,7 +83,8 @@ class WatchInstancesTest(testing.AsyncTestCase):
         connection.write_message(json.dumps({
             "action": "instances",
             "operation": "unwatch",
-            "correlation": correlation
+            "correlation": correlation,
+            "body": {"namespace": "kube-system"}
         }))
 
         deserialized_message = yield wait_message(connection, correlation)
