@@ -1,1 +1,8 @@
 <h3>details</h3>
+
+<div class="ek-instance-overview-details__detail"
+     ng-repeat="(key, value) in ctrl.details track by key"
+     ng-if="value !== ''">
+    <h4>{{:: key }}</h4>
+    <div>{{:: value }}</div>
+</div>
