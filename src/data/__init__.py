@@ -1,9 +1,11 @@
 import logging
+import os
 import time
 
 from tornado.gen import coroutine
 
-PASSWORD_REGEX = "^(([a-zA-Z]+\d+)|(\d+[a-zA-Z]+))[a-zA-Z0-9]*$"
+from api.resources import resources
+
 DEFAULT_GITREPO = "https://github.com/helm/charts.git"
 SCHEMA_VERSION = 2
 
@@ -29,7 +31,7 @@ def init(database):
             },
             "authentication": {
                 "password": {
-                    "regex": PASSWORD_REGEX
+                    "regex": read_password_regex_from_file(os.path.join(resources.ROOT_PATH, 'password_default_regex'))
                 }
             },
             "schema_version": SCHEMA_VERSION
@@ -59,3 +61,10 @@ def migrate(database, settings):
         settings['schema_version'] = 2
 
     database.Settings.update({"_id": settings['_id']}, settings)
+
+
+def read_password_regex_from_file(regex_password_file):
+    with open(regex_password_file, 'r') as regex_file:
+        password_regex = regex_file.read().replace('\n', '')
+
+    return password_regex

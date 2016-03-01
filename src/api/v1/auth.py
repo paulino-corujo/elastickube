@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
 import json
 import logging
-from datetime import datetime, timedelta
+import random
+import string
 
 import jwt
+from passlib.hash import sha512_crypt
 from tornado.auth import GoogleOAuth2Mixin, OAuth2Mixin
 from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler, HTTPError
@@ -11,6 +14,11 @@ from data.query import Query
 from api.v1 import ELASTICKUBE_TOKEN_HEADER
 
 ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
+ROUNDS = 40000
+
+
+def salt_generator(size=64):
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(size))
 
 
 class AuthHandler(RequestHandler):
@@ -92,10 +100,14 @@ class SignupHandler(AuthHandler):
             if "lastname" not in data:
                 raise HTTPError(400, message="Last name is required.")
 
+            salt = salt_generator()
             user = dict(
                 email=data["email"],
                 username=data["email"],
-                password=data["password"],
+                password=dict(
+                        hash=sha512_crypt.encrypt((data["password"] + salt).encode("utf-8"), rounds=ROUNDS),
+                        salt=salt
+                ),
                 firstname=data["firstname"],
                 lastname=data["lastname"],
                 role="administrator",
@@ -130,7 +142,7 @@ class PasswordHandler(AuthHandler):
             logging.debug("Username '%s' not found." % username)
             raise HTTPError(401, reason="Invalid username or password.")
 
-        if user["password"] == password:
+        if sha512_crypt.verify((password+user["password"]["salt"]).encode('utf-8'), (user["password"]["hash"]).encode("utf-8")):
             token = yield self.authenticate_user(user)
             self.write(token)
             self.flush()
