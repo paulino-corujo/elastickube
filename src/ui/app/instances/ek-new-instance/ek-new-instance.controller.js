@@ -1,9 +1,10 @@
 class NewInstanceController {
-    constructor(instanceActionCreator, instancesNavigationActionCreator) {
+    constructor(instancesActionCreator, instancesNavigationActionCreator, sessionStore) {
         'ngInject';
 
-        this._instanceActionCreator = instanceActionCreator;
+        this._instancesActionCreator = instancesActionCreator;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
+        this._sessionStore = sessionStore;
 
         this.step = 1;
     }
@@ -24,7 +25,7 @@ class NewInstanceController {
     }
 
     deploy() {
-        this._instanceActionCreator.deploy(this.selectedChart, this.deploymentInfo)
+        this._instancesActionCreator.deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
             .then(() => {
                 this._instancesNavigationActionCreator.instances();
             });
