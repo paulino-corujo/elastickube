@@ -22,13 +22,11 @@ class PrincipalActionCreatorService {
         return this._principalAPI.login(user);
     }
 
-    loggedIn() {
+    loggedIn(username) {
         this._dispatcher.dispatch({
             type: this._actions.PRINCIPAL_LOGGED,
-            principal: {}
+            principal: this._userStore.get(username)
         });
-
-        // TODO Principal should be queried from the services
     }
 
     logout() {

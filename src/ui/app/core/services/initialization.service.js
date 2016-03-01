@@ -38,12 +38,14 @@ class InitializationService {
             ? this._sessionActionCreator.destroy().then(() => this._sessionActionCreator.storeSessionToken(sessionToken))
             : false;
 
+        const tokenData = JSON.parse(atob(sessionToken.split('.')[1]));
+
         return this._$q.when(sessionDestroyed)
             .then(() => this._websocketClient.connect())
-            .then(() => this._principalActionCreator.loggedIn())
             .then(() => this._chartsActionCreator.subscribe())
             .then(() => this._namespacesActionCreator.subscribe())
             .then(() => this._usersActionCreator.subscribe())
+            .then(() => this._principalActionCreator.loggedIn(tokenData.username))
             .then(() => {
                 let namespace = this._sessionStore.getActiveNamespace();
 
