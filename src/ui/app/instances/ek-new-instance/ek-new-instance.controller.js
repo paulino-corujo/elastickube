@@ -1,8 +1,8 @@
 class NewInstanceController {
-    constructor(instancesActionCreator, instancesNavigationActionCreator) {
+    constructor(instanceActionCreator, instancesNavigationActionCreator) {
         'ngInject';
 
-        this._instancesActionCreator = instancesActionCreator;
+        this._instanceActionCreator = instanceActionCreator;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
 
         this.step = 1;
@@ -24,7 +24,7 @@ class NewInstanceController {
     }
 
     deploy() {
-        this._instancesActionCreator.deploy(this.selectedChart, this.deploymentInfo)
+        this._instanceActionCreator.deploy(this.selectedChart, this.deploymentInfo)
             .then(() => {
                 this._instancesNavigationActionCreator.instances();
             });

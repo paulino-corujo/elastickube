@@ -1,4 +1,5 @@
 import ChartsAPIService from './charts-api.service';
+import InstanceAPIService from './instance-api.service';
 import InstancesAPIService from './instances-api.service';
 import NamespacesAPIService from './namespaces-api.service';
 import PrincipalAPIService from './principal-api.service';
@@ -12,6 +13,7 @@ angular
     .module(moduleName, [])
 
     .service('chartsAPI', ChartsAPIService)
+    .service('instanceAPI', InstanceAPIService)
     .service('instancesAPI', InstancesAPIService)
     .service('namespacesAPI', NamespacesAPIService)
     .service('principalAPI', PrincipalAPIService)

@@ -11,10 +11,6 @@ class InstancesAPIService extends AbstractAPI {
         this._namespaceSubscriptions = {};
     }
 
-    deploy(body) {
-        return this.create(body);
-    }
-
     subscribe(body) {
         this._namespaceSubscriptions[body.namespace] = this._namespaceSubscriptions[body.namespace] || 0;
         this._namespaceSubscriptions[body.namespace] += 1;
