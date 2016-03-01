@@ -1,14 +1,14 @@
-import logging
-import os
 import binascii
 import glob
+import logging
+import os
 
-from data.query import Query
 from git.repo import Repo
 from git.exc import InvalidGitRepositoryError
-from yaml import load, load_all
 from tornado.gen import coroutine, Return, sleep
+from yaml import load, load_all
 
+from data.query import Query
 
 REPO_DIRECTORY = '/var/elastickube/charts'
 
@@ -53,9 +53,9 @@ class GitSync(object):
             self.charts[path] = chart
 
         discovered_charts = dict()
-        for subdir, dirs, files in os.walk(REPO_DIRECTORY):
-            for file in files:
-                if file == "Chart.yaml":
+        for subdir, _, files in os.walk(REPO_DIRECTORY):
+            for chart_file in files:
+                if chart_file == "Chart.yaml":
                     try:
                         discovered_charts[subdir] = yield self.import_chart(subdir)
                     except Exception:
@@ -95,7 +95,7 @@ class GitSync(object):
             chart["resources"] = []
 
             manifests = yield self.import_manifests(directory)
-            for file, manifest in manifests.iteritems():
+            for _, manifest in manifests.iteritems():
                 if commit.committed_date < manifest["commit"].committed_date:
                     chart["commit"] = binascii.hexlify(manifest["commit"].binsha)
                     chart["committed_date"] = manifest["commit"].committed_date

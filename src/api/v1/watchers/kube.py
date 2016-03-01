@@ -114,17 +114,16 @@ class KubeWatcher(object):
                                 continue
 
                             self.watchers[watcher_key]['watcher'] = self.settings["kube"][name].filter(
-                                self.get_selector(resource_metadata["selector"])).watch(
+                                self.get_selector(metadata["selector"])).watch(
                                     name=self.params["name"],
                                     namespace=self.params["namespace"],
                                     resource_version=self.watchers[watcher_key]['resourceVersion'],
-                                    on_data=self.data_callback
-                            )
+                                    on_data=self.data_callback)
 
                             self.watchers[watcher_key]['watcher'].add_done_callback(done_callback)
                             logging.debug("Reconnected watcher for %s" % watcher_key)
 
-        logging.info("Starting watch KubeWatcher for action %s" % self.message["action"])
+        logging.info("Starting watch KubeWatcher for action %s", self.message["action"])
         yield self.initialize_data()
 
         self.connected = True
@@ -137,12 +136,11 @@ class KubeWatcher(object):
                         name=self.params["name"],
                         namespace=self.params["namespace"],
                         resource_version=self.watchers[resource_metadata["type"]]["resourceVersion"],
-                        on_data=self.data_callback
-                )
+                        on_data=self.data_callback)
 
                 self.watchers[resource_metadata["type"]]['watcher'].add_done_callback(done_callback)
-                logging.debug("Added watcher for %s and namespace %s" % (resource_metadata["type"],
-                                                                         self.params["namespace"]))
+                logging.debug("Added watcher for %s and namespace %s", (resource_metadata["type"],
+                                                                        self.params["namespace"]))
 
         except Exception as e:
             logging.exception(e)
@@ -208,7 +206,7 @@ class KubeWatcher(object):
         ))
 
     def unwatch(self):
-        logging.info("Stopping watch %s for namespace %s" % (self.message["action"], self.params["namespace"]))
+        logging.info("Stopping watch %s for namespace %s", (self.message["action"], self.params["namespace"]))
         for watcher in self.watchers.values():
             if 'watcher' in watcher:
                 watcher['watcher'].cancel()

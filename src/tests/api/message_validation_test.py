@@ -15,7 +15,7 @@ import logging
 import uuid
 
 from tornado import testing
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
+from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
 from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER

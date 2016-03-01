@@ -19,7 +19,7 @@ class SettingActions(object):
 
     @coroutine
     def update(self, document):
-        logging.info("Updating Setting document with _id: %s" % document["_id"])
+        logging.info("Updating Setting document with _id: %s", document["_id"])
 
         setting = yield Query(self.database, "Settings").update(document)
         raise Return(setting)
