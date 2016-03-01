@@ -10,6 +10,7 @@ class UsersStoreService extends AbstractStore {
 
         this._$q = $q;
         this._actions = actions;
+        this._users = {};
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
@@ -25,17 +26,11 @@ class UsersStoreService extends AbstractStore {
                     break;
 
                 case this._actions.USERS_UPDATED:
-                    const newUser = action.users;
-                    const oldUser = this.get(newUser.username || newUser);
-
-                    if (!_.isUndefined(oldUser)) {
-                        this._users = _.without(this._users, oldUser);
+                    if (action.operation === 'deleted') {
+                        this._removeUser(action.user);
+                    } else {
+                        this._setUser(action.user);
                     }
-
-                    if (action.operation !== 'deleted') {
-                        this._users = this._users.concat(newUser);
-                    }
-
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -44,20 +39,32 @@ class UsersStoreService extends AbstractStore {
         });
     }
 
+    _setUser(user) {
+        this._users[user.username] = user;
+    }
+
     _setUsers(users) {
-        this._users = users;
+        const newUsers = {};
+
+        _.each(users, (x) => newUsers[x.username] = x);
+
+        this._users = newUsers;
+    }
+
+    _removeUser(user) {
+        delete this._users[user.username];
     }
 
     destroy() {
-        delete this._users;
+        this._users = {};
     }
 
     get(username) {
-        return _.find(this._users, { username });
+        return this._users[username];
     }
 
     getAll() {
-        return this._users;
+        return _.values(this._users);
     }
 
     isLoading() {

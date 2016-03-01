@@ -23,6 +23,12 @@ class UserStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.PRINCIPAL_UPDATE:
+                case this._actions.PRINCIPAL_UPDATED:
+                    this._principal = action.principal;
+                    this.emit(CHANGE_EVENT);
+                    break;
+
                 default:
             }
         });

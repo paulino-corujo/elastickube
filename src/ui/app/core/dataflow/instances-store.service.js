@@ -25,12 +25,16 @@ class InstancesStoreService extends AbstractStore {
                     break;
 
                 case this._actions.INSTANCES_UNSUBSCRIBED:
-                    this._removeInstances(action.namespace);
+                    this._removeInstancesByNamespace(action.namespace);
                     this.emit(CHANGE_EVENT);
                     break;
 
                 case this._actions.INSTANCES_UPDATED:
-                    this._setInstance(action.instance);
+                    if (action.operation === 'deleted') {
+                        this._removeInstance(action.instance);
+                    } else {
+                        this._setInstance(action.instance);
+                    }
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -44,10 +48,18 @@ class InstancesStoreService extends AbstractStore {
     }
 
     _setInstances(instances) {
-        _.each(instances, (x) => this._setInstance(x));
+        const newInstances = {};
+
+        _.each(instances, (x) => newInstances[x.metadata.uid] = x);
+
+        this._instances = newInstances;
     }
 
-    _removeInstances(namespace) {
+    _removeInstance(instance) {
+        delete this._instances[instance.metadata.uid];
+    }
+
+    _removeInstancesByNamespace(namespace) {
         if (_.isUndefined(namespace)) {
             return;
         }
