@@ -5,16 +5,17 @@ from pymongo.errors import DuplicateKeyError
 from tornado.gen import coroutine, Return, Future
 
 from api.v1 import SecureWebSocketHandler
+from api.v1.actions.instances import InstancesActions
+from api.v1.actions.namespaces import NamespacesActions
+from api.v1.actions.settings import SettingsActions
+from api.v1.actions.users import UsersActions
 from api.v1.watchers.cursor import CursorWatcher
 from api.v1.watchers.kube import KubeWatcher
-from api.v1.actions.namespace import NamespaceActions
-from api.v1.actions.setting import SettingActions
-from api.v1.actions.user import UserActions
 from data.query import ObjectNotFoundException
 
 REST_OPERATIONS = ["create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
-SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instance", "instances", "charts"]
+SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "instance", "charts"]
 
 
 class MainWebSocketHandler(SecureWebSocketHandler):
@@ -26,25 +27,26 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         self.current_watchers = dict()
 
         self.actions_lookup = dict(
-            instances=dict(
-                watcher_cls=KubeWatcher
+            charts=dict(
+                watcher_cls=CursorWatcher
             ),
             instance=dict(
                 watcher_cls=KubeWatcher
             ),
-            charts=dict(
-                watcher_cls=CursorWatcher
+            instances=dict(
+                rest=InstancesActions(self.settings),
+                watcher_cls=KubeWatcher
             ),
             namespaces=dict(
-                rest=NamespaceActions(self.settings),
+                rest=NamespacesActions(self.settings),
                 watcher_cls=CursorWatcher
             ),
             settings=dict(
-                rest=SettingActions(self.settings),
+                rest=SettingsActions(self.settings),
                 watcher_cls=CursorWatcher
             ),
             users=dict(
-                rest=UserActions(self.settings),
+                rest=UsersActions(self.settings),
                 watcher_cls=CursorWatcher
             )
         )

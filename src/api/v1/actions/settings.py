@@ -5,10 +5,10 @@ from tornado.gen import coroutine, Return
 from data.query import Query
 
 
-class SettingActions(object):
+class SettingsActions(object):
 
     def __init__(self, settings):
-        logging.info("Initializing SettingActions")
+        logging.info("Initializing SettingsActions")
         self.database = settings['database']
 
     def check_permissions(self, user, _operation, _body):
