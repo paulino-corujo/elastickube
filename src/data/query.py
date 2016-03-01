@@ -27,15 +27,15 @@ class Query(object):
         return query
 
     @coroutine
-    def find_one(self, criteria=None):
-        document = yield self.database[self.collection].find_one(self._generate_query(criteria))
+    def find_one(self, criteria=None, projection=None):
+        document = yield self.database[self.collection].find_one(self._generate_query(criteria), projection)
         raise Return(document)
 
     @coroutine
-    def find(self, criteria=None):
+    def find(self, criteria=None, projection=None):
         documents = []
 
-        cursor = self.database[self.collection].find(self._generate_query(criteria))
+        cursor = self.database[self.collection].find(self._generate_query(criteria), projection)
         while (yield cursor.fetch_next):
             documents.append(cursor.next_object())
 
