@@ -6,9 +6,12 @@
         <div layout="row">
             <md-input-container class="ek-validate-user__name md-block animate">
                 <label>Your Name</label>
-                <input ng-model="user.firstname" name="firstname" required>
+                <input type="text" name="firstname" required
+                       ng-model="user.firstname"
+                       ng-maxlength="128" maxlength="128">
                 <div ng-messages="signupForm.firstname.$error">
-                    <div ng-message="required">Your name is required.</div>
+                    <div ng-message="required">Your firstname is required.</div>
+                    <div ng-message="maxlength">Your firstname is too long.</div>
                 </div>
             </md-input-container>
         </div>
@@ -16,9 +19,12 @@
         <div layout="row">
             <md-input-container class="ek-validate-user__name md-block animate">
                 <label>Your Lastname</label>
-                <input ng-model="user.lastname" name="lastname" required>
+                <input type="text" name="lastname" required
+                       ng-model="user.lastname"
+                       ng-maxlength="128" maxlength="128">
                 <div ng-messages="signupForm.lastname.$error">
                     <div ng-message="required">Your lastname is required.</div>
+                    <div ng-message="maxlength">Your lastname is too long.</div>
                 </div>
             </md-input-container>
         </div>
@@ -26,10 +32,13 @@
         <div layout="row">
             <md-input-container class="ek-validate-user__email md-block animate">
                 <label>Your Email</label>
-                <input ng-model="user.email" name="email" type="email" disabled required>
+                <input type="email" name="email" disabled required
+                       ng-model="user.email"
+                       ng-maxlength="254" maxlength="254">
                 <div ng-messages="signupForm.email.$error">
                     <div ng-message="required">Your email is required.</div>
                     <div ng-message="email">Your email is invalid.</div>
+                    <div ng-message="maxlength">Your email is too long.</div>
                 </div>
             </md-input-container>
         </div>
@@ -37,12 +46,12 @@
         <div layout="row">
             <md-input-container class="ek-validate-user__password md-block animate">
                 <label>Create Password</label>
-                <input ng-model="user.password"
-                       ng-pattern="ctrl.authProviders.password.regex"
-                       name="password" type="password" required>
+                <input name="password" type="password" required
+                       ng-model="user.password"
+                       ng-pattern="ctrl.authProviders.password.regex">
                 <div ng-messages="signupForm.password.$error">
                     <div ng-message="required">Your password is required.</div>
-                    <div ng-message="pattern">Password not match the specified format.</div>
+                    <div ng-message="pattern">Your password not match the specified format.</div>
                 </div>
             </md-input-container>
         </div>
@@ -50,7 +59,9 @@
         <div layout="row">
             <md-input-container class="ek-validate-user__password-confirm md-block animate">
                 <label>Confirm Password</label>
-                <input ng-model="user.confirm" name="confirm" type="password" match-password="password" required>
+                <input type="password" name="confirm" required
+                       ng-model="user.confirm"
+                       match-password="password">
                 <div ng-messages="signupForm.confirm.$error">
                     <div ng-message="required">Password confirmation is required.</div>
                     <div ng-message="passwordMatch">Password and password confirmation does not match.</div>
