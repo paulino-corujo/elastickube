@@ -12,6 +12,10 @@ ACTIONS_TO_COLLECTIONS_MAP = {
     "charts": "Charts"
 }
 
+ACTION_PROJECTIONS = {
+    "users": {'password': 0}
+}
+
 
 class CursorWatcher(object):
 
@@ -26,9 +30,10 @@ class CursorWatcher(object):
 
     @coroutine
     def watch(self):
-        logging.info("Starting watch for collection %s" % ACTIONS_TO_COLLECTIONS_MAP[self.message["action"]])
-
-        data = yield Query(self.settings["database"], ACTIONS_TO_COLLECTIONS_MAP[self.message["action"]]).find()
+        action = self.message["action"]
+        logging.info("Starting watch for collection %s" % ACTIONS_TO_COLLECTIONS_MAP[action])
+        projection = ACTION_PROJECTIONS[action] if action in ACTION_PROJECTIONS else None
+        data = yield Query(self.settings["database"], ACTIONS_TO_COLLECTIONS_MAP[action]).find(projection=projection)
         self.callback(dict(
             action=self.message["action"],
             operation="watched",
@@ -54,7 +59,7 @@ class CursorWatcher(object):
             action=self.message["action"],
             operation=operation,
             status_code=200,
-            body=document["o"]
+            body=self._filter_data(document["o"])
         ))
 
         raise Return()
@@ -74,3 +79,12 @@ class CursorWatcher(object):
             ))
 
             raise RuntimeError()
+
+    def _filter_data(self, document):
+        action = self.message["action"]
+        fields_to_filter = ACTION_PROJECTIONS[action] if action in ACTION_PROJECTIONS else None
+        if fields_to_filter is not None:
+            for field in fields_to_filter:
+                if field in document:
+                    del document[field]
+        return document
