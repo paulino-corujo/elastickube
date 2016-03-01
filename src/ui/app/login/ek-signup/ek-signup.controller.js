@@ -1,4 +1,5 @@
 import constants from 'constants';
+import defaultPasswordRegexString from 'text!../../../../api/resources/password_default_regex';
 
 class SignupController {
     constructor($scope, adminNavigationActionCreator, initialization, principalActionCreator) {
@@ -8,6 +9,8 @@ class SignupController {
         this._adminNavigationActionCreator = adminNavigationActionCreator;
         this._initialization = initialization;
         this._principalActionCreator = principalActionCreator;
+
+        this.PASSWORD_REGEX = new RegExp(defaultPasswordRegexString.trim());
     }
 
     submit() {
