@@ -1,6 +1,18 @@
 @import "../../colors";
 
-.ek-input, input {
+.ek-input, textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"] {
     border: 1px solid @grey400;
     transition: all 0.15s ease-in-out;
     &:hover {
