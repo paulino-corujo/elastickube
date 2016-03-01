@@ -4,7 +4,7 @@
         <h4 class="ek-admin-settings__title">hostname</h4>
 
         <input type="text" name="hostname" required
-               class="ek-admin-settings__input ek-admin-settings__input--long"
+               class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                ng-model="ctrl.hostname"
                ng-pattern="/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/">
         <div class="ek-message-error" ng-messages="ctrl.form.hostname.$error">
@@ -36,7 +36,7 @@
     <div class="ek-admin-settings__authentication" layout="column">
         <h4 class="ek-admin-settings__title">authentication</h4>
 
-        <span class="ek-admin-settings__subtitle">what services can users use to login?</span>
+        <span class="ek-admin-settings__subtitle">What services can users use to login?</span>
         <div class="ek-admin-settings__authentication__methods">
 
             <div class="ek-admin-settings__authentication__methods__google"
@@ -51,15 +51,15 @@
             </div>
             <div ng-if="ctrl.auth.google">
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Key</div>
-                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.auth.google_data.key" required>
 
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Redirect URL</div>
-                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.auth.google_data.redirect_uri" required>
 
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Secret</div>
-                <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long"
+                <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.auth.google_data.secret" required>
             </div>
 
@@ -77,7 +77,7 @@
             </div>
             <div ng-if="ctrl.auth.password">
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Password Regex</div>
-                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.auth.password_data.regex" required>
             </div>
 
@@ -94,15 +94,15 @@
         </div>
         <div ng-if="ctrl.mail">
             <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Server Address</div>
-            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                    ng-model="ctrl.mail_data.server" required>
 
             <div class="ek-admin-settings__subtitle">Port</div>
-            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--short"
+            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--short ek-input"
                    ng-model="ctrl.mail_data.port">
 
             <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">No-Reply Address</div>
-            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+            <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                    ng-model="ctrl.mail_data.no_reply_address" required>
 
 
@@ -112,11 +112,11 @@
             </div>
             <div ng-if="ctrl.mailAuth">
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SMTP Username</div>
-                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long"
+                <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.mailAuth_data.username" required>
 
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SMTP Password</div>
-                <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long"
+                <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.mailAuth_data.password" required>
             </div>
 
