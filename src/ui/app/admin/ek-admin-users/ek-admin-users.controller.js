@@ -43,7 +43,7 @@ class AdminUsersController {
                 {
                     name: 'created',
                     enableColumnMenu: false,
-                    cellTemplate: `<div>{{ row.entity.created | ekHumanizeDate }} ago</div>`
+                    cellTemplate: `<div>{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>`
                 }
             ],
             onRegisterApi: (gridApi) => {
