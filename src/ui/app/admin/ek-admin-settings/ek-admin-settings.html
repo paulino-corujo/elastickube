@@ -1,5 +1,19 @@
 <div layout="column" layout-align="start center" ng-form="ctrl.form">
 
+    <div class="ek-admin-settings__hostname" layout="column">
+        <h4 class="ek-admin-settings__title">hostname</h4>
+
+        <input type="text" name="hostname" required
+               class="ek-admin-settings__input ek-admin-settings__input--long"
+               ng-model="ctrl.hostname"
+               ng-pattern="/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/">
+        <div class="ek-message-error" ng-messages="ctrl.form.hostname.$error">
+            <div ng-message="required">The hostname URL is required.</div>
+            <div ng-message="pattern">The hostname URL is invalid.</div>
+        </div>
+
+    </div>
+
     <div class="ek-admin-settings__admins" layout="column">
         <h4 class="ek-admin-settings__title">cluster administrators</h4>
 
