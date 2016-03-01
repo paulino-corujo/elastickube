@@ -12,18 +12,28 @@
     &--active {
         .ek-choose-chart__toolbar {
             padding-bottom: 30px;
+            border-bottom: 1px solid @grey350;
+            &__step {
+                &__number {
+                    color: @cyan500;
+                }
+            }
+            &__content {
+                &__title {
+                    color: @cyan500;
+                }
+            }
         }
     }
 
     &__toolbar {
-        border-bottom: 1px solid @grey350;
         font-weight: bold;
         padding-bottom: 0;
+
         &__step {
             margin-left: 20px;
 
             &__number {
-                color: @cyan500;
                 font-size: 16px;
                 font-weight: 500;
                 margin: 30px 0 25px 10px;
@@ -34,7 +44,6 @@
             margin-left: 5px;
 
             &__title {
-                color: @cyan500;
                 font-size: 16px;
                 font-weight: 500;
                 margin: 30px 30px 25px 0;
@@ -47,11 +56,14 @@
 
             &__chartname {
                 margin-left: 10px;
+                font-size: 14px;
+                font-weight: normal;
             }
 
             &__edit {
                 color: @grey450;
                 margin-right: 20px;
+                cursor: pointer;
             }
             input {
                 font-weight: normal;
@@ -67,16 +79,7 @@
             height: 30px;
             min-height: 0;
             margin: 20px 20px 0 0;
-            box-shadow: none;
             line-height: 29px;
-            font-weight: bold;
-            font-size: 13px;
-            &.md-raised:not([disabled]) {
-                box-shadow: none;
-                font-weight: bold;
-                color: #fff;
-                font-size: 13px;
-            }
         }
     }
 }

@@ -11,7 +11,7 @@
     <div transclude-to="body">
         <ek-sidenav-layout>
             <div transclude-to="sidenav">
-                <button class="ek-instances__new" ng-click="ctrl.newInstance()">New</button>
+                <md-button class="ek-instances__new md-raised md-primary ek-button" ng-click="ctrl.newInstance()">New</md-button>
                 <ek-instance-filters instances-to-filter="ctrl.instances"
                                      filtered-instances="ctrl.instancesFilteredByOwnerAndStatus"></ek-instance-filters>
             </div>
