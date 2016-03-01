@@ -16,14 +16,8 @@ class InstanceActionCreatorService {
 
         this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOY });
 
-        return this._instanceAPI.deploy(body)
+        return this._instanceAPI.create(body)
             .then((newInstance) => this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOYED, newInstance }));
-    }
-
-    subscribe() {
-    }
-
-    unsubscribe() {
     }
 }
 
