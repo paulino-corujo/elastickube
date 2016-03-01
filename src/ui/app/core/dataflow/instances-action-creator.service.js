@@ -8,19 +8,6 @@ class InstancesActionCreatorService {
         this._namespacesStore = namespacesStore;
     }
 
-    deploy(chart, info) {
-        const body = {
-            uid: chart._id.$oid,
-            labels: info.labels,
-            name: info.name
-        };
-
-        this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOY });
-
-        return this._instancesAPI.deploy(body)
-            .then((newInstance) => this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOYED, newInstance }));
-    }
-
     subscribe(namespace) {
         this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBE, namespace });
 
