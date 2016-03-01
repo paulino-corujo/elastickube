@@ -1,6 +1,6 @@
 <ek-header-layout>
     <div transclude-to="header" layout="row" layout-align="start center">
-        <h3 class="ek-new-instance__header__title ek-title"><span>instances ></span> new</h3>
+        <h3 class="ek-new-instance__header__title ek-title"><span>instances &rsaquo;</span> new</h3>
     </div>
 
     <div transclude-to="body">
@@ -12,7 +12,7 @@
                     <ek-customize-deployment step="ctrl.step"></ek-customize-deployment>
                 </div>
                 <div class="ek-new-instance__deploy" layout="row" layout-align="center center">
-                    <md-button class="md-raised md-primary" ng-disabled="ctrl.isDisabled()" ng-click="ctrl.deploy()">Deploy</md-button>
+                    <md-button class="md-raised md-primary ek-button" ng-disabled="ctrl.isDisabled()" ng-click="ctrl.deploy()">Deploy</md-button>
                 </div>
             </div>
         </div>

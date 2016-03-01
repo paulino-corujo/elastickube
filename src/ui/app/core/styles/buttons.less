@@ -1,0 +1,26 @@
+@import "../../colors";
+
+.ek-button {
+    box-shadow: none;
+    font-weight: bold;
+    font-size: 13px;
+    &.md-raised:not([disabled]) {
+        box-shadow: none;
+    }
+    &.md-primary {
+        background: @cyan400;
+        color: #fff !important;
+        &.md-raised:not([disabled]):active {
+            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
+        }
+    }
+    &.md-primary[disabled] {
+        background: rgba(38,198,218, 0.4) !important;
+        color: #fff !important;
+    }
+
+    &, &:not([disabled]):focus {
+        box-shadow: none;
+    }
+
+}
