@@ -1,23 +1,44 @@
 class InstancesActionCreatorService {
-    constructor(actions, dispatcher, instancesAPI) {
+    constructor(actions, dispatcher, instancesAPI, namespacesStore) {
         'ngInject';
 
         this._instancesAPI = instancesAPI;
         this._actions = actions;
         this._dispatcher = dispatcher;
+        this._namespacesStore = namespacesStore;
     }
 
-    deploy(chart, deployInfo) {
-        const deployBody = {
+    deploy(chart, info) {
+        const body = {
             uid: chart._id.$oid,
-            labels: deployInfo.labels,
-            name: deployInfo.name
+            labels: info.labels,
+            name: info.name
         };
 
         this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOY });
 
-        return this._instancesAPI.deploy(deployBody)
+        return this._instancesAPI.deploy(body)
             .then((newInstance) => this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOYED, newInstance }));
+    }
+
+    subscribe(namespace) {
+        this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBE, namespace });
+
+        return this._instancesAPI.subscribe({ namespace: namespace.metadata.name })
+            .then((instances) => this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBED, namespace, instances }));
+    }
+
+    unsubscribe(namespace) {
+        this._dispatcher.dispatch({
+            type: this._actions.INSTANCES_UNSUBSCRIBE,
+            namespace
+        });
+
+        return this._instancesAPI.unsubscribe({ namespace: namespace.metadata.name })
+            .then((x) => this._dispatcher.dispatch({
+                type: this._actions.INSTANCES_UNSUBSCRIBED,
+                namespace: this._namespacesStore.get(x)
+            }));
     }
 }
 

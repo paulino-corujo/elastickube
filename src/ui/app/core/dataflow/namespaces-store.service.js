@@ -10,6 +10,7 @@ class NamespacesStoreService extends AbstractStore {
 
         this._$q = $q;
         this._actions = actions;
+        this._namespaces = {};
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
@@ -30,15 +31,23 @@ class NamespacesStoreService extends AbstractStore {
     }
 
     _setNamespaces(namespaces) {
-        this._namespaces = namespaces;
+        this._namespaces = _.reduce(namespaces, (memo, namespace) => {
+            memo[namespace.metadata.uid] = namespace;
+
+            return memo;
+        }, this._namespaces);
     }
 
     destroy() {
-        delete this._namespaces;
+        this._namespaces = {};
     }
 
     getAll() {
-        return this._namespaces;
+        return _.values(this._namespaces);
+    }
+
+    get(uid) {
+        return this._namespaces[uid];
     }
 
     isLoading() {

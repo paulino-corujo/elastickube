@@ -10,6 +10,7 @@ class InstancesStoreService extends AbstractStore {
 
         this._$q = $q;
         this._actions = actions;
+        this._instances = {};
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
@@ -23,8 +24,13 @@ class InstancesStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.INSTANCES_UNSUBSCRIBED:
+                    this._removeInstances(action.namespace);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
                 case this._actions.INSTANCES_UPDATED:
-                    this._instances.push(action.instance);
+                    this._setInstance(action.instance);
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -33,8 +39,23 @@ class InstancesStoreService extends AbstractStore {
         });
     }
 
+    _setInstance(instance) {
+        this._instances[instance.metadata.uid] = instance;
+    }
+
     _setInstances(instances) {
-        this._instances = instances;
+        _.each(instances, (x) => this._setInstance(x));
+    }
+
+    _removeInstances(namespace) {
+        if (_.isUndefined(namespace)) {
+            return;
+        }
+
+        const instances = _.reject(_.values(this._instances), (x) => x.metadata.namespace === namespace.metadata.name);
+
+        this.destroy();
+        this._setInstances(instances);
     }
 
     isLoading() {
@@ -42,15 +63,17 @@ class InstancesStoreService extends AbstractStore {
     }
 
     destroy() {
-        delete this._instances;
+        this._instances = {};
     }
 
-    get(id) {
-        return _.find(this._instances, { id });
+    get(uid) {
+        return this._instances[uid];
     }
 
-    getAll() {
-        return this._instances;
+    getAll(namespace) {
+        const instances = _.values(this._instances);
+
+        return namespace ? _.filter(instances, (x) => x.metadata.namespace === namespace) : instances;
     }
 
     addChangeListener(callback) {
