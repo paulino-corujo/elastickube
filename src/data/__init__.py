@@ -4,7 +4,7 @@ import time
 
 from tornado.gen import coroutine
 
-from api.resources import resources
+from api import resources
 
 DEFAULT_GITREPO = "https://github.com/helm/charts.git"
 SCHEMA_VERSION = 2

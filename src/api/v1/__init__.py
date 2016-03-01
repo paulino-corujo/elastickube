@@ -1,11 +1,11 @@
 import datetime
 import logging
 import json
-import jwt
 import os
-
-from bson.json_util import dumps
 from datetime import timedelta
+
+import jwt
+from bson.json_util import dumps
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine
 from tornado.ioloop import IOLoop
@@ -13,12 +13,13 @@ from tornado.web import HTTPError
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from api.v1.sync import SyncNamespaces
-from data import watch, init as initialize_database
 from api.kube import client
+from data import watch, init as initialize_database
 
 PING_FREQUENCY = timedelta(seconds=5)
 RESPONSE_TIMEOUT = timedelta(seconds=5)
 ELASTICKUBE_TOKEN_HEADER = "ElasticKube-Token"
+ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
 
 
 def configure(settings):

@@ -1,24 +1,17 @@
-from datetime import datetime, timedelta
 import json
 import logging
 import random
 import string
+from datetime import datetime, timedelta
 
 import jwt
 from passlib.hash import sha512_crypt
-from tornado.auth import GoogleOAuth2Mixin, OAuth2Mixin
+from tornado.auth import GoogleOAuth2Mixin
 from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler, HTTPError
 
+from api.v1 import ELASTICKUBE_TOKEN_HEADER, ELASTICKUBE_VALIDATION_TOKEN_HEADER
 from data.query import Query
-from api.v1 import ELASTICKUBE_TOKEN_HEADER
-
-ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
-ROUNDS = 40000
-
-
-def salt_generator(size=64):
-    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(size))
 
 
 class AuthHandler(RequestHandler):
@@ -41,10 +34,10 @@ class AuthHandler(RequestHandler):
         user["last_login"] = datetime.utcnow()
         yield self.settings["database"].Users.update({"_id": user["_id"]}, user)
 
-        token = jwt.encode(token, self.settings['secret'], algorithm='HS256')
+        token = jwt.encode(token, self.settings["secret"], algorithm="HS256")
         self.set_cookie(ELASTICKUBE_TOKEN_HEADER, token)
 
-        logging.info("User '%s' authenticated." % user["username"])
+        logging.info("User '%(username)s' authenticated." % user)
         raise Return(token)
 
 
@@ -61,14 +54,10 @@ class AuthProvidersHandler(RequestHandler):
             settings = yield Query(self.settings["database"], "Settings").find_one()
 
             if "google_oauth" in settings["authentication"]:
-                providers['google'] = dict(
-                    auth_url="/api/v1/auth/google"
-                )
+                providers['google'] = dict(auth_url="/api/v1/auth/google")
 
             if "password" in settings["authentication"]:
-                providers['password'] = dict(
-                    regex=settings["authentication"]["password"]["regex"]
-                )
+                providers['password'] = dict(regex=settings["authentication"]["password"]["regex"])
 
             validation_token = self.request.headers.get(ELASTICKUBE_VALIDATION_TOKEN_HEADER)
             if validation_token is not None:
@@ -100,13 +89,13 @@ class SignupHandler(AuthHandler):
             if "lastname" not in data:
                 raise HTTPError(400, message="Last name is required.")
 
-            salt = salt_generator()
+            salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
             user = dict(
                 email=data["email"],
                 username=data["email"],
                 password=dict(
-                        hash=sha512_crypt.encrypt((data["password"] + salt).encode("utf-8"), rounds=ROUNDS),
-                        salt=salt
+                    hash=sha512_crypt.encrypt((data["password"] + salt).encode("utf-8"), rounds=40000),
+                    salt=salt
                 ),
                 firstname=data["firstname"],
                 lastname=data["lastname"],
@@ -128,21 +117,22 @@ class PasswordHandler(AuthHandler):
         logging.info("Initiating PasswordHandler post")
 
         data = json.loads(self.request.body)
-        if 'username' not in data:
+        if "username" not in data:
             raise HTTPError(400, reason="Missing username in body request.")
 
-        if 'password' not in data:
+        if "password" not in data:
             raise HTTPError(400, reason="Missing password in body request.")
 
-        username = data['username']
-        password = data['password']
+        username = data["username"]
+        password = data["password"]
 
         user = yield self.settings["database"].Users.find_one({"username": username})
         if not user:
             logging.debug("Username '%s' not found." % username)
             raise HTTPError(401, reason="Invalid username or password.")
 
-        if sha512_crypt.verify((password+user["password"]["salt"]).encode('utf-8'), (user["password"]["hash"]).encode("utf-8")):
+        encoded_user_password = user["password"]["hash"].encode("utf-8")
+        if sha512_crypt.verify((password + user["password"]["salt"]).encode("utf-8"), encoded_user_password):
             token = yield self.authenticate_user(user)
             self.write(token)
             self.flush()
@@ -157,13 +147,13 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
     def get(self):
         logging.info("Initiating Google OAuth.")
 
-        google_oauth = self.settings.get('google_oauth', None)
-        code = self.get_argument('code', False)
+        google_oauth = self.settings.get("google_oauth", None)
+        code = self.get_argument("code", False)
 
         if code:
             logging.debug("Google redirect received.")
             auth_data = yield self.get_authenticated_user(
-                redirect_uri=google_oauth['redirect_uri'],
+                redirect_uri=google_oauth["redirect_uri"],
                 code=code)
 
             logging.debug("User Authenticating, getting user info.")

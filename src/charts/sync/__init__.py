@@ -1,10 +1,11 @@
 import logging
 import os
 
-from data.query import Query
-from charts.sync.repo import GitSync
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine, Return
+
+from data.query import Query
+from charts.sync.repo import GitSync
 
 
 @coroutine

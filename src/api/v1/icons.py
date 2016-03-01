@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler
 
-from api.resources import resources
+from api import resources
 from api.v1 import get_icon_template, load_colors
 from data.query import Query
 
@@ -46,7 +46,6 @@ class IconGenerator(RequestHandler):
             icon = icon_data
             content_type = resources.SVG_CONTENT_TYPE
         else:
-            icon = icon_data
             icon = cairosvg.svg2png(icon_data)
             content_type = resources.PNG_CONTENT_TYPE
 
@@ -67,6 +66,6 @@ class IconGenerator(RequestHandler):
         words = re.findall(r"[\w']+", name.upper())[:2]
         letters = ""
         for word in words:
-            letters = letters + word[:1]
+            letters += word[:1]
 
         return letters

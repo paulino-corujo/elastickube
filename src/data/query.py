@@ -43,7 +43,7 @@ class Query(object):
 
     @coroutine
     def insert(self, document):
-        if 'metadata' in document:
+        if "metadata" in document:
             document["metadata"]["resourceVersion"] = time.time()
             document["metadata"]["creationTimestamp"] = time.time()
             document["metadata"]["deletionTimestamp"] = None
@@ -70,8 +70,8 @@ class Query(object):
 
     @coroutine
     def update_fields(self, criteria, fields):
-        update = {'$set': fields}
-        update['$set']['metadata.resourceVersion'] = time.time()
+        update = {"$set": fields}
+        update["$set"]["metadata.resourceVersion"] = time.time()
 
         response = yield self.database[self.collection].update(criteria, update)
         raise Return(response)

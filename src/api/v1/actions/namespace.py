@@ -1,8 +1,9 @@
 import logging
+from datetime import datetime
+
+from tornado.gen import coroutine, Return
 
 from data.query import Query
-from datetime import datetime
-from tornado.gen import coroutine, Return
 
 
 class NamespaceActions(object):

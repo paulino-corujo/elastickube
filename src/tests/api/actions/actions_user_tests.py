@@ -17,7 +17,7 @@ import uuid
 from bson.objectid import ObjectId
 from motor.motor_tornado import MotorClient
 from tornado import testing
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
+from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
 from tests.api import get_token, ELASTICKUBE_TOKEN_HEADER
