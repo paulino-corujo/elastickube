@@ -14,7 +14,6 @@ import actions from './dataflow/actions';
 import ChartsActionCreatorService from './dataflow/charts-action-creator.service.js';
 import ChartsStoreService from './dataflow/charts-store.service.js';
 import DispatcherService from './dataflow/dispatcher.service.js';
-import InstanceActionCreatorService from './dataflow/instance-action-creator.service.js';
 import InstancesActionCreatorService from './dataflow/instances-action-creator.service.js';
 import InstancesStoreService from './dataflow/instances-store.service.js';
 import NamespacesActionCreatorService from './dataflow/namespaces-action-creator.service.js';
@@ -64,7 +63,6 @@ angular
     .service('chartsActionCreator', ChartsActionCreatorService)
     .service('chartsStore', ChartsStoreService)
 
-    .service('instanceActionCreator', InstanceActionCreatorService)
     .service('instancesActionCreator', InstancesActionCreatorService)
     .service('instancesStore', InstancesStoreService)
 
