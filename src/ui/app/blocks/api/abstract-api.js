@@ -51,22 +51,22 @@ class AbstractAPI extends EventEmitter {
         });
     }
 
-    subscribe(...params) {
-        return this._ws.subscribeEvent(this._name, ...params)
+    subscribe(body) {
+        return this._ws.subscribeEvent(this._name, body)
             .then((x) => x && x.body);
     }
 
-    unsubscribe(...params) {
-        return this._ws.unsubscribeEvent(this._name, ...params);
+    unsubscribe(body) {
+        return this._ws.unsubscribeEvent(this._name, body);
     }
 
-    update(...params) {
-        return this._ws.updateEvent(this._name, ...params)
+    update(body) {
+        return this._ws.updateEvent(this._name, body)
             .then((x) => x && x.body);
     }
 
-    remove(...params) {
-        return this._ws.deleteEvent(this._name, ...params);
+    remove(body) {
+        return this._ws.deleteEvent(this._name, body);
     }
 
     create(body) {

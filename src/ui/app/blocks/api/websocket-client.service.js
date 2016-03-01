@@ -102,17 +102,12 @@ class WebsocketClientService extends EventEmitter {
         return defer.promise;
     }
 
-    subscribeEvent(action, namespace) {
+    subscribeEvent(action, body) {
         const message = {
             action,
+            body,
             operation: 'watch'
         };
-
-        if (!_.isUndefined(namespace)) {
-            message.body = {
-                namespace
-            };
-        }
 
         return this.sendMessage(message)
             .then((response) => {
@@ -122,9 +117,10 @@ class WebsocketClientService extends EventEmitter {
             });
     }
 
-    unsubscribeEvent(action) {
+    unsubscribeEvent(action, body) {
         const message = {
             action,
+            body,
             operation: 'unwatch'
         };
 

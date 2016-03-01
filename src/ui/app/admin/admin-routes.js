@@ -77,6 +77,13 @@ const states = [{
             header: {
                 name: 'admin'
             }
+        },
+        resolve: {
+            loading: ($q, instancesActionCreator, namespacesStore) => {
+                'ngInject';
+
+                return $q.all(_.map(namespacesStore.getAll(), (x) => instancesActionCreator.subscribe(x)));
+            }
         }
     }
 }];

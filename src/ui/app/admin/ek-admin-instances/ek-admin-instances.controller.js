@@ -1,7 +1,7 @@
 import rowTemplate from './ek-admin-instances-row.template.html';
 
 class AdminInstancesController {
-    constructor($scope, instancesStore) {
+    constructor($scope, instancesStore, instancesActionCreator, namespacesStore) {
         'ngInject';
 
         this.bulkActions = 'Bulk Actions';
@@ -71,6 +71,8 @@ class AdminInstancesController {
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
             }
         };
+
+        $scope.$on('$destroy', () => _.map(namespacesStore.getAll(), (x) => instancesActionCreator.unsubscribe(x)));
     }
 }
 
