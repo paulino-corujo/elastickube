@@ -40,7 +40,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
-    v.cpus = 8
+    v.cpus = 2
     v.name = "elastickube"
     v.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', '10000']
   end
