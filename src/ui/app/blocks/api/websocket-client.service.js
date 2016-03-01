@@ -13,7 +13,7 @@ class WebsocketClientService extends EventEmitter {
         this._$rootScope = $rootScope;
 
         this._connectionAttempts = 1;
-        this._eventsSubscribed = {};
+        this._eventsSubscribed = new Set();
         this._currentOnGoingMessages = {};
     }
 
@@ -77,7 +77,11 @@ class WebsocketClientService extends EventEmitter {
     disconnect() {
         const promises = [];
 
-        _.each(this._eventsSubscribed, (value, key) => promises.push(this.unsubscribeEvent(key)));
+        this._eventsSubscribed.forEach((key) => {
+            const message = JSON.parse(key);
+
+            promises.push(this.unsubscribeEvent(message.action, message.body));
+        });
 
         return this._$q.all(promises)
             .then(() => {
@@ -111,7 +115,7 @@ class WebsocketClientService extends EventEmitter {
 
         return this.sendMessage(message)
             .then((response) => {
-                this._eventsSubscribed[action] = message;
+                this._eventsSubscribed.add(createKey(message));
 
                 return response;
             });
@@ -123,9 +127,10 @@ class WebsocketClientService extends EventEmitter {
             body,
             operation: 'unwatch'
         };
+        const key = createKey(message);
 
-        return this._$q.when(this._eventsSubscribed[action] && this.sendMessage(message)
-                .then(() => delete this._eventsSubscribed[action]));
+        return this._$q.when(this._eventsSubscribed.has(key) && this.sendMessage(message)
+                .then(() => this._eventsSubscribed.delete(key)));
     }
 
     updateEvent(action, body) {
@@ -169,6 +174,10 @@ class WebsocketClientService extends EventEmitter {
 
 function generateInterval(k) {
     return Math.min(30, Math.pow(2, k) - 1) * 1000;
+}
+
+function createKey(obj) {
+    return JSON.stringify(_.omitBy(obj, (value, key) => _.isEmpty(value) || _.includes(['correlation', 'operation'], key)));
 }
 
 export default WebsocketClientService;
