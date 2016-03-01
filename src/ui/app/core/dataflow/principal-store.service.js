@@ -37,7 +37,7 @@ class UserStoreService extends AbstractStore {
     }
 
     isAdmin() {
-        return _.propertyOf(this._principal, 'role') === 'administrator';
+        return _.get(this._principal, 'role') === 'administrator';
     }
 
     addPrincipalChangeListener(callback) {
