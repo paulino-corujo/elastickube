@@ -72,7 +72,7 @@
         "salt": {
           "type": "string",
           "maxLength": 64
-        },
+        }
       }
     },
     "role": {

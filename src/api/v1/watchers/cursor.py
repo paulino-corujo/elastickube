@@ -65,9 +65,10 @@ class CursorWatcher(object):
         elif document["op"] == "d":
             operation = "deleted"
 
-        for key in ACTIONS_METADATA[self.message["action"]].get("projection", {}).iterkeys():
-            if key in document["o"]:
-                del document["o"][key]
+        if ACTIONS_METADATA[self.message["action"]]["projection"]:
+            for key in ACTIONS_METADATA[self.message["action"]]["projection"].iterkeys():
+                if key in document["o"]:
+                    del document["o"][key]
 
         self.callback(dict(
             action=self.message["action"],

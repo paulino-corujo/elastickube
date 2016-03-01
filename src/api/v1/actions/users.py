@@ -7,10 +7,10 @@ from tornado.gen import coroutine, Return
 from data.query import Query, ObjectNotFoundException
 
 
-class UserActions(object):
+class UsersActions(object):
 
     def __init__(self, settings):
-        logging.info("Initializing UserActions")
+        logging.info("Initializing UsersActions")
         self.database = settings['database']
 
     def check_permissions(self, user, operation, body):
@@ -27,7 +27,7 @@ class UserActions(object):
     def update(self, document):
         logging.info("Updating user")
 
-        user = yield Query(self.database, "Users").find_one(document['_id'])
+        user = yield Query(self.database, "Users").find_one({"_id": ObjectId(document['_id'])})
         user['firstname'] = document['firstname']
         user['lastname'] = document['lastname']
 

@@ -6,10 +6,10 @@ from tornado.gen import coroutine, Return
 from data.query import Query
 
 
-class NamespaceActions(object):
+class NamespacesActions(object):
 
     def __init__(self, settings):
-        logging.info("Initializing UserActions")
+        logging.info("Initializing NamespacesActions")
         self.kube_client = settings['kube']
 
     def check_permissions(self, user, operation, body):
