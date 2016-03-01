@@ -2,23 +2,24 @@ const ADMINISTRATOR_ROLE = 'administrator';
 const USER_ROLE = 'user';
 
 class AdminSettingsController {
-    constructor($scope, settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
+    constructor($scope, $location, settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
         'ngInject';
 
         const onUsersChange = () => this._getAdmins();
         const onSettingsChange = () => this._getSettings();
 
+        this._$location = $location;
         this._settingsActionCreator = settingsActionCreator;
         this._settingsStore = settingsStore;
         this._usersActionCreator = usersActionCreator;
         this._usersStore = usersStore;
         this._sendForm = _.debounce(this._sendForm, 300);
 
-        this._getAdmins();
-        this._getSettings();
-
         usersStore.addChangeListener(onUsersChange);
         settingsStore.addSettingsChangeListener(onSettingsChange);
+
+        this._getAdmins();
+        this._getSettings();
 
         $scope.$watch('ctrl.form.$dirty', (v) => {
             if (v) {
@@ -62,6 +63,8 @@ class AdminSettingsController {
 
         this._settings = angular.copy(settings);
 
+        this.hostname = _.isUndefined(this._settings.hostname) ? getHostname(this._$location) : this._settings.hostname;
+
         this.auth = {
             google: settings.authentication && hasValues(googleData),
             google_data: googleData,
@@ -77,10 +80,14 @@ class AdminSettingsController {
 
         this.mailAuth = settings.mail && hasValues(settings.mail.authentication);
         this.mailAuth_data = angular.copy(settings.mail && settings.mail.authentication || {});
+
+        this._sendForm();
     }
 
     _sendForm() {
         if (this.form.$valid) {
+            this._settings.hostname = this.hostname;
+
             if (this.auth.google && hasValues(this.auth.google_data)) {
                 this._settings.authentication.google_oauth = this.auth.google_data;
             } else {
@@ -135,6 +142,14 @@ function hasValues(obj) {
         .compact()
         .isEmpty()
         .value();
+}
+
+function getHostname($location) {
+    const absUrl = $location.absUrl();
+    const path = $location.path();
+    const index = absUrl.indexOf(path);
+
+    return absUrl.substring(0, index);
 }
 
 export default AdminSettingsController;
