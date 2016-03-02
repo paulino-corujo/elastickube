@@ -21,7 +21,7 @@ class NewInstanceController {
     }
 
     isDisabled() {
-        return _.isUndefined(this.selectedChart) || _.isUndefined(this.deploymentInfo) || !this.form.$valid;
+        return _.isUndefined(this.selectedChart) || _.isUndefined(this.deploymentInfo);
     }
 
     deploy() {

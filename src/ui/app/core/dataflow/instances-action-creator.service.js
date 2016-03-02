@@ -20,8 +20,7 @@ class InstancesActionCreatorService {
         const body = {
             uid: chart._id.$oid,
             namespace: _.get(namespace, 'metadata.name'),
-            labels: info.labels,
-            name: info.name
+            labels: info.labels
         };
 
         this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOY });
