@@ -25,12 +25,14 @@ class UsersStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.USERS_CREATED:
                 case this._actions.USERS_UPDATED:
-                    if (action.operation === 'deleted') {
-                        this._removeUser(action.user);
-                    } else {
-                        this._setUser(action.user);
-                    }
+                    this._setUser(action.user);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.USERS_DELETED:
+                    this._removeUser(action.user);
                     this.emit(CHANGE_EVENT);
                     break;
 

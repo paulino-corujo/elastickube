@@ -3,13 +3,27 @@
 
         <h2>Invite users</h2>
 
-        <h3>People</h3>
+        <div class="ek-invite-users__block ek-invite-users__people">
+            <h3>People</h3>
 
-        <div layout="row">
-            <ek-insert-emails class="ek-invite-users__emails" emails="ctrl.emails" flex></ek-insert-emails>
+            <div layout="row">
+                <ek-insert-emails class="ek-invite-users__emails" emails="ctrl.emails" flex></ek-insert-emails>
+            </div>
         </div>
 
-        <textarea class="ek-invite-users__note ek-input"
+        <div class="ek-invite-users__block ek-invite-users__namespaces">
+            <h3>Namespaces</h3>
+
+            <div layout="row" layout-align="start center" layout-wrap>
+                <div class="ek-invite-users__namespace"
+                     ng-class="{'ek-invite-users__namespace--selected': ctrl.selectedNamespaces.indexOf(namespace.metadata.name) > -1}"
+                     ng-repeat="namespace in ctrl.namespaces track by namespace.metadata.uid"
+                     ng-click="ctrl.toggleSelection(namespace)">{{ namespace.metadata.name }}
+                </div>
+            </div>
+        </div>
+
+        <textarea class="ek-invite-users__block ek-invite-users__note ek-input"
                   ng-model="ctrl.note"
                   placeholder="Add a note"></textarea>
 
@@ -19,6 +33,7 @@
         <md-button class="ek-button" ng-click="ctrl.cancel()">cancel</md-button>
         <md-button ng-click="ctrl.send()"
                    ng-disabled="ctrl.emails.length === 0"
-                   class="md-raised md-primary ek-button">send</md-button>
+                   class="md-raised md-primary ek-button">send
+        </md-button>
     </md-dialog-actions>
 </md-dialog>

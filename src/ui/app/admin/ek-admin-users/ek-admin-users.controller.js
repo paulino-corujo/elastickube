@@ -4,6 +4,7 @@ class AdminUsersController {
     constructor($scope, adminNavigationActionCreator, usersStore) {
         'ngInject';
 
+        const onUsersChange = () => this.users = usersStore.getAll();
         const onRowSelectionChanged = () => this.hasRowsSelected = !_.isEmpty(this.gridApi.selection.getSelectedRows());
 
         this._adminNavigationActionCreator = adminNavigationActionCreator;
@@ -24,7 +25,10 @@ class AdminUsersController {
                 {
                     name: 'name',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-user-info username="row.entity.username"></ek-user-info>`,
+                    cellTemplate: `
+                    <div ng-if="!row.entity.email_validated_at">--</div>
+                    <ek-user-info ng-if="!!row.entity.email_validated_at" username="row.entity.username"></ek-user-info>
+                    `,
                     sortingAlgorithm: (a, b, rowA, rowB) => {
                         const nameA = `${rowA.entity.firstname} ${rowA.entity.lastname || ''}`.toLowerCase();
                         const nameB = `${rowB.entity.firstname} ${rowB.entity.lastname || ''}`.toLowerCase();
@@ -38,12 +42,22 @@ class AdminUsersController {
                         return 0;
                     }
                 },
-                { name: 'username', enableColumnMenu: false },
+                {
+                    name: 'username',
+                    enableColumnMenu: false,
+                    cellTemplate: `
+                    <div ng-if="!row.entity.email_validated_at">--</div>
+                    <div ng-if="!!row.entity.email_validated_at">{{ row.entity.username }}</div>
+                    `
+                },
                 { name: 'email', enableColumnMenu: false },
                 {
                     name: 'created',
                     enableColumnMenu: false,
-                    cellTemplate: `<div>{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>`
+                    cellTemplate: `
+                    <div ng-if="!row.entity.email_validated_at" class="ek-admin-users__invitation-pending">Invitation pending</div>
+                    <div ng-if="!!row.entity.email_validated_at">{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>
+                    `
                 }
             ],
             onRegisterApi: (gridApi) => {
@@ -53,6 +67,10 @@ class AdminUsersController {
                 gridApi.selection.on.rowSelectionChangedBatch($scope, onRowSelectionChanged);
             }
         };
+
+        usersStore.addChangeListener(onUsersChange);
+
+        $scope.$on('$destroy', () => usersStore.removeChangeListener(onUsersChange));
     }
 
     inviteUsers() {

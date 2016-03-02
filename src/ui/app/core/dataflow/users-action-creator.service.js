@@ -7,7 +7,9 @@ class UsersActionCreatorService {
         this._usersAPI = usersAPI;
         this._invitesAPI = invitesAPI;
 
-        usersAPI.addOnUpdatedListener((users) => this._dispatcher.dispatch({ type: this._actions.USERS_UPDATED, users }));
+        usersAPI.addOnCreatedListener((user) => this._dispatcher.dispatch({ type: this._actions.USERS_CREATED, user }));
+        usersAPI.addOnUpdatedListener((user) => this._dispatcher.dispatch({ type: this._actions.USERS_UPDATED, user }));
+        usersAPI.addOnDeletedListener((user) => this._dispatcher.dispatch({ type: this._actions.USERS_DELETED, user }));
     }
 
     subscribe() {
