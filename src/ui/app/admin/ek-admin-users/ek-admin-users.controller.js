@@ -56,7 +56,7 @@ class AdminUsersController {
                     enableColumnMenu: false,
                     cellTemplate: `
                     <div ng-if="!row.entity.email_validated_at" class="ek-admin-users__invitation-pending">Invitation pending</div>
-                    <div ng-if="!!row.entity.email_validated_at">{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>
+                    <div ng-if="!!row.entity.email_validated_at">{{ row.entity.metadata.creationTimestamp | ekHumanizeDate: 'epoch' }} ago</div>
                     `
                 }
             ],
