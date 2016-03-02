@@ -6,6 +6,14 @@ class InstancesActionCreatorService {
         this._actions = actions;
         this._dispatcher = dispatcher;
         this._namespacesStore = namespacesStore;
+
+        instancesAPI.addOnCreatedListener((instance) => this._dispatcher.dispatch({
+            type: this._actions.INSTANCE_DEPLOYED,
+            instances: [instance]
+        }));
+
+        instancesAPI.addOnUpdatedListener((instance) => this._dispatcher.dispatch({ type: this._actions.INSTANCES_UPDATED, instance }));
+        instancesAPI.addOnDeletedListener((instance) => this._dispatcher.dispatch({ type: this._actions.INSTANCES_DELETED, instance }));
     }
 
     deploy(namespace, chart, info) {
@@ -19,7 +27,7 @@ class InstancesActionCreatorService {
         this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOY });
 
         return this._instancesAPI.create(body)
-            .then((newInstance) => this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOYED, newInstance }));
+            .then((instances) => this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOYED, instances }));
     }
 
     subscribe(namespace) {

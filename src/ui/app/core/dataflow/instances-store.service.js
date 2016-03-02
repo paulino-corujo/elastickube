@@ -29,12 +29,20 @@ class InstancesStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.INSTANCE_DEPLOYED:
+                    action.instances.forEach((instance) => {
+                        this._setInstance(instance);
+                    });
+                    this.emit(CHANGE_EVENT);
+                    break;
+
                 case this._actions.INSTANCES_UPDATED:
-                    if (action.operation === 'deleted') {
-                        this._removeInstance(action.instance);
-                    } else {
-                        this._setInstance(action.instance);
-                    }
+                    this._setInstance(action.instance);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.INSTANCES_DELETED:
+                    this._removeInstance(action.instance);
                     this.emit(CHANGE_EVENT);
                     break;
 
