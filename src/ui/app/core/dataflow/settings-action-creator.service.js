@@ -6,6 +6,8 @@ class SettingsActionCreatorService {
         this._actions = actions;
         this._dispatcher = dispatcher;
         this._settingsAPI = settingsAPI;
+
+        settingsAPI.addOnUpdatedListener((settings) => this._dispatcher.dispatch({ type: this._actions.SETTINGS_UPDATED, settings }));
     }
 
     authProviders(code) {
