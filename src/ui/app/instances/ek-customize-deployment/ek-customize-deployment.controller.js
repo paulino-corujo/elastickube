@@ -23,6 +23,10 @@ class CustomizeDeploymentController {
             }
         });
     }
+
+    setLabels() {
+        return (labels) => this.deploymentInfo.labels = labels;
+    }
 }
 
 export default CustomizeDeploymentController;
