@@ -7,7 +7,7 @@ from smtplib import SMTP, SMTP_SSL
 import concurrent.futures
 from tornado.gen import Return, coroutine
 
-from api.resources.resources import INVITE_TEMPLATE, INVITE_SUBJECT
+from api.resources import INVITE_TEMPLATE, INVITE_SUBJECT
 
 DEFAULT_THREADPOOL = concurrent.futures.ThreadPoolExecutor(max_workers=6)
 INVITE_BODY_TYPE = 'html'
