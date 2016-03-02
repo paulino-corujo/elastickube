@@ -42,6 +42,7 @@ class ChartStoreService extends AbstractStore {
 
     destroy() {
         delete this._charts;
+        delete this._isLoading;
     }
 
     get(id) {

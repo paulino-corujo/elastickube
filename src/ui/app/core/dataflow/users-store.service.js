@@ -57,6 +57,7 @@ class UsersStoreService extends AbstractStore {
 
     destroy() {
         this._users = {};
+        delete this._isLoading;
     }
 
     get(username) {
