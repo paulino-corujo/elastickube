@@ -28,6 +28,10 @@ class NewInstanceController {
         this._instancesActionCreator.deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
             .then(() => {
                 this._instancesNavigationActionCreator.instances();
+            }, () => {
+                this._instancesNavigationActionCreator.instances();
+
+                // FIXME we should show an error message here
             });
     }
 }
