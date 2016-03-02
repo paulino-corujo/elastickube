@@ -19,7 +19,7 @@ class SelectUsersController {
 
     querySearch(text) {
         return _.chain(this._usersStore.getAll())
-            .reject((x) => _.includes(this.selectedUsers, x))
+            .reject((x) => _.includes(this.selectedUsers, x) || _.isUndefined(x.email_validated_at))
             .filter((x) => `${x.firstname} ${x.lastname}`.toLowerCase().indexOf((text || '').toLowerCase()) !== -1)
             .value();
     }
