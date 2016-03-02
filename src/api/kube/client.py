@@ -61,7 +61,7 @@ class HTTPClient(object):
         params = self.build_params(url_path, **kwargs)
         url = url_concat(self.build_url(url_path, **kwargs), params)
 
-        client = AsyncHTTPClient()
+        client = AsyncHTTPClient(force_instance=True)
         try:
             result = yield client.fetch(url, method="GET", headers=self.build_headers())
             raise Return(result)
@@ -73,7 +73,7 @@ class HTTPClient(object):
         url = self.build_url(url_path, **kwargs)
         params = self.build_params(url_path, **kwargs)
 
-        client = AsyncHTTPClient()
+        client = AsyncHTTPClient(force_instance=True)
         try:
             result = yield client.fetch(
                 url,
@@ -90,7 +90,7 @@ class HTTPClient(object):
         url = self.build_url(url_path, **kwargs)
         params = self.build_params(url_path, **kwargs)
 
-        client = AsyncHTTPClient()
+        client = AsyncHTTPClient(force_instance=True)
         try:
             result = yield client.fetch(
                 url,
@@ -104,7 +104,7 @@ class HTTPClient(object):
 
     @coroutine
     def delete(self, url_path, **kwargs):
-        client = AsyncHTTPClient()
+        client = AsyncHTTPClient(force_instance=True)
         try:
             response = yield client.fetch(
                 self.build_url(url_path, **kwargs),
@@ -119,7 +119,7 @@ class HTTPClient(object):
         url = self.build_url(url_path, **kwargs)
         params = self.build_params(url_path, **kwargs)
 
-        client = AsyncHTTPClient()
+        client = AsyncHTTPClient(force_instance=True)
         try:
             result = yield client.fetch(
                 url,
@@ -152,7 +152,7 @@ class HTTPClient(object):
             request_timeout=3600,
             streaming_callback=data_callback)
 
-        client = AsyncHTTPClient()
+        client = AsyncHTTPClient(force_instance=True)
         future = WatchFuture()
 
         chain_future(client.fetch(request), future)
