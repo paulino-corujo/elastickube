@@ -16,7 +16,7 @@ from data.query import ObjectNotFoundError
 
 REST_OPERATIONS = ["create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
-SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "instance", "charts"]
+SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "instance", "invitations", "charts"]
 
 
 class MainWebSocketHandler(SecureWebSocketHandler):
@@ -49,7 +49,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             users=dict(
                 rest=UsersActions(self.settings),
                 watcher_cls=CursorWatcher
-            )
+            ),
+            invitations=dict(
+                rest=InvitationActions(self.settings),
+            ),
         )
 
     def open(self):

@@ -10,3 +10,8 @@ CACHE_CONTROL_NO_CACHE = 'no-cache, must-revalidate'
 
 SVG_CONTENT_TYPE = 'image/svg+xm'
 PNG_CONTENT_TYPE = 'image/png'
+
+with open(os.path.join(ROOT_PATH, 'invite.html')) as invite_file:
+    INVITE_TEMPLATE = invite_file.read()
+
+INVITE_SUBJECT = u"You've been invited to ElasticKube"

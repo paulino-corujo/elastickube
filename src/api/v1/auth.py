@@ -61,42 +61,74 @@ class AuthProvidersHandler(RequestHandler):
 
             validation_token = self.request.headers.get(ELASTICKUBE_VALIDATION_TOKEN_HEADER)
             if validation_token is not None:
-                # TODO recover email from DB
-                providers['email'] = "test@email.com"
+                user = yield Query(self.settings["database"], "Users").find_one({"invite_token": validation_token})
+                if user is not None and 'email_validated_at' not in user:
+                    providers['email'] = user[u'email']
 
             self.write(providers)
+
+
+def _validate_data_signup_or_bad_request(data):
+    if "email" not in data:
+        raise HTTPError(400, message="Email is required.")
+
+    if "password" not in data:
+        raise HTTPError(400, message="Password is required.")
+
+    if "firstname" not in data:
+        raise HTTPError(400, message="First name is required.")
+
+    if "lastname" not in data:
+        raise HTTPError(400, message="Last name is required.")
+
+    return True
 
 
 class SignupHandler(AuthHandler):
 
     @coroutine
+    def _update_invited_user(self, validation_token, data):
+        user = yield Query(self.settings["database"], "Users").find_one(
+            {"invite_token": validation_token, "email": data["email"]})
+        if user is not None and 'email_validated_at' not in user:
+            user[u"username"] = data.get("username", data["email"])
+            user[u"password"] = _generate_hashed_password(data["password"])
+            user[u"firstname"] = data["firstname"]
+            user[u"lastname"] = data["lastname"]
+            user[u"role"] = "user"
+            user[u"schema"] = "http://elasticbox.net/schemas/user"
+            user[u"email_validated_at"] = datetime.utcnow().isoformat()
+            raise Return(user)
+
+        else:
+            raise HTTPError(403, message="Invitation not found.")
+
+    @coroutine
     def post(self):
+        try:
+            data = json.loads(self.request.body)
+        except Exception:
+            raise HTTPError(400, message='Invalid JSON')
+
+        validation_token = self.request.headers.get(ELASTICKUBE_VALIDATION_TOKEN_HEADER)
+        if validation_token is not None:
+            _validate_data_signup_or_bad_request(data)
+            user = yield self._update_invited_user(validation_token, data)
+            token = yield self.authenticate_user(user)
+            self.write(token)
+            self.flush()
+
         # Signup can be used only the first time
-        if (yield Query(self.settings["database"], "Users").find_one()) is not None:
+        elif (yield Query(self.settings["database"], "Users").find_one()) is not None:
             raise HTTPError(403, message="Onboarding already completed.")
 
         else:
-            data = json.loads(self.request.body)
-            if "email" not in data:
-                raise HTTPError(400, message="Email is required.")
+            _validate_data_signup_or_bad_request(data)
 
-            if "password" not in data:
-                raise HTTPError(400, message="Password is required.")
-
-            if "firstname" not in data:
-                raise HTTPError(400, message="First name is required.")
-
-            if "lastname" not in data:
-                raise HTTPError(400, message="Last name is required.")
-
-            salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
             user = dict(
                 email=data["email"],
                 username=data["email"],
-                password=dict(
-                    hash=sha512_crypt.encrypt((data["password"] + salt).encode("utf-8"), rounds=40000),
-                    salt=salt
-                ),
+                password=_generate_hashed_password(data["password"]),
                 firstname=data["firstname"],
                 lastname=data["lastname"],
                 role="administrator",
@@ -108,6 +140,11 @@ class SignupHandler(AuthHandler):
             token = yield self.authenticate_user(signup_user)
             self.write(token)
             self.flush()
+
+
+def _generate_hashed_password(password):
+    salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
+    return {'hash': sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=40000), 'salt': salt}
 
 
 class PasswordHandler(AuthHandler):
@@ -147,8 +184,18 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
     def get(self):
         logging.info("Initiating Google OAuth.")
 
-        google_oauth = self.settings.get("google_oauth", None)
-        code = self.get_argument("code", False)
+        settings = yield Query(self.settings["database"], "Settings").find_one()
+        google_oauth = settings[u'authentication'].get('google_oauth', None)
+        if google_oauth is None:
+            raise HTTPError(403, 'Forbidden request')
+
+        code = self.get_argument('code', False)
+
+        # Add OAuth settings for GoogleOAuth2Mixin
+        self.settings['google_oauth'] = {
+            'key': google_oauth['key'],
+            'secret': google_oauth['secret']
+        }
 
         if code:
             logging.debug("Google redirect received.")
@@ -165,7 +212,7 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
                 logging.debug("Google user email verified.")
                 user = yield self.settings["database"].Users.find_one({"email": auth_user["email"]})
 
-                if user:
+                if user:  # TODO: Accept user invitation if user already exists
                     yield self.authenticate_user(user)
                     self.redirect('/')
                 else:

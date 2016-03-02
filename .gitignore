@@ -9,5 +9,8 @@
 *.iso
 *.log
 
+# python files
+*.py[cod]
+
 # src files
 node_modules
