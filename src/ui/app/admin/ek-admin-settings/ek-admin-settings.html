@@ -5,8 +5,7 @@
 
         <input type="text" name="hostname" required
                class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-               ng-model="ctrl.hostname"
-               ng-pattern="/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/">
+               ng-model="ctrl.hostname">
         <div class="ek-message-error" ng-messages="ctrl.form.hostname.$error">
             <div ng-message="required">The hostname URL is required.</div>
             <div ng-message="pattern">The hostname URL is invalid.</div>
