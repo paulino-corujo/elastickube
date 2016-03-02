@@ -1,8 +1,10 @@
 import rowTemplate from './ek-admin-instances-row.template.html';
 
 class AdminInstancesController {
-    constructor($scope, instancesStore, instancesActionCreator, namespacesStore) {
+    constructor($scope, instancesStore, instancesActionCreator, instancesNavigationActionCreator, namespacesStore) {
         'ngInject';
+
+        this._instancesNavigationActionCreator = instancesNavigationActionCreator;
 
         this.bulkActions = 'Bulk Actions';
         this.instances = instancesStore.getAll();
@@ -73,6 +75,10 @@ class AdminInstancesController {
         };
 
         $scope.$on('$destroy', () => _.map(namespacesStore.getAll(), (x) => instancesActionCreator.unsubscribe(x)));
+    }
+
+    newInstance() {
+        this._instancesNavigationActionCreator.newInstance();
     }
 }
 
