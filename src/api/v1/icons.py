@@ -21,7 +21,6 @@ class IconGenerator(RequestHandler):
 
     @coroutine
     def get(self, entity_id, chart_id):
-        logging.debug(entity_id)
         if not ObjectId.is_valid(chart_id):
             self.set_status(httplib.BAD_REQUEST)
             raise Return()
