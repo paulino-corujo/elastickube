@@ -49,5 +49,9 @@ def validate_response(test_case, message, expected_result):
                          "Operation is %s instead of %s" % (message["operation"], expected_result["operation"]))
     test_case.assertTrue(message["action"] == expected_result["action"],
                          "Action is %s instead of %s" % (message["action"], expected_result["action"]))
-    test_case.assertTrue(isinstance(message["body"], expected_result["body_type"]),
-                         "Body is not a %s but %s" % (expected_result["body_type"], type(message["body"])))
+
+    if "body_type" in expected_result:
+        test_case.assertTrue(isinstance(message["body"], expected_result["body_type"]),
+                             "Body is not a %s but %s" % (expected_result["body_type"], type(message["body"])))
+    else:
+        test_case.assertIsNone(message["body"], "Body is not a None but '%s'" % message["body"])

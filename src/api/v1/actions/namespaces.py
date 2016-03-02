@@ -12,7 +12,9 @@ class NamespacesActions(object):
         logging.info("Initializing NamespacesActions")
         self.kube_client = settings['kube']
 
-    def check_permissions(self, user, operation, body):
+    @staticmethod
+    def check_permissions(user, operation):
+        logging.debug("Checking permissions for user %s and operation %s on namespaces", user["username"], operation)
         return True
 
     @coroutine

@@ -4,7 +4,7 @@ from datetime import datetime
 from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 
-from data.query import Query, ObjectNotFoundException
+from data.query import Query, ObjectNotFoundError
 
 
 class UsersActions(object):
@@ -13,7 +13,9 @@ class UsersActions(object):
         logging.info("Initializing UsersActions")
         self.database = settings['database']
 
-    def check_permissions(self, user, operation, body):
+    @staticmethod
+    def check_permissions(user, operation):
+        logging.debug("Checking permissions for user %s and operation %s on users", user["username"], operation)
         return True
 
     @coroutine
@@ -44,4 +46,4 @@ class UsersActions(object):
             user["metadata"]["deletionTimestamp"] = datetime.utcnow().isoformat()
             yield Query(self.database, "Users").update(user)
         else:
-            raise ObjectNotFoundException()
+            raise ObjectNotFoundError("users %s not found." % user_id)

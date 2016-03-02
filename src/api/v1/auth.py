@@ -18,7 +18,7 @@ class AuthHandler(RequestHandler):
 
     @coroutine
     def authenticate_user(self, user):
-        logging.info("Authenticating user '%(username)s'" % user)
+        logging.info("Authenticating user '%(username)s'", user)
 
         token = dict(
             id=str(user["_id"]),
@@ -37,7 +37,7 @@ class AuthHandler(RequestHandler):
         token = jwt.encode(token, self.settings["secret"], algorithm="HS256")
         self.set_cookie(ELASTICKUBE_TOKEN_HEADER, token)
 
-        logging.info("User '%(username)s' authenticated." % user)
+        logging.info("User '%(username)s' authenticated.", user)
         raise Return(token)
 
 
@@ -128,7 +128,7 @@ class PasswordHandler(AuthHandler):
 
         user = yield self.settings["database"].Users.find_one({"username": username})
         if not user:
-            logging.debug("Username '%s' not found." % username)
+            logging.debug("Username '%s' not found.", username)
             raise HTTPError(401, reason="Invalid username or password.")
 
         encoded_user_password = user["password"]["hash"].encode("utf-8")
@@ -137,7 +137,7 @@ class PasswordHandler(AuthHandler):
             self.write(token)
             self.flush()
         else:
-            logging.info("Invalid password for user '%s'." % username)
+            logging.info("Invalid password for user '%s'.", username)
             raise HTTPError(401, reason="Invalid username or password.")
 
 
@@ -169,10 +169,10 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
                     yield self.authenticate_user(user)
                     self.redirect('/')
                 else:
-                    logging.debug("User '%s' not found" % auth_user["email"])
+                    logging.debug("User '%s' not found", auth_user["email"])
                     raise HTTPError(400, "Invalid authentication request.")
             else:
-                logging.info("User email '%s' not verified." % auth_user["email"])
+                logging.info("User email '%s' not verified.", auth_user["email"])
                 raise HTTPError(400, "Email is not verified.")
         else:
             logging.debug("Redirecting to google for authentication.")

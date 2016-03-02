@@ -6,27 +6,19 @@ from tornado.concurrent import Future, chain_future
 from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
 from tornado.httputil import url_concat
 
-from api.kube.exceptions import KubernetesException, WatchDisconnectedException, NotFoundException
+from api.kube.exceptions import KubernetesException, WatchDisconnectedException, ResourceNotFoundException
 from api.kube.resources import Resource, NamespacedResource
 
 
 class HTTPClient(object):
 
-    def __init__(self, server, username, password, token, version='v1'):
+    def __init__(self, server, token, version='v1'):
         self.server = server
-        self.username = username
-        self.password = password
         self.token = token
         self.version = version
 
         self._base_url = "https://{0}/api/{1}".format(self.server, self.version)
-
-        defaults = dict(validate_cert=False)
-        if self.username and self.password:
-            defaults["auth_username"] = self.username
-            defaults["auth_password"] = self.password
-
-        AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient", defaults=defaults)
+        AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient", defaults=dict(validate_cert=False))
 
     def build_url(self, url_path, **kwargs):
         if url_path.startswith("/"):
@@ -169,10 +161,31 @@ class HTTPClient(object):
 
 class KubeClient(object):
 
-    def __init__(self, endpoint, username=None, password=None, token=None, version='v1'):
+    # Cannot be generated from the API
+    RESOURCE_TO_KIND_MAPPING = {
+        "bindings": "Binding",
+        "componentstatuses": "ComponentStatus",
+        "endpoints": "Endpoints",
+        "events": "Event",
+        "limitranges": "LimitRange",
+        "namespaces": "Namespace",
+        "nodes": "Node",
+        "persistentvolumeclaims": "PersistentVolumeClaim",
+        "persistentvolumes": "PersistentVolume",
+        "pods": "Pod",
+        "podtemplates": "PodTemplate",
+        "replicationcontrollers": "ReplicationController",
+        "resourcequotas": "ResourceQuota",
+        "secrets": "Secret",
+        "serviceaccounts": "ServiceAccount",
+        "services": "Service"
+    }
+
+    def __init__(self, endpoint, token=None, version='v1'):
         self.version = version
-        self.http_client = HTTPClient(endpoint, username, password, token)
+        self.http_client = HTTPClient(endpoint, token)
         self.resources = {}
+        self.kind_to_resource = {}
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -188,6 +201,9 @@ class KubeClient(object):
             if "/" in resource["name"]:
                 continue
 
+            if resource["name"] in self.RESOURCE_TO_KIND_MAPPING.keys():
+                self.kind_to_resource[self.RESOURCE_TO_KIND_MAPPING[resource["name"]]] = resource["name"]
+
             if resource["namespaced"]:
                 self.resources[resource["name"]] = NamespacedResource(self, resource["name"])
             else:
@@ -195,7 +211,14 @@ class KubeClient(object):
 
         raise Return()
 
-    def format_error(self, error):
+    def get_resource_type(self, kind):
+        if kind not in self.kind_to_resource.keys():
+            raise ResourceNotFoundException("Resource %s not found." % kind)
+
+        return self.kind_to_resource[kind]
+
+    @staticmethod
+    def format_error(error):
         if error.code != 599:
             error_message = error.response.body
             error_method = error.response.request.method
@@ -212,13 +235,13 @@ class KubeClient(object):
     def get(self, url_path, **kwargs):
         try:
             response = yield self.http_client.get(url_path, **kwargs)
-        except HTTPError as e:
-            message = self.format_error(e)
-            logging.exception(e)
-            if e.code == 404:
-                raise NotFoundException(message)
+        except HTTPError as http_error:
+            message = self.format_error(http_error)
+            logging.exception(http_error)
+            if http_error.code == 404:
+                raise ResourceNotFoundException(message)
             else:
-                raise KubernetesException(message, e.code)
+                raise KubernetesException(message, http_error.code)
 
         raise Return(json.loads(response.body))
 
@@ -226,13 +249,13 @@ class KubeClient(object):
     def put(self, url_path, **kwargs):
         try:
             response = yield self.http_client.put(url_path, **kwargs)
-        except HTTPError as e:
-            message = self.format_error(e)
+        except HTTPError as http_error:
+            message = self.format_error(http_error)
 
-            if e.code == 404:
-                raise NotFoundException(message)
+            if http_error.code == 404:
+                raise ResourceNotFoundException(message)
             else:
-                raise KubernetesException(message, e.code)
+                raise KubernetesException(message, http_error.code)
 
         raise Return(json.loads(response.body))
 
@@ -240,8 +263,8 @@ class KubeClient(object):
     def post(self, url_path, **kwargs):
         try:
             response = yield self.http_client.post(url_path, **kwargs)
-        except HTTPError as e:
-            raise KubernetesException(self.format_error(e), e.code)
+        except HTTPError as http_error:
+            raise KubernetesException(self.format_error(http_error), http_error.code)
 
         raise Return(json.loads(response.body))
 
@@ -249,13 +272,13 @@ class KubeClient(object):
     def delete(self, url_path, **kwargs):
         try:
             response = yield self.http_client.delete(url_path, **kwargs)
-        except HTTPError as e:
-            message = self.format_error(e)
+        except HTTPError as http_error:
+            message = self.format_error(http_error)
 
-            if e.code == 404:
-                raise NotFoundException(message)
+            if http_error.code == 404:
+                raise ResourceNotFoundException(message)
             else:
-                raise KubernetesException(message, e.code)
+                raise KubernetesException(message, http_error.code)
 
         raise Return(json.loads(response.body))
 
@@ -263,13 +286,13 @@ class KubeClient(object):
     def patch(self, url_path, **kwargs):
         try:
             response = yield self.http_client.patch(url_path, **kwargs)
-        except HTTPError as e:
-            message = self.format_error(e)
+        except HTTPError as http_error:
+            message = self.format_error(http_error)
 
-            if e.code == 404:
-                raise NotFoundException(message)
+            if http_error.code == 404:
+                raise ResourceNotFoundException(message)
             else:
-                raise KubernetesException(message, e.code)
+                raise KubernetesException(message, http_error.code)
 
         raise Return(json.loads(response.body))
 
@@ -277,12 +300,12 @@ class KubeClient(object):
     def watch(self, url_path, on_data, **kwargs):
         try:
             yield self.http_client.watch(url_path, on_data, **kwargs)
-        except HTTPError as e:
-            message = self.format_error(e)
+        except HTTPError as http_error:
+            message = self.format_error(http_error)
 
-            if e.code == 404:
-                raise NotFoundException(message)
-            elif e.code == 599:
+            if http_error.code == 404:
+                raise ResourceNotFoundException(message)
+            elif http_error.code == 599:
                 raise WatchDisconnectedException(message)
             else:
-                raise KubernetesException(message, e.code)
+                raise KubernetesException(message, http_error.code)

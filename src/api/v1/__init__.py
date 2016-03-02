@@ -131,4 +131,5 @@ def load_colors(color_definition_template):
     with open(color_definition_template) as colors_file:
         for color_name, color_value in json.load(colors_file).iteritems():
             colors[color_name] = color_value
+
     return colors

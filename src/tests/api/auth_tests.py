@@ -36,8 +36,8 @@ class AuthTests(testing.AsyncTestCase):
                 method="POST",
                 body=json.dumps({})
             )
-        except HTTPError as e:
-            error = e
+        except HTTPError as http_error:
+            error = http_error
 
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/signup")
         self.assertEquals(error.code, 403, "/api/v1/auth/signup raised %d instead of 403" % error.code)
@@ -66,8 +66,8 @@ class AuthTests(testing.AsyncTestCase):
                 "http://localhost/api/v1/auth/login",
                 method='POST',
                 body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube2")))
-        except HTTPError as e:
-            error = e
+        except HTTPError as http_error:
+            error = http_error
 
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/login")
         self.assertEquals(error.code, 401, "/api/v1/auth/login raised %d instead of 401" % error.code)
