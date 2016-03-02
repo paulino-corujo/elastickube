@@ -1,15 +1,13 @@
 import './ek-choose-chart-card.less';
 import Directive from 'directive';
-import Controller from './ek-choose-chart-card.controller';
 import template from './ek-choose-chart-card.html';
 
 class ChartCardDirective extends Directive {
     constructor() {
-        super({ Controller, template });
+        super({ template });
 
-        this.bindToController = {
-            chart: '=',
-            selected: '='
+        this.scope = {
+            chart: '='
         };
     }
 

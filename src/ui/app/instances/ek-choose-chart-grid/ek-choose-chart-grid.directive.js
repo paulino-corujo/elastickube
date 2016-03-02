@@ -16,9 +16,10 @@ class ChooseChartGridDirective extends Directive {
 
     compile(tElement) {
         tElement.addClass('ek-choose-chart-grid');
+
         return ($scope, $element, attrs, ctrl) => {
             if (_.isFunction(ctrl.onSelection())) {
-               ctrl.onSelection = ctrl.onSelection();
+                ctrl.onSelection = ctrl.onSelection();
             }
         };
     }

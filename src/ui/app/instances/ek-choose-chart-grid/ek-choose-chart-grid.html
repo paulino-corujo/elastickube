@@ -1,9 +1,9 @@
 <md-content>
     <div layout="row" layout-wrap>
         <ek-choose-chart-card class="ek-choose-chart-grid__card"
-                              ng-repeat="chart in ctrl.charts"
-                              selected="ctrl.selectedChart == chart"
+                              ng-repeat="chart in ctrl.charts track by $index"
                               ng-click="ctrl.selectChart(chart)"
+                              ng-class="{'ek-choose-chart-grid__card--selected': ctrl.isSelected(chart) }"
                               chart="chart"></ek-choose-chart-card>
     </div>
 </md-content>
