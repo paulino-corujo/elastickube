@@ -48,11 +48,11 @@ class AdminInstancesController {
                     }
                 },
                 {
-                    name: 'serviceId',
-                    displayName: 'Service ID',
-                    field: 'metadata.name',
+                    name: 'serviceType',
+                    displayName: 'Service Type',
+                    field: 'kind',
                     enableColumnMenu: false,
-                    cellTemplate: `<p>{{ row.entity.metadata.name }}</p>`
+                    cellTemplate: `<p>{{ row.entity.kind }}</p>`
                 },
                 {
                     name: 'modified',
