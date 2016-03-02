@@ -22,7 +22,13 @@
     </div>
 
     <div class="ek-admin-instances__body" flex>
-        <div class="ek-admin-instances__body__table ek-table" ui-grid="ctrl.gridOptions" ui-grid-selection></div>
+        <div class="ek-instance-list__table ek-table" ui-grid-selection ui-grid-tree-view
+             ng-if="ctrl.containsGroups"
+             ui-grid="ctrl.gridOptions"></div>
+
+        <div class="ek-instance-list__table ek-table" ui-grid-selection
+             ng-if="!ctrl.containsGroups"
+             ui-grid="ctrl.gridOptions"></div>
     </div>
 </div>
 

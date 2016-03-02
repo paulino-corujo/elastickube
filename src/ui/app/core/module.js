@@ -44,6 +44,7 @@ angular
         'ngMessages',
         'ui.grid',
         'ui.grid.selection',
+        'ui.grid.treeView',
         apiModule,
         routerModule
     ])

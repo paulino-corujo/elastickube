@@ -4,11 +4,15 @@ class AdminInstancesController {
     constructor($scope, instancesStore, instancesActionCreator, instancesNavigationActionCreator, namespacesStore) {
         'ngInject';
 
+        const onChange = () => this.instances = groupInstances(instancesStore.getAll());
+
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
 
         this.bulkActions = 'Bulk Actions';
-        this.instances = instancesStore.getAll();
+        this.instances = groupInstances(instancesStore.getAll());
         this.filteredInstances = [];
+
+        instancesStore.addChangeListener(onChange);
 
         this.gridOptions = {
             rowTemplate,
@@ -16,6 +20,7 @@ class AdminInstancesController {
             enableFiltering: false,
             enableRowSelection: true,
             enableSelectAll: true,
+            showTreeExpandNoChildren: false,
             selectionRowHeaderWidth: 50,
             rowHeight: 50,
             columnDefs: [
@@ -23,7 +28,9 @@ class AdminInstancesController {
                     name: 'name',
                     field: 'metadata.name',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-instance-name instance="row.entity"></ek-instance-name>`
+                    cellTemplate: `<div ng-class="{'ek-admin-instances__child-row': row.entity.$$treeLevel === 1}">
+                        <ek-instance-name instance="row.entity"></ek-instance-name>
+                    </div>`
                 },
                 {
                     name: 'state',
@@ -74,12 +81,43 @@ class AdminInstancesController {
             }
         };
 
+        $scope.$watchCollection('ctrl.filteredInstances', () => this.containsGroups = _.find(this.filteredInstances,
+            (x) => x.$$treeLevel === 1));
+
         $scope.$on('$destroy', () => _.map(namespacesStore.getAll(), (x) => instancesActionCreator.unsubscribe(x)));
     }
 
     newInstance() {
         this._instancesNavigationActionCreator.newInstance();
     }
+}
+
+function groupInstances(instances) {
+    const key = ['metadata', 'annotations', 'kubernetes.io/created-by'];
+
+    return _.chain(instances)
+        .groupBy((instance) => {
+            if (_.has(instance, key)) {
+                const data = JSON.parse(_.get(instance, key));
+
+                return data.reference.uid;
+            }
+
+            return instance.metadata.uid;
+        })
+        .mapValues((items) => {
+            return _.chain(items)
+                .map((item) => {
+                    item.$$treeLevel = _.has(item, key) ? 1 : 0;
+
+                    return item;
+                })
+                .sortBy('$$treeLevel')
+                .value();
+        })
+        .values()
+        .flatten()
+        .value();
 }
 
 export default AdminInstancesController;

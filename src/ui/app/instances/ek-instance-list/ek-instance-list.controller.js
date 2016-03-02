@@ -10,6 +10,7 @@ class InstanceListController {
             enableFiltering: false,
             enableRowSelection: true,
             enableSelectAll: true,
+            showTreeExpandNoChildren: false,
             selectionRowHeaderWidth: 50,
             rowHeight: 50,
             columnDefs: [
@@ -17,7 +18,9 @@ class InstanceListController {
                     name: 'name',
                     field: 'metadata.name',
                     enableColumnMenu: false,
-                    cellTemplate: `<ek-instance-name instance="row.entity"></ek-instance-name>`
+                    cellTemplate: `<div ng-class="{'ek-instance-list__child-row': row.entity.$$treeLevel === 1}">
+                        <ek-instance-name instance="row.entity"></ek-instance-name>
+                    </div>`
                 },
                 {
                     name: 'state',
@@ -67,6 +70,8 @@ class InstanceListController {
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
             }
         };
+
+        $scope.$watchCollection('ctrl.instances', () => this.containsGroups = _.find(this.instances, (x) => x.$$treeLevel === 1));
     }
 }
 
