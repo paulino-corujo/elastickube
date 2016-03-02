@@ -15,10 +15,9 @@ import logging
 import uuid
 
 from tornado import testing
-from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
-from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
+from tests.api import get_ws_request, validate_response, wait_message
 
 
 class WatchInstancesTest(testing.AsyncTestCase):
@@ -27,13 +26,7 @@ class WatchInstancesTest(testing.AsyncTestCase):
     def watch_instances_test(self):
         logging.debug("Start watch_instances_test")
 
-        token = yield get_token(self.io_loop)
-        request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
-            headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
-            validate_cert=False
-        )
-
+        request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
 
         correlation = str(uuid.uuid4())[:10]
@@ -43,18 +36,12 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "correlation": correlation
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message["status_code"] == 200,
-                        "Status code is %d instead of 200" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message["operation"] == "watched",
-                        "Operation is %s instead of watched" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "instances",
-                        "Action is %s instead of instances" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], list),
-                        "Body is not a list but %s" % type(deserialized_message["body"]))
-        self.assertTrue(len(deserialized_message["body"]) > 0, "No instances returned as part of the response")
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="watched", action="instances", body_type=list))
+        self.assertTrue(len(message["body"]) > 0, "No instances returned as part of the response")
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -63,19 +50,13 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "correlation": correlation,
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message["status_code"] == 400,
-                        "Status code is %d instead of 400" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message["operation"] == "watched",
-                        "Operation is %s instead of watched" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "instances",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message["body"]))
-        self.assertTrue(deserialized_message["body"]["message"] == "Action already watched.",
-                        "Message is %s instead of 'Action already watched.'" % deserialized_message["body"]["message"])
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=400, correlation=correlation, operation="watched", action="instances", body_type=dict))
+        self.assertTrue(message["body"]["message"] == "Action already watched.",
+                        "Message is %s instead of 'Action already watched.'" % message["body"]["message"])
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -85,18 +66,12 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "body": {"namespace": "kube-system"}
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message["status_code"] == 200,
-                        "Status code is %d instead of 200" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message["operation"] == "watched",
-                        "Operation is %s instead of watched" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "instances",
-                        "Action is %s instead of instances" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], list),
-                        "Body is not a list but %s" % type(deserialized_message["body"]))
-        self.assertTrue(len(deserialized_message["body"]) > 0, "No instances returned as part of the response")
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="watched", action="instances", body_type=list))
+        self.assertTrue(len(message["body"]) > 0, "No instances returned as part of the response")
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -106,19 +81,13 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "body": {"namespace": "kube-system"}
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message["status_code"] == 400,
-                        "Status code is %d instead of 400" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message["operation"] == "watched",
-                        "Operation is %s instead of watched" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "instances",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message["body"]))
-        self.assertTrue(deserialized_message["body"]["message"] == "Action already watched.",
-                        "Message is %s instead of 'Action already watched.'" % deserialized_message["body"]["message"])
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=400, correlation=correlation, operation="watched", action="instances", body_type=dict))
+        self.assertTrue(message["body"]["message"] == "Action already watched.",
+                        "Message is %s instead of 'Action already watched.'" % message["body"]["message"])
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -128,18 +97,12 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "body": {"namespace": "kube-system"}
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message['status_code'] == 200,
-                        "Status code is %d instead of 200" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message['operation'] == "unwatched",
-                        "Operation is %s instead of unwatched" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "instances",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(len(deserialized_message['body'].keys()) == 0, "Body is not empty")
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="unwatched", action="instances", body_type=dict))
+        self.assertTrue(len(message['body'].keys()) == 0, "Body is not empty")
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -149,20 +112,13 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "body": {"namespace": "kube-system"}
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message['status_code'] == 400,
-                        "Status code is %d instead of 400" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message['operation'] == "unwatched",
-                        "Operation is %s instead of unwatched" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "instances",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(deserialized_message["body"]["message"] == "Action not previously watch.",
-                        "Message is %s instead of 'Action not previously watch.'" %
-                        deserialized_message["body"]["message"])
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=400, correlation=correlation, operation="unwatched", action="instances", body_type=dict))
+        self.assertTrue(message["body"]["message"] == "Action not previously watch.",
+                        "Message is %s instead of 'Action not previously watch.'" % message["body"]["message"])
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -171,18 +127,12 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "correlation": correlation
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message['status_code'] == 200,
-                        "Status code is %d instead of 200" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message['operation'] == "unwatched",
-                        "Operation is %s instead of unwatched" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "instances",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(len(deserialized_message['body'].keys()) == 0, "Body is not empty")
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="unwatched", action="instances", body_type=dict))
+        self.assertTrue(len(message['body'].keys()) == 0, "Body is not empty")
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
@@ -191,20 +141,13 @@ class WatchInstancesTest(testing.AsyncTestCase):
             "correlation": correlation
         }))
 
-        deserialized_message = yield wait_message(connection, correlation)
-        self.assertTrue(deserialized_message['status_code'] == 400,
-                        "Status code is %d instead of 400" % deserialized_message['status_code'])
-        self.assertTrue(deserialized_message["correlation"] == correlation,
-                        "Correlation is %s instead of %s" % (deserialized_message["correlation"], correlation))
-        self.assertTrue(deserialized_message['operation'] == "unwatched",
-                        "Operation is %s instead of unwatched" % deserialized_message['operation'])
-        self.assertTrue(deserialized_message['action'] == "instances",
-                        "Action is %s instead of users" % deserialized_message['action'])
-        self.assertTrue(isinstance(deserialized_message['body'], dict),
-                        "Body is not a dict but %s" % type(deserialized_message['body']))
-        self.assertTrue(deserialized_message["body"]["message"] == "Action not previously watch.",
-                        "Message is %s instead of 'Action not previously watch.'" %
-                        deserialized_message["body"]["message"])
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=400, correlation=correlation, operation="unwatched", action="instances", body_type=dict))
+        self.assertTrue(message["body"]["message"] == "Action not previously watch.",
+                        "Message is %s instead of 'Action not previously watch.'" % message["body"]["message"])
 
         connection.close()
         logging.debug("Completed watch_instances_test")

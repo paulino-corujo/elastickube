@@ -20,7 +20,7 @@ class InstancesActions(object):
 
     @coroutine
     def create(self, document):
-        logging.info("Creating instance for request %s", document)
+        logging.debug("Creating instance for request %s", document)
 
         namespace = document["namespace"]
 
@@ -35,3 +35,17 @@ class InstancesActions(object):
             result.append(response)
 
         raise Return(result)
+
+    @coroutine
+    def delete(self, document):
+        logging.debug("Deleting instance for request %s", document)
+
+        if document["kind"] == "ReplicationController":
+            response = yield self.kube[self.kube.get_resource_type(document["kind"])].patch(
+                document["name"], dict(spec=dict(replicas=0)), namespace=document["namespace"])
+            logging.debug("Updated ReplicationController %s", response)
+
+        response = yield self.kube[self.kube.get_resource_type(document["kind"])].delete(
+            document["name"], namespace=document["namespace"])
+
+        raise Return(response)

@@ -113,14 +113,14 @@ class KubeWatcher(object):
                             if watcher_key != metadata["type"]:
                                 continue
 
-                            self.watchers[watcher_key]['watcher'] = self.settings["kube"][name].filter(
+                            self.watchers[watcher_key]["watcher"] = self.settings["kube"][name].filter(
                                 self.get_selector(metadata["selector"])).watch(
                                     name=self.params["name"],
                                     namespace=self.params["namespace"],
-                                    resource_version=self.watchers[watcher_key]['resourceVersion'],
+                                    resource_version=self.watchers[watcher_key]["resourceVersion"],
                                     on_data=self.data_callback)
 
-                            self.watchers[watcher_key]['watcher'].add_done_callback(done_callback)
+                            self.watchers[watcher_key]["watcher"].add_done_callback(done_callback)
                             logging.debug("Reconnected watcher for %s", watcher_key)
 
         logging.info("Starting watch KubeWatcher for action %s", self.message["action"])
@@ -131,7 +131,7 @@ class KubeWatcher(object):
             logging.debug("Starting watch %s connected", self.message["action"])
 
             for resource, resource_metadata in self.resources_config.iteritems():
-                self.watchers[resource_metadata["type"]]['watcher'] = self.settings["kube"][resource].filter(
+                self.watchers[resource_metadata["type"]]["watcher"] = self.settings["kube"][resource].filter(
                     self.get_selector(resource_metadata["selector"])).watch(
                         name=self.params["name"],
                         namespace=self.params["namespace"],
@@ -156,9 +156,12 @@ class KubeWatcher(object):
 
     @coroutine
     def data_callback(self, data):
-        logging.info("InstancesWatcher data_callback")
+        logging.debug("InstancesWatcher data_callback")
 
-        resource_list = data['object']['kind'] + "List"
+        resource_list = data["object"]["kind"]
+        if resource_list not in self.watchers.keys():
+            resource_list += "List"
+
         self.watchers[resource_list]["resourceVersion"] = data['object']['metadata']['resourceVersion']
 
         operation = "updated"

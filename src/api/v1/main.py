@@ -3,6 +3,7 @@ import logging
 from bson.json_util import loads
 from pymongo.errors import DuplicateKeyError, PyMongoError
 from tornado.gen import coroutine, Return, Future
+from tornado.web import HTTPError
 
 from api.kube.exceptions import KubernetesException
 from api.v1 import SecureWebSocketHandler
@@ -61,9 +62,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
         try:
             super(MainWebSocketHandler, self).open()
-        except Exception as e:
-            logging.exception(e)
-            self.write_message({"error": {"message": "Cannot open connection"}})
+        except HTTPError as error:
+            logging.exception(error)
+            self.write_message({"error": {"message": error.log_message}})
             self.close()
 
     @coroutine
@@ -111,7 +112,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                                 response["operation"] = "updated"
 
                             elif request["operation"] == "delete":
-                                response["body"] = yield action.delete(request["body"]["_id"])
+                                response["body"] = yield action.delete(request["body"])
                                 response["operation"] = "deleted"
 
                         except PyMongoError as e:
@@ -205,7 +206,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
             raise Return(None)
 
-        if request["operation"] not in (REST_OPERATIONS + WATCH_OPERATIONS):
+        if request["operation"] not in REST_OPERATIONS + WATCH_OPERATIONS:
             self.write_message(dict(
                 action=request["action"],
                 operation=request["operation"],

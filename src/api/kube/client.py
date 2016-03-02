@@ -197,7 +197,6 @@ class KubeClient(object):
     def build_resources(self):
         response = yield self.http_client.get("/")
         for resource in json.loads(response.body).get("resources", []):
-            # FIXME: Also build methods endpoint
             if "/" in resource["name"]:
                 continue
 

@@ -13,15 +13,13 @@ from api.v1.icons import IconGenerator
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-# Config tornado.curl_httpclient to use NullHandler
-tornado_logger = logging.getLogger('tornado.curl_httpclient')
-tornado_logger.addHandler(logging.NullHandler())
-tornado_logger.propagate = False
 
+def setup_server():
+    # Config tornado.curl_httpclient to use NullHandler
+    tornado_logger = logging.getLogger('tornado.curl_httpclient')
+    tornado_logger.addHandler(logging.NullHandler())
+    tornado_logger.propagate = False
 
-if __name__ == "__main__":
-
-    # FIXME: generate a random SALT when initializing DB
     settings = dict(
         autoreload=True,
         secret="ElasticKube",
@@ -45,4 +43,8 @@ if __name__ == "__main__":
     server.add_socket(socket)
 
     IOLoop.current().add_callback(initialize, settings)
+
+
+if __name__ == "__main__":
+    setup_server()
     IOLoop.current().start()

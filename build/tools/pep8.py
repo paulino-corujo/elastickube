@@ -39,7 +39,7 @@ def _run_auto_pep8(arguments_to_pass, file_name):
     return errors
 
 
-def check_and_fix(file_paths, exclude_files=None, verbose=False):
+def check_and_fix(file_paths, verbose=False):
     arguments_to_pass = '--max-line-length=120'
 
     unfixed_violations = []
