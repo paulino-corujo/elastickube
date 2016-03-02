@@ -57,6 +57,7 @@ class NamespacesStoreService extends AbstractStore {
 
     destroy() {
         this._namespaces = {};
+        delete this._isLoading;
     }
 
     getAll() {

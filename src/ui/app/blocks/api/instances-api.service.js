@@ -8,6 +8,10 @@ class InstancesAPIService extends AbstractAPI {
         super('instances', websocketClient);
 
         this._$q = $q;
+        this.initializeSubscriptions();
+    }
+
+    initializeSubscriptions() {
         this._namespaceSubscriptions = {};
     }
 

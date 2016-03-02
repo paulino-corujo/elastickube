@@ -45,6 +45,7 @@ class SettingsStoreService extends AbstractStore {
 
     destroy() {
         delete this._settings;
+        delete this._isLoading;
     }
 
     isLoading() {

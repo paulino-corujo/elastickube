@@ -76,6 +76,7 @@ class InstancesStoreService extends AbstractStore {
 
     destroy() {
         this._instances = {};
+        delete this._isLoading;
     }
 
     get(uid) {
