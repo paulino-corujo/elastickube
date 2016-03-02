@@ -16,7 +16,7 @@ class InstanceFiltersController {
 
     filterInstancesByState() {
         this.instancesFilteredByState = _.chain(this.instancesToFilter)
-            .filter((x) => this.selectedState === 'all' || this.selectedState === x.state)
+            .filter((x) => this.selectedState === 'all' || this.selectedState.toLowerCase() === (x.kind||'').toLowerCase())
             .value();
     }
 
