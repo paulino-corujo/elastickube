@@ -7,13 +7,13 @@ from data.query import Query
 from api.kube import emails
 
 
-class InvitationActions(object):
+class InvitationsActions(object):
 
     def __init__(self, settings):
         logging.info("Initializing InviteActions")
         self.database = settings['database']
 
-    def check_permissions(self, user, _operation, _body):
+    def check_permissions(self, user, _operation):
         if user['role'] == 'administrator':
             return True
         else:

@@ -10,6 +10,7 @@ from api.v1.actions.instances import InstancesActions
 from api.v1.actions.namespaces import NamespacesActions
 from api.v1.actions.settings import SettingsActions
 from api.v1.actions.users import UsersActions
+from api.v1.actions.invitations import InvitationsActions
 from api.v1.watchers.cursor import CursorWatcher
 from api.v1.watchers.kube import KubeWatcher
 from data.query import ObjectNotFoundError
@@ -51,7 +52,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                 watcher_cls=CursorWatcher
             ),
             invitations=dict(
-                rest=InvitationActions(self.settings),
+                rest=InvitationsActions(self.settings),
             ),
         )
 
