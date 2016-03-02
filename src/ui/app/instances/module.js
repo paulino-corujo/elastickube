@@ -12,6 +12,7 @@ import ChooseChartGridDirective from './ek-choose-chart-grid/ek-choose-chart-gri
 import CustomizeDeploymentDirective from './ek-customize-deployment/ek-customize-deployment.directive';
 import InstanceDirective from './ek-instance/ek-instance.directive';
 import InstanceContainerChartDirective from './ek-instance-container-chart/ek-instance-container-chart.directive';
+import InstanceActionsDirective from './ek-instance-actions/ek-instance-actions.directive';
 import InstanceOverviewDirective from './ek-instance-overview/ek-instance-overview.directive';
 import InstanceOverviewContainersDirective from './ek-instance-overview-containers/ek-instance-overview-containers.directive';
 import InstanceOverviewDetailsDirective from './ek-instance-overview-details/ek-instance-overview-details.directive';
@@ -42,6 +43,7 @@ angular
     .directive('ekCustomizeDeployment', () => new CustomizeDeploymentDirective())
     .directive('ekInstance', () => new InstanceDirective())
     .directive('ekInstanceContainerChart', () => new InstanceContainerChartDirective())
+    .directive('ekInstanceActions', () => new InstanceActionsDirective())
     .directive('ekInstanceOverview', () => new InstanceOverviewDirective())
     .directive('ekInstanceOverviewContainers', () => new InstanceOverviewContainersDirective())
     .directive('ekInstanceOverviewDetails', () => new InstanceOverviewDetailsDirective())
