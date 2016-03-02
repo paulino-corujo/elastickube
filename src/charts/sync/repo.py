@@ -110,11 +110,11 @@ class GitSync(object):
         manifests = dict()
 
         manifests_path = os.path.join(directory, "manifests", "*.yaml")
-        for file in glob.glob(manifests_path):
-            with open(file, "r") as stream:
-                manifests[file] = dict(
+        for manifest in glob.glob(manifests_path):
+            with open(manifest, "r") as stream:
+                manifests[manifest] = dict(
                     resources=[resource for resource in load_all(stream)],
-                    commit=self.repo.iter_commits(paths=file).next()
+                    commit=self.repo.iter_commits(paths=manifest).next()
                 )
 
         raise Return(manifests)

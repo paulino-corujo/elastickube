@@ -121,14 +121,14 @@ class KubeWatcher(object):
                                     on_data=self.data_callback)
 
                             self.watchers[watcher_key]['watcher'].add_done_callback(done_callback)
-                            logging.debug("Reconnected watcher for %s" % watcher_key)
+                            logging.debug("Reconnected watcher for %s", watcher_key)
 
         logging.info("Starting watch KubeWatcher for action %s", self.message["action"])
         yield self.initialize_data()
 
         self.connected = True
         try:
-            logging.debug("Starting watch %s connected" % self.message["action"])
+            logging.debug("Starting watch %s connected", self.message["action"])
 
             for resource, resource_metadata in self.resources_config.iteritems():
                 self.watchers[resource_metadata["type"]]['watcher'] = self.settings["kube"][resource].filter(
@@ -143,8 +143,8 @@ class KubeWatcher(object):
                               resource_metadata["type"],
                               self.params["namespace"])
 
-        except Exception as e:
-            logging.exception(e)
+        except Exception as error:
+            logging.exception(error)
             if self.connected:
                 self.callback(dict(
                     action=self.message["action"],

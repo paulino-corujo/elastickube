@@ -5,7 +5,7 @@ class KubernetesException(Exception):
         self.status_code = status_code
 
 
-class NotFoundException(KubernetesException):
+class ResourceNotFoundException(KubernetesException):
 
     def __init__(self, message):
         KubernetesException.__init__(self, message, 404)

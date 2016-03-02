@@ -1,10 +1,12 @@
 import time
 
+from pymongo.errors import PyMongoError
 from tornado.gen import coroutine, Return
 
 
-class ObjectNotFoundException(Exception):
-    pass
+class ObjectNotFoundError(PyMongoError):
+    """Raised when object is not found into the collection.
+    """
 
 
 class Query(object):
@@ -63,7 +65,7 @@ class Query(object):
         document["metadata"]["resourceVersion"] = time.time()
         response = yield self.database[self.collection].update({"_id": document["_id"]}, document, upsert=True)
         if response['n'] == 0:
-            raise ObjectNotFoundException()
+            raise ObjectNotFoundError()
 
         inserted_document = yield self.database[self.collection].find_one({"_id": document["_id"]})
         raise Return(inserted_document)

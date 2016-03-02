@@ -1,9 +1,9 @@
-import cairosvg
 import httplib
 import logging
 import os
 import re
 
+import cairosvg
 from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler

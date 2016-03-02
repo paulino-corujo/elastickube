@@ -1,9 +1,10 @@
 import logging
 
 from bson.json_util import loads
-from pymongo.errors import DuplicateKeyError
+from pymongo.errors import DuplicateKeyError, PyMongoError
 from tornado.gen import coroutine, Return, Future
 
+from api.kube.exceptions import KubernetesException
 from api.v1 import SecureWebSocketHandler
 from api.v1.actions.instances import InstancesActions
 from api.v1.actions.namespaces import NamespacesActions
@@ -11,7 +12,7 @@ from api.v1.actions.settings import SettingsActions
 from api.v1.actions.users import UsersActions
 from api.v1.watchers.cursor import CursorWatcher
 from api.v1.watchers.kube import KubeWatcher
-from data.query import ObjectNotFoundException
+from data.query import ObjectNotFoundError
 
 REST_OPERATIONS = ["create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
@@ -77,6 +78,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         response = dict(
             action=request["action"],
             correlation=request["correlation"],
+            operation=request["operation"],
             body={},
             status_code=200
         )
@@ -86,47 +88,42 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             if action:
                 if (not hasattr(type(action), request["operation"]) or
                         not callable(getattr(type(action), request["operation"]))):
-                    response["status_code"] = 405
-                    response["operation"] = request["operation"]
-                    response["body"] = {
-                        "message": "Operation %s not supported for action %s." % (
-                            request["operation"], request["action"])
-                    }
+                    error = "Operation %s not supported for action %s." % (request["operation"], request["action"])
+                    response.update(dict(status_code=405, body=dict(message=error)))
+
                 else:
-                    if not action.check_permissions(self.user, request["operation"], request["body"]):
-                        response["status_code"] = 403
-                        response["operation"] = request["operation"]
-                        response["body"] = {
-                            "message": "Operation %s forbidden for action %s." % (
-                                request["operation"], request["action"])
-                        }
+                    if not action.check_permissions(self.user, request["operation"]):
+                        error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
+                        response.update(dict(status_code=403, body=dict(message=error)))
+
                     else:
-                        if request["operation"] == "create":
-                            response["operation"] = "created"
-
-                            try:
+                        try:
+                            if request["operation"] == "create":
                                 response["body"] = yield action.create(request["body"])
-                            except DuplicateKeyError as e:
-                                response["body"] = {"message": e.message}
-                                response["status_code"] = 409
+                                response["operation"] = "created"
 
-                        elif request["operation"] == "update":
-                            response["operation"] = "updated"
-                            response["body"] = yield action.update(request["body"])
+                            elif request["operation"] == "update":
+                                response["body"] = yield action.update(request["body"])
+                                response["operation"] = "updated"
 
-                        elif request["operation"] == "delete":
-                            response["operation"] = "deleted"
-
-                            try:
+                            elif request["operation"] == "delete":
                                 response["body"] = yield action.delete(request["body"]["_id"])
-                            except ObjectNotFoundException:
-                                response["body"] = {"message": "%s %s not found." % (
-                                    request["action"], request["body"]["_id"])}
+                                response["operation"] = "deleted"
+
+                        except PyMongoError as e:
+                            response["body"] = dict(message=e.message)
+                            if isinstance(e, DuplicateKeyError):
+                                response["status_code"] = 409
+                            elif isinstance(e, ObjectNotFoundError):
                                 response["status_code"] = 404
+                            else:
+                                response["status_code"] = 400
+                        except KubernetesException as e:
+                            response.update(dict(status_code=e.status_code, body=dict(message=e.message)))
+
             else:
-                response["status_code"] = 400
-                response["operation"] = request["operation"]
-                response["body"] = {"message": "Action %s does not support operations." % request["action"]}
+                error = "Action %s does not support operations." % request["action"]
+                response.update(dict(status_code=400, body=dict(message=error)))
 
             self.write_message(response)
 

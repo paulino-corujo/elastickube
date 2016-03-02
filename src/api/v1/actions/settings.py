@@ -11,7 +11,9 @@ class SettingsActions(object):
         logging.info("Initializing SettingsActions")
         self.database = settings['database']
 
-    def check_permissions(self, user, _operation, _body):
+    @staticmethod
+    def check_permissions(user, operation):
+        logging.debug("Checking permissions for user %s and operation %s on settings", user["username"], operation)
         if user['role'] == 'administrator':
             return True
         else:

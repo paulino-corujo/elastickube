@@ -1,15 +1,3 @@
-"""
-ElasticBox Confidential
-Copyright (c) 2016 All Right Reserved, ElasticBox Inc.
-
-NOTICE:  All information contained herein is, and remains the property
-of ElasticBox. The intellectual and technical concepts contained herein are
-proprietary and may be covered by U.S. and Foreign Patents, patents in process,
-and are protected by trade secret or copyright law. Dissemination of this
-information or reproduction of this material is strictly forbidden unless prior
-written permission is obtained from ElasticBox
-"""
-
 import json
 import logging
 import uuid
@@ -17,10 +5,9 @@ import uuid
 from bson.objectid import ObjectId
 from motor.motor_tornado import MotorClient
 from tornado import testing
-from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
-from tests.api import get_token, ELASTICKUBE_TOKEN_HEADER
+from tests.api import get_ws_request, validate_response, wait_message
 
 
 class ActionsUsersTests(testing.AsyncTestCase):
@@ -29,6 +16,7 @@ class ActionsUsersTests(testing.AsyncTestCase):
 
     def setUp(self):
         super(ActionsUsersTests, self).setUp()
+
         self.user_id = None
         self.user_email = "test_%s@elasticbox.com" % str(uuid.uuid4())[:10]
 
@@ -47,18 +35,14 @@ class ActionsUsersTests(testing.AsyncTestCase):
     def create_user_test(self):
         logging.debug("Start create_user_test")
 
-        token = yield get_token(self.io_loop)
-        request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
-            headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
-            validate_cert=False
-        )
-
+        request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
+
+        correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
             "action": "users",
             "operation": "create",
-            "correlation": 123,
+            "correlation": correlation,
             "body": dict(
                 email=self.user_email,
                 username=self.user_email,
@@ -70,64 +54,47 @@ class ActionsUsersTests(testing.AsyncTestCase):
             )
         }))
 
-        message = yield connection.read_message()
-        deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message["status_code"] == 200,
-                        "Status code is %d instead of 200" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
-        self.assertTrue(deserialized_message["operation"] == "created",
-                        "Operation is %s instead of created" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "users",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message["body"]))
-        self.assertTrue(deserialized_message["body"]["email"] == self.user_email,
-                        "Email is %s instead of '%s'" % (deserialized_message["body"]["username"], self.user_email))
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="created", action="users", body_type=dict))
 
-        self.user_id = deserialized_message["body"]["_id"]["$oid"]
+        self.assertTrue(message["body"]["email"] == self.user_email,
+                        "Email is %s instead of '%s'" % (message["body"]["username"], self.user_email))
+
+        self.user_id = message["body"]["_id"]["$oid"]
+        correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
             "action": "users",
             "operation": "delete",
-            "correlation": 123,
+            "correlation": correlation,
             "body": dict(_id=self.user_id)
         }))
 
-        message = yield connection.read_message()
-        deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message["status_code"] == 200,
-                        "Status code is %d instead of 200" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
-        self.assertTrue(deserialized_message["operation"] == "deleted",
-                        "Operation is %s instead of deleted" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "users",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertIsNone(deserialized_message["body"],
-                          "Body is not a None but '%s'" % deserialized_message["body"])
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="deleted", action="users"))
 
+        correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
             "action": "users",
             "operation": "delete",
-            "correlation": 123,
+            "correlation": correlation,
             "body": dict(_id=self.user_id)
         }))
 
-        message = yield connection.read_message()
-        deserialized_message = json.loads(message)
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=404, correlation=correlation, operation="delete", action="users", body_type=dict))
+
         expected_message = "users %s not found." % self.user_id
-        self.assertTrue(deserialized_message["status_code"] == 404,
-                        "Status code is %d instead of 404" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
-        self.assertTrue(deserialized_message["operation"] == "deleted",
-                        "Operation is %s instead of deleted" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "users",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message["body"]))
-        self.assertTrue(deserialized_message["body"]["message"] == expected_message,
-                        "Message is %s instead of '%s'" % (deserialized_message["body"]["message"], expected_message))
+        self.assertTrue(message["body"]["message"] == expected_message,
+                        "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
         logging.debug("Completed create_user_test")
@@ -136,18 +103,14 @@ class ActionsUsersTests(testing.AsyncTestCase):
     def duplicate_user_test(self):
         logging.debug("Start duplicate_user_test")
 
-        token = yield get_token(self.io_loop)
-        request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
-            headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
-            validate_cert=False
-        )
-
+        request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
+
+        correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
             "action": "users",
             "operation": "create",
-            "correlation": 123,
+            "correlation": correlation,
             "body": dict(
                 email=self.user_email,
                 username=self.user_email,
@@ -159,26 +122,21 @@ class ActionsUsersTests(testing.AsyncTestCase):
             )
         }))
 
-        message = yield connection.read_message()
-        deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message["status_code"] == 200,
-                        "Status code is %d instead of 200" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
-        self.assertTrue(deserialized_message["operation"] == "created",
-                        "Operation is %s instead of created" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "users",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message["body"]))
-        self.assertTrue(deserialized_message["body"]["email"] == self.user_email,
-                        "Email is %s instead of '%s'" % (deserialized_message["body"]["username"], self.user_email))
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=200, correlation=correlation, operation="created", action="users", body_type=dict))
 
-        self.user_id = deserialized_message["body"]["_id"]["$oid"]
+        self.assertTrue(message["body"]["email"] == self.user_email,
+                        "Email is %s instead of '%s'" % (message["body"]["username"], self.user_email))
+
+        self.user_id = message["body"]["_id"]["$oid"]
+        correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
             "action": "users",
             "operation": "create",
-            "correlation": 123,
+            "correlation": correlation,
             "body": dict(
                 email=self.user_email,
                 username=self.user_email,
@@ -190,24 +148,17 @@ class ActionsUsersTests(testing.AsyncTestCase):
             )
         }))
 
-        message = yield connection.read_message()
-        deserialized_message = json.loads(message)
-        self.assertTrue(deserialized_message["status_code"] == 409,
-                        "Status code is %d instead of 409" % deserialized_message["status_code"])
-        self.assertTrue(deserialized_message["correlation"] == 123,
-                        "Correlation is %d instead of 123" % deserialized_message["correlation"])
-        self.assertTrue(deserialized_message["operation"] == "created",
-                        "Operation is %s instead of created" % deserialized_message["operation"])
-        self.assertTrue(deserialized_message["action"] == "users",
-                        "Action is %s instead of users" % deserialized_message["action"])
-        self.assertTrue(isinstance(deserialized_message["body"], dict),
-                        "Body is not a dict but %s" % type(deserialized_message["body"]))
+        message = yield wait_message(connection, correlation)
+        validate_response(
+            self,
+            message,
+            dict(status_code=409, correlation=correlation, operation="create", action="users", body_type=dict))
 
         expected_message = "E11000 duplicate key error collection: elastickube.Users index: email_1 dup "\
             "key: { : \"%s\" }" % self.user_email
 
-        self.assertTrue(deserialized_message["body"]["message"] == expected_message,
-                        "Message is %s instead of '%s'" % (deserialized_message["body"]["message"], expected_message))
+        self.assertTrue(message["body"]["message"] == expected_message,
+                        "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         logging.debug("Completed duplicate_user_test")
 
