@@ -3,23 +3,8 @@
 md-select {
     .md-select-icon {
         &:after {
-            top: 1px;
+            top: -2px;
         }
-    }
-}
-
-md-select.ek-select-button {
-    margin: 0;
-    border-radius: 2px;
-    border: 1px solid @grey400;
-    height: 30px;
-    background-color: @grey100;
-    padding-left: 15px;
-    padding-right: 10px;
-    text-transform: capitalize;
-
-    &:hover {
-        border-color: @grey450;
     }
 
     &, &:not([disabled]):focus {
@@ -37,14 +22,29 @@ md-select.ek-select-button {
         }
     }
 
-    .md-select-icon {
-        margin: 0 0 0 10px;
-        width: 13px;
-        height: 13px;
-    }
-
-    .md-text {
-        font-weight: 500;
+    &.ek-select-button {
+        margin: 0;
+        border-radius: 2px;
+        border: 1px solid @grey400;
+        height: 30px;
+        background-color: @grey100;
+        padding-left: 15px;
+        padding-right: 10px;
         text-transform: capitalize;
+
+        &:hover {
+            border-color: @grey450;
+        }
+
+        .md-select-icon {
+            margin: 0 0 0 10px;
+            width: 13px;
+            height: 13px;
+        }
+
+        .md-text {
+            font-weight: 500;
+            text-transform: capitalize;
+        }
     }
 }
