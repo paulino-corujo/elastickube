@@ -1,6 +1,9 @@
 <div layout="column">
     <div class="ek-application-layout__header" layout="row" layout-align="start center">
-        <img class="ek-application-layout__header__logo" ng-src="{{:: images.KUBERNETES_LOGO }}">
+        <img class="ek-application-layout__header__logo"
+             ng-class="{'ek-application-layout__header__logo--clickable': ctrl.isLoggedIn()}"
+             ng-click="ctrl.goToInstances()"
+             ng-src="{{:: images.KUBERNETES_LOGO }}">
         <div transclude-id="header" flex></div>
     </div>
 
