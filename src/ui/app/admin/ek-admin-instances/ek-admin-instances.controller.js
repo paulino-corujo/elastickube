@@ -4,19 +4,20 @@ class AdminInstancesController {
     constructor($scope, instancesStore, instancesActionCreator, instancesNavigationActionCreator, namespacesStore) {
         'ngInject';
 
-        const onChange = () => this.instances = groupInstances(instancesStore.getAll());
+        const onChange = () => this.instances = instancesStore.getAll();
 
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
 
         this.bulkActions = 'Bulk Actions';
-        this.instances = groupInstances(instancesStore.getAll());
+        this.instances = instancesStore.getAll();
         this.filteredInstances = [];
+        this.groupedInstances = [];
 
         instancesStore.addChangeListener(onChange);
 
         this.gridOptions = {
             rowTemplate,
-            data: 'ctrl.filteredInstances',
+            data: 'ctrl.groupedInstances',
             enableFiltering: false,
             enableRowSelection: true,
             enableSelectAll: true,
@@ -81,43 +82,49 @@ class AdminInstancesController {
             }
         };
 
-        $scope.$watchCollection('ctrl.filteredInstances', () => this.containsGroups = _.find(this.filteredInstances,
-            (x) => x.$$treeLevel === 1));
+        $scope.$watchCollection('ctrl.filteredInstances', (instances) => {
+            this.groupedInstances = this.groupInstances(instances);
+            this.containsGroups = _.find(this.groupedInstances, (x) => x.$$treeLevel === 1);
+        });
 
         $scope.$on('$destroy', () => _.map(namespacesStore.getAll(), (x) => instancesActionCreator.unsubscribe(x)));
+    }
+
+    groupInstances(instances) {
+        const key = ['metadata', 'annotations', 'kubernetes.io/created-by'];
+
+        return _.chain(instances)
+            .groupBy((instance) => {
+                if (_.has(instance, key)) {
+                    const data = JSON.parse(_.get(instance, key));
+
+                    return data.reference.uid;
+                }
+
+                return instance.metadata.uid;
+            })
+            .mapValues((items) => {
+                const parent = _.find(items, (x) => !_.has(x, key));
+
+                return _.chain(items)
+                    .map((x) => {
+                        const item = angular.copy(x);
+
+                        item.$$treeLevel = _.has(item, key) && !_.isUndefined(parent) ? 1 : 0;
+
+                        return item;
+                    })
+                    .sortBy('$$treeLevel')
+                    .value();
+            })
+            .values()
+            .flatten()
+            .value();
     }
 
     newInstance() {
         this._instancesNavigationActionCreator.newInstance();
     }
-}
-
-function groupInstances(instances) {
-    const key = ['metadata', 'annotations', 'kubernetes.io/created-by'];
-
-    return _.chain(instances)
-        .groupBy((instance) => {
-            if (_.has(instance, key)) {
-                const data = JSON.parse(_.get(instance, key));
-
-                return data.reference.uid;
-            }
-
-            return instance.metadata.uid;
-        })
-        .mapValues((items) => {
-            return _.chain(items)
-                .map((item) => {
-                    item.$$treeLevel = _.has(item, key) ? 1 : 0;
-
-                    return item;
-                })
-                .sortBy('$$treeLevel')
-                .value();
-        })
-        .values()
-        .flatten()
-        .value();
 }
 
 export default AdminInstancesController;

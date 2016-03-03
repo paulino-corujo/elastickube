@@ -4,9 +4,11 @@ class InstanceListController {
     constructor($scope) {
         'ngInject';
 
+        this.groupedInstances = [];
+
         this.gridOptions = {
             rowTemplate,
-            data: 'ctrl.instances',
+            data: 'ctrl.groupedInstances',
             enableFiltering: false,
             enableRowSelection: true,
             enableSelectAll: true,
@@ -71,7 +73,42 @@ class InstanceListController {
             }
         };
 
-        $scope.$watchCollection('ctrl.instances', () => this.containsGroups = _.find(this.instances, (x) => x.$$treeLevel === 1));
+        $scope.$watchCollection('ctrl.instances', (instances) => {
+            this.groupedInstances = this.groupInstances(instances);
+            this.containsGroups = _.find(this.groupedInstances, (x) => x.$$treeLevel === 1);
+        });
+    }
+
+    groupInstances(instances) {
+        const key = ['metadata', 'annotations', 'kubernetes.io/created-by'];
+
+        return _.chain(instances)
+            .groupBy((instance) => {
+                if (_.has(instance, key)) {
+                    const data = JSON.parse(_.get(instance, key));
+
+                    return data.reference.uid;
+                }
+
+                return instance.metadata.uid;
+            })
+            .mapValues((items) => {
+                const parent = _.find(items, (x) => !_.has(x, key));
+
+                return _.chain(items)
+                    .map((x) => {
+                        const item = angular.copy(x);
+
+                        item.$$treeLevel = _.has(item, key) && !_.isUndefined(parent) ? 1 : 0;
+
+                        return item;
+                    })
+                    .sortBy('$$treeLevel')
+                    .value();
+            })
+            .values()
+            .flatten()
+            .value();
     }
 }
 
