@@ -10,14 +10,17 @@ ACTIONS_METADATA = {
         "resources": {
             "pods": {
                 "type": "PodList",
+                "arguments": ["namespace"],
                 "selector": None
             },
             "replicationcontrollers": {
                 "type": "ReplicationControllerList",
+                "arguments": ["namespace"],
                 "selector": None
             },
             "services": {
                 "type": "ServiceList",
+                "arguments": ["namespace"],
                 "selector": None
             }
         }
@@ -28,14 +31,19 @@ ACTIONS_METADATA = {
             "resources": {
                 "pods": {
                     "type": "Pod",
+                    "arguments": ["namespace", "name"],
                     "selector": None
                 },
                 "events": {
                     "type": "EventList",
+                    "arguments": ["namespace"],
                     "selector": {
-                        "involvedObject.name": "%(name)s",
-                        "involvedObject.namespace": "%(namespace)s",
-                        "involvedObject.uid": "%(uid)s"
+                        "fieldSelector": {
+                            "involvedObject.name": "%(name)s",
+                            "involvedObject.namespace": "%(namespace)s",
+                            "involvedObject.uid": "%(uid)s"
+                        }
+
                     }
                 }
             }
@@ -44,15 +52,19 @@ ACTIONS_METADATA = {
             "resources": {
                 "replicationcontrollers": {
                     "type": "ReplicationController",
+                    "arguments": ["namespace", "name"],
                     "selector": None
                 },
                 "events": {
                     "type": "EventList",
+                    "arguments": ["namespace"],
                     "selector": {
-                        "involvedObject.name": "%(name)s",
-                        "involvedObject.kind": "%(kind)s",
-                        "involvedObject.namespace": "%(namespace)s",
-                        "involvedObject.uid": "%(uid)s"
+                        "fieldSelector": {
+                            "involvedObject.name": "%(name)s",
+                            "involvedObject.kind": "%(kind)s",
+                            "involvedObject.namespace": "%(namespace)s",
+                            "involvedObject.uid": "%(uid)s"
+                        }
                     }
                 }
             }
@@ -61,19 +73,24 @@ ACTIONS_METADATA = {
             "resources": {
                 "services": {
                     "type": "Service",
+                    "arguments": ["namespace", "name"],
                     "selector": None
                 },
                 "endpoints": {
                     "type": "Endpoints",
+                    "arguments": ["namespace", "name"],
                     "selector": None
                 },
                 "events": {
                     "type": "EventList",
+                    "arguments": ["namespace"],
                     "selector": {
-                        "involvedObject.name": "%(name)s",
-                        "involvedObject.kind": "%(kind)s",
-                        "involvedObject.namespace": "%(namespace)s",
-                        "involvedObject.uid": "%(uid)s"
+                        "fieldSelector": {
+                            "involvedObject.name": "%(name)s",
+                            "involvedObject.kind": "%(kind)s",
+                            "involvedObject.namespace": "%(namespace)s",
+                            "involvedObject.uid": "%(uid)s"
+                        }
                     }
                 }
             }
@@ -115,10 +132,9 @@ class KubeWatcher(object):
 
                             self.watchers[watcher_key]["watcher"] = self.settings["kube"][name].filter(
                                 self.get_selector(metadata["selector"])).watch(
-                                    name=self.params["name"],
-                                    namespace=self.params["namespace"],
                                     resource_version=self.watchers[watcher_key]["resourceVersion"],
-                                    on_data=self.data_callback)
+                                    on_data=self.data_callback,
+                                    **self.get_params(metadata["arguments"]))
 
                             self.watchers[watcher_key]["watcher"].add_done_callback(done_callback)
                             logging.debug("Reconnected watcher for %s", watcher_key)
@@ -133,10 +149,9 @@ class KubeWatcher(object):
             for resource, resource_metadata in self.resources_config.iteritems():
                 self.watchers[resource_metadata["type"]]["watcher"] = self.settings["kube"][resource].filter(
                     self.get_selector(resource_metadata["selector"])).watch(
-                        name=self.params["name"],
-                        namespace=self.params["namespace"],
                         resource_version=self.watchers[resource_metadata["type"]]["resourceVersion"],
-                        on_data=self.data_callback)
+                        on_data=self.data_callback,
+                        **self.get_params(resource_metadata["arguments"]))
 
                 self.watchers[resource_metadata["type"]]['watcher'].add_done_callback(done_callback)
                 logging.debug("Added watcher for %s and namespace %s",
@@ -158,17 +173,20 @@ class KubeWatcher(object):
     def data_callback(self, data):
         logging.debug("InstancesWatcher data_callback")
 
-        resource_list = data["object"]["kind"]
-        if resource_list not in self.watchers.keys():
-            resource_list += "List"
-
-        self.watchers[resource_list]["resourceVersion"] = data['object']['metadata']['resourceVersion']
-
         operation = "updated"
         if data["type"] == "ADDED":
             operation = "created"
         elif data["type"] == "DELETED":
             operation = "deleted"
+        elif data["type"] == "ERROR":
+            logging.warn("Error raised from Kubernetes: %s", data["object"])
+            raise Return()
+
+        resource_list = data["object"]["kind"]
+        if resource_list not in self.watchers.keys():
+            resource_list += "List"
+
+        self.watchers[resource_list]["resourceVersion"] = data['object']['metadata']['resourceVersion']
 
         response = dict(
             action=self.message["action"],
@@ -186,7 +204,8 @@ class KubeWatcher(object):
 
         for resource, resource_metadata in self.resources_config.iteritems():
             result = yield self.settings["kube"][resource].filter(self.get_selector(
-                resource_metadata["selector"])).get(name=self.params["name"], namespace=self.params["namespace"])
+                resource_metadata["selector"])).get(
+                    **self.get_params(resource_metadata["arguments"]))
 
             self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
 
@@ -238,9 +257,19 @@ class KubeWatcher(object):
         else:
             self.resources_config = ACTIONS_METADATA[self.message["action"]]["resources"]
 
+    def get_params(self, arguments):
+        params = dict()
+        for argument in arguments:
+            params[argument] = self.params[argument]
+
+        return params
+
     def get_selector(self, selector):
         if selector:
-            for key, value in selector.iteritems():
-                selector[key] = value % self.params
+            for key, selector_items in selector.iteritems():
+                for selector_key, selector_value in selector_items.iteritems():
+                    selector_items[selector_key] = selector_value % self.params
+
+                selector[key] = selector_items
 
         return selector
