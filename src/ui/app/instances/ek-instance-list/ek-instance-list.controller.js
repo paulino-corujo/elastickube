@@ -26,8 +26,7 @@ class InstanceListController {
                     cellTemplate: `<ek-instance-state instance="row.entity"></ek-instance-state>`
                 },
                 {
-                    name: 'serviceType',
-                    displayName: 'Service Type',
+                    name: 'kind',
                     field: 'kind',
                     enableColumnMenu: false,
                     cellTemplate: `<p>{{ row.entity.kind }}</p>`
