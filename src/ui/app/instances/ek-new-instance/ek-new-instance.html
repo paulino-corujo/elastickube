@@ -1,6 +1,10 @@
 <ek-header-layout>
     <div transclude-to="header" layout="row" layout-align="start center">
-        <h3 class="ek-new-instance__header__title ek-title"><span>instances &rsaquo;</span> new</h3>
+        <h3 class="ek-new-instance__header__title ek-title">
+            <span ng-click="ctrl.goToInstances()">instances</span>
+            <md-icon class="ek-new-instance__header__title__arrow" md-svg-src="{{:: icons.IC_KEYBOARD_ARROW_RIGHT_48PX }}"></md-icon>
+            new
+        </h3>
     </div>
 
     <div transclude-to="body">

@@ -24,12 +24,16 @@ class NewInstanceController {
         return _.isUndefined(this.selectedChart) || _.isUndefined(this.deploymentInfo);
     }
 
+    goToInstances() {
+        return this._instancesNavigationActionCreator.instances();
+    }
+
     deploy() {
         this._instancesActionCreator.deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
             .then(() => {
-                this._instancesNavigationActionCreator.instances();
+                this.goToInstances();
             }, () => {
-                this._instancesNavigationActionCreator.instances();
+                this.goToInstances();
 
                 // FIXME we should show an error message here
             });
