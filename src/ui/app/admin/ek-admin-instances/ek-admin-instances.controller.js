@@ -58,8 +58,7 @@ class AdminInstancesController {
                     }
                 },
                 {
-                    name: 'serviceType',
-                    displayName: 'Service Type',
+                    name: 'kind',
                     field: 'kind',
                     enableColumnMenu: false,
                     cellTemplate: `<p>{{ row.entity.kind }}</p>`
