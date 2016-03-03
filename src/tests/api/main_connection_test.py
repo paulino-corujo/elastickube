@@ -52,7 +52,7 @@ class MainConnectionTest(testing.AsyncTestCase):
 
         self.assertTrue(isinstance(deserialized_message, dict),
                         "Body is not a dict but %s" % type(deserialized_message))
-        expected_message = "Cannot open connection"
+        expected_message = "Invalid token."
         self.assertTrue(deserialized_message["error"]["message"] == expected_message,
                         "Message is %s instead of '%s'" % (deserialized_message["error"]["message"], expected_message))
         connection.close()

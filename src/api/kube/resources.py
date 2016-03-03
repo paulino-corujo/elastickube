@@ -78,8 +78,8 @@ class Resource(object):
 
     def filter(self, selector=None):
         if selector is not None:
-            for k, v in selector.iteritems():
-                self.selector[k] = v
+            for k, value in selector.iteritems():
+                self.selector[k] = value
 
         return self
 
@@ -182,7 +182,7 @@ class NamespacedResource(object):
 
     def filter(self, selector=None):
         if selector is not None:
-            for k, v in selector.iteritems():
-                self.selector[k] = v
+            for k, value in selector.iteritems():
+                self.selector[k] = value
 
         return self

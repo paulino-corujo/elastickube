@@ -3,8 +3,8 @@ import uuid
 
 from tornado.gen import coroutine, Return
 
+from api.v1.actions import emails
 from data.query import Query
-from api.kube import emails
 
 
 class InvitationsActions(object):

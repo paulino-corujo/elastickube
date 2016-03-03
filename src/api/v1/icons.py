@@ -1,5 +1,4 @@
 import httplib
-import logging
 import os
 import re
 

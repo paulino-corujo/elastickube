@@ -1,7 +1,6 @@
-import logging
-
 import cgi
-from email.MIMEText import MIMEText
+import logging
+from email import MIMEText
 from smtplib import SMTP, SMTP_SSL
 
 import concurrent.futures

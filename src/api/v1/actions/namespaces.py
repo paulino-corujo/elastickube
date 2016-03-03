@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 
 from tornado.gen import coroutine, Return
 
@@ -10,7 +9,8 @@ class NamespacesActions(object):
 
     def __init__(self, settings):
         logging.info("Initializing NamespacesActions")
-        self.kube_client = settings['kube']
+        self.kube = settings['kube']
+        self.database = settings["database"]
 
     @staticmethod
     def check_permissions(user, operation):
@@ -31,7 +31,7 @@ class NamespacesActions(object):
             }
         }
 
-        response = self.kube_client.namespaces.post(body)
+        response = self.kube.namespaces.post(body)
         raise Return(response)
 
     @coroutine
@@ -39,17 +39,13 @@ class NamespacesActions(object):
         logging.info("Updating namespace")
 
         user = yield Query(self.database, "Users").find_one(document['_id'])
-        yield Query(self.database, "Users").save(user)
+        yield Query(self.database, "Users").update(user)
 
         raise Return(user)
 
     @coroutine
-    def delete(self, namespace_id):
+    def delete(self, document):
         logging.info("Deleting namespace")
 
-        user = yield Query(self.database, "Users").find_one(namespace_id)
-        user['deleted'] = datetime.now()
-
-        yield Query(self.database, "Users").save(user)
-
-        raise Return(user)
+        namespace = yield Query(self.database, "Namespaces").find_one(document["_id"])
+        raise Return(namespace)
