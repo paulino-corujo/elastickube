@@ -1,16 +1,18 @@
 import './ek-application-layout.less';
 import images from '../images';
+import Directive from 'directive';
+import Controller from './ek-application-layout.controller';
 import template from './ek-application-layout.html';
 
-class ApplicationLayoutDirective {
+class ApplicationLayoutDirective extends Directive {
     constructor(multiTransclude) {
         'ngInject';
 
+        super({ Controller, template });
+
         this._multiTransclude = multiTransclude;
 
-        this.restrict = 'E';
         this.transclude = true;
-        this.template = template;
     }
 
     compile(tElement) {
