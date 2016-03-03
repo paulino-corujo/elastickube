@@ -6,15 +6,10 @@ import template from './ek-instance-overview-labels.html';
 class InstanceOverviewLabelsDirective extends Directive {
     constructor() {
         super({ Controller, template });
-
-        this.bindToController = {
-            instance: '='
-        };
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-instance-overview-labels ek-white-box');
+        tElement.addClass('ek-instance-overview-labels ek-white-box');
     }
 }
 

@@ -36,16 +36,18 @@ function instancesRoutes(routerHelperProvider) {
         config: {
             url: '/:namespace/instances/{instanceId:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}}',
             parent: 'private',
-            template: '<ek-instance instance="instance"></ek-instance>',
-            controller: ($scope, $stateParams, checkNamespace, instancesStore) => {
+            template: '<ek-instance></ek-instance>',
+            controller: ($scope, $stateParams, checkNamespace, instanceActionCreator, instancesStore) => {
                 'ngInject';
                 const namespace = $stateParams.namespace;
                 const instanceId = $stateParams.instanceId;
 
                 checkNamespace.execute();
 
-                $scope.instance = _.find(instancesStore.getAll(), (x) => _.matchesProperty('metadata.namespace', namespace)(x)
-                    && _.matchesProperty('metadata.uid', instanceId)(x));
+                const instance = _.find(instancesStore.getAll(),
+                    (x) => _.matchesProperty('metadata.namespace', namespace)(x) && _.matchesProperty('metadata.uid', instanceId)(x));
+
+                $scope.$on('$destroy', () => instanceActionCreator.unsubscribe(instance));
             },
             data: {
                 header: {
@@ -53,10 +55,15 @@ function instancesRoutes(routerHelperProvider) {
                 }
             },
             resolve: {
-                loading: ($q, instancesStore, namespacesStore) => {
+                loading: ($q, $stateParams, instanceActionCreator, instancesStore, namespacesStore) => {
                     'ngInject';
 
-                    return $q.all([instancesStore.isLoading(), namespacesStore.isLoading()]);
+                    return $q.all([instancesStore.isLoading(), namespacesStore.isLoading()])
+                        .then(() => {
+                            const instance = instancesStore.get($stateParams.instanceId);
+
+                            return instanceActionCreator.subscribe(instance);
+                        });
                 }
             }
         }
@@ -74,7 +81,5 @@ function instancesRoutes(routerHelperProvider) {
         }
     }]);
 }
-
-// a234a27a-da15-11e5-8bc0-0800277146a7
 
 export default instancesRoutes;

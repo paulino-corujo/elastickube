@@ -1,16 +1,26 @@
 import moment from 'moment';
 
 class InstanceOverviewDetailsController {
-    constructor(instancesStore) {
+    constructor($scope, instanceStore, instancesStore) {
         'ngInject';
 
+        const onChange = () => {
+            this.instance = instanceStore.getInstance();
+        };
+
         this._instancesStore = instancesStore;
+
+        this.instance = instanceStore.getInstance();
+
+        instanceStore.addChangeListener(onChange);
 
         if (_.has(this.instance, 'status.replicas')) {
             this.details = this._createReplicationControllerDetails();
         } else {
             this.details = this._createPodDetails();
         }
+
+        $scope.$on('$destroy', () => instanceStore.removeChangeListener(onChange));
     }
 
     _createPodDetails() {
