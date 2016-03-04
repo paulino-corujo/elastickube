@@ -9,6 +9,13 @@ const states = [{
         url: '/admin',
         data: {
             access: profiles.ADMIN
+        },
+        resolve: {
+            loading: (settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.subscribe();
+            }
         }
     }
 }, {
@@ -25,13 +32,6 @@ const states = [{
 
                     return actionCreator.settings();
                 }
-            }
-        },
-        resolve: {
-            loading: (settingsActionCreator) => {
-                'ngInject';
-
-                return settingsActionCreator.subscribe();
             }
         }
     }

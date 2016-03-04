@@ -43,7 +43,6 @@ class AdminSettingsController {
         });
 
         $scope.$on('$destroy', () => {
-            settingsActionCreator.unsubscribe();
             usersStore.removeChangeListener(onUsersChange);
             settingsStore.removeSettingsChangeListener(onSettingsChange);
         });
