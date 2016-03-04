@@ -26,6 +26,7 @@ const webpackConfig = {
             'moment',
             'normalize.css/normalize.css',
             'roboto-fontface/css/roboto-fontface.css',
+            'tether-drop',
             'angular-ui-grid/ui-grid.css',
             'angular-material/angular-material.css'
         ]

@@ -29,6 +29,16 @@ class InstancesActionCreatorService {
             .then((instances) => this._dispatcher.dispatch({ type: this._actions.INSTANCE_DEPLOYED, instances }));
     }
 
+    delete(instance) {
+        const body = {
+            kind: instance.kind,
+            name: instance.metadata.name,
+            namespace: instance.metadata.namespace
+        };
+
+        return this._instancesAPI.remove(body);
+    }
+
     subscribe(namespace) {
         this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBE, namespace });
 

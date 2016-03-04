@@ -59,6 +59,15 @@ class InstanceListController {
                     field: 'metadata.creationTimestamp',
                     enableColumnMenu: false,
                     cellTemplate: `<div>{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>`
+                },
+                {
+                    name: 'actions',
+                    displayName: '',
+                    enableSorting: false,
+                    enableColumnMenu: false,
+                    cellTemplate: `<div class="ek-instance-list__table__actions" layout="row" layout-align="end center">
+                            <ek-instance-actions instance="row.entity"></ek-instance-actions>
+                        </div>`
                 }
             ],
             onRegisterApi: (gridApi) => {
