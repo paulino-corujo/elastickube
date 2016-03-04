@@ -2,13 +2,16 @@ const ADMINISTRATOR_ROLE = 'administrator';
 const USER_ROLE = 'user';
 
 class AdminSettingsController {
-    constructor($scope, $location, settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
+    constructor($scope, $element, $location, $stateParams, $timeout, settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
         'ngInject';
 
         const onUsersChange = () => this._getAdmins();
         const onSettingsChange = () => this._getSettings();
 
+        this._$element = $element;
         this._$location = $location;
+        this._$stateParams = $stateParams;
+        this._$timeout = $timeout;
         this._settingsActionCreator = settingsActionCreator;
         this._settingsStore = settingsStore;
         this._usersActionCreator = usersActionCreator;
@@ -74,6 +77,11 @@ class AdminSettingsController {
         };
 
         this.mail = hasValues(settings.mail);
+        if (this._$stateParams.focusSection === 'email') {
+            this.mail = true;
+            this._$timeout(() => this._$element.find('[ng-model="ctrl.mail_data.server"]').focus());
+        }
+
         this.mail_data = angular.copy(settings.mail || {});
         delete this.mail_data.authentication;
 
