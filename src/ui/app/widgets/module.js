@@ -2,8 +2,11 @@ import 'angular-material/angular-material';
 
 import coreModule from 'core/module';
 
+import ConfirmDialogService from './confirm-dialog.service';
+
 import AvatarDirective from './ek-avatar/ek-avatar.directive';
 import ButtonGroupDirective from './ek-button-group/ek-button-group.directive';
+import ConfirmDirective from './ek-confirm/ek-confirm.directive';
 import DonutChartDirective from './ek-donut-chart/ek-donut-chart.directive';
 import DropDirective from './ek-drop/ek-drop.directive';
 import DropContentDirective from './ek-drop/ek-drop-content.directive.js';
@@ -28,8 +31,11 @@ angular
         coreModule,
         'ngMaterial'
     ])
+    .service('ekConfirmDialog', ConfirmDialogService)
+
     .directive('ekAvatar', () => new AvatarDirective())
     .directive('ekButtonGroup', () => new ButtonGroupDirective())
+    .directive('ekConfirm', ($compile, $rootScope) => new ConfirmDirective($compile, $rootScope))
     .directive('ekDrop', () => new DropDirective())
     .directive('ekDropContent', () => new DropContentDirective())
     .directive('ekDropTarget', () => new DropTargetDirective())

@@ -1,14 +1,15 @@
 class NavigationActionCreatorService {
-    constructor($mdDialog, routerHelper, sessionStore) {
+    constructor($mdDialog, ekConfirmDialog, routerHelper, sessionStore) {
         'ngInject';
 
         this._$mdDialog = $mdDialog;
+        this._ekConfirmDialog = ekConfirmDialog;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
     }
 
-    settings() {
-        return this._routerHelper.changeToState('admin.settings');
+    settings(stateOptions) {
+        return this._routerHelper.changeToState('admin.settings', stateOptions);
     }
 
     users() {
@@ -25,6 +26,17 @@ class NavigationActionCreatorService {
 
     instances() {
         return this._routerHelper.changeToState('admin.instances');
+    }
+
+    warnOutboundEmailDisabled($scope) {
+        return this._ekConfirmDialog.confirm($scope, {
+            title: 'Outbound email is turned off',
+            content: 'An outbound email server and no reply address must be specified in order to send invites.',
+            ok: 'TURN ON',
+            cancel: 'NOT NOW'
+        }).then(() => {
+            return this.settings({ focusSection: 'email' });
+        });
     }
 
     inviteUsers() {
