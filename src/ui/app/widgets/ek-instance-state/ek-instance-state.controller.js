@@ -3,7 +3,7 @@ class InstanceStateController {
     }
 
     getInstanceState() {
-        return this.instance.status.phase;
+        return _.get(this.instance, 'status.phase');
     }
 }
 

@@ -6,15 +6,10 @@ import template from './ek-instance.html';
 class InstanceDirective extends Directive {
     constructor() {
         super({ Controller, template });
-
-        this.bindToController = {
-            instance: '='
-        };
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-instance');
+        tElement.addClass('ek-instance');
     }
 }
 

@@ -6,10 +6,6 @@ import template from './ek-instance-overview-containers.html';
 class InstanceOverviewContainersDirective extends Directive {
     constructor() {
         super({ Controller, template });
-
-        this.bindToController = {
-            instance: '='
-        };
     }
 
     compile(tElement) {
