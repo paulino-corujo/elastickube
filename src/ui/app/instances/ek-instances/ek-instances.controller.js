@@ -2,15 +2,15 @@ class InstancesController {
     constructor($scope, instancesNavigationActionCreator, instancesStore, sessionStore) {
         'ngInject';
 
-        const onChange = () => this.instances = this._instancesStore.getAll(sessionStore.getActiveNamespace().metadata.name);
-        const removeInstancesListener = () => this._instancesStore.removeChangeListener(onChange);
+        const onChange = () => this.instances = instancesStore.getAll(sessionStore.getActiveNamespace().metadata.name);
+        const removeInstancesListener = () => instancesStore.removeChangeListener(onChange);
 
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
-        this._instancesStore = instancesStore;
-        this._instancesStore.addChangeListener(onChange);
+
+        instancesStore.addChangeListener(onChange);
         sessionStore.addNamespaceChangeListener(removeInstancesListener);
 
-        this.instances = this._instancesStore.getAll(sessionStore.getActiveNamespace().metadata.name);
+        this.instances = instancesStore.getAll(sessionStore.getActiveNamespace().metadata.name);
         this.selectedView = 'list';
         this.showEmpty = true;
         this.instancesFilteredByOwnerAndStatus = [];

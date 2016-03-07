@@ -2,6 +2,8 @@ import AbstractStore from './abstract-store';
 import constants from './constants';
 
 const NAMESPACE_UPDATED_EVENT = 'namespace.change';
+const EXPANDED_INSTANCES_CHANGED_EVENT = 'expanded-instances.changed';
+const EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT = 'expanded-admin-instances.changed';
 
 class SessionStoreService extends AbstractStore {
     constructor(session, actions, dispatcher, namespacesStore) {
@@ -16,16 +18,21 @@ class SessionStoreService extends AbstractStore {
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
 
-                case this._actions.NAMESPACE_CHANGED:
+                case this._actions.SESSION_NAMESPACE_CHANGED:
                     this.emit(NAMESPACE_UPDATED_EVENT);
+                    break;
+
+                case this._actions.SESSION_EXPANDED_INSTANCES_CHANGED:
+                    this.emit(EXPANDED_INSTANCES_CHANGED_EVENT);
+                    break;
+
+                case this._actions.SESSION_EXPANDED_ADMIN_INSTANCES_CHANGED:
+                    this.emit(EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT);
                     break;
 
                 default:
             }
         });
-    }
-
-    destroy() {
     }
 
     getActiveNamespace() {
@@ -38,12 +45,36 @@ class SessionStoreService extends AbstractStore {
         return this._session.getItem(constants.SESSION_TOKEN);
     }
 
+    getExpandedInstances() {
+        return this._session.getItem(constants.EXPANDED_INSTANCES) || [];
+    }
+
+    getExpandedAdminInstances() {
+        return this._session.getItem(constants.EXPANDED_ADMIN_INSTANCES) || [];
+    }
+
     addNamespaceChangeListener(callback) {
         this.on(NAMESPACE_UPDATED_EVENT, callback);
     }
 
     removeNamespaceChangeListener(callback) {
         this.removeListener(NAMESPACE_UPDATED_EVENT, callback);
+    }
+
+    addExpandedInstancesChangeListener(callback) {
+        this.on(EXPANDED_INSTANCES_CHANGED_EVENT, callback);
+    }
+
+    removeExpandedInstancesChangeListener(callback) {
+        this.removeListener(EXPANDED_INSTANCES_CHANGED_EVENT, callback);
+    }
+
+    addExpandedAdminInstancesChangeListener(callback) {
+        this.on(EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT, callback);
+    }
+
+    removeExpandedAdminInstancesChangeListener(callback) {
+        this.removeListener(EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT, callback);
     }
 }
 
