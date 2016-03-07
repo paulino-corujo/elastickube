@@ -14,6 +14,19 @@ from api.v1 import ELASTICKUBE_TOKEN_HEADER, ELASTICKUBE_VALIDATION_TOKEN_HEADER
 from data.query import Query
 
 
+def _generate_hashed_password(password):
+    salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
+    return {'hash': sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=40000), 'salt': salt}
+
+
+def _fill_signup_invitation_request(document, firstname, lastname, password=None):
+    document["firstname"] = firstname
+    document["lastname"] = lastname
+    document["email_validated_at"] = datetime.utcnow()
+    if password is not None:
+        document["password"] = _generate_hashed_password(password)
+
+
 class AuthHandler(RequestHandler):
 
     @coroutine
@@ -91,13 +104,10 @@ class SignupHandler(AuthHandler):
         user = yield Query(self.settings["database"], "Users").find_one(
             {"invite_token": validation_token, "email": data["email"]})
         if user is not None and 'email_validated_at' not in user:
-            user[u"username"] = data.get("username", data["email"])
-            user[u"password"] = _generate_hashed_password(data["password"])
-            user[u"firstname"] = data["firstname"]
-            user[u"lastname"] = data["lastname"]
-            user[u"role"] = "user"
-            user[u"schema"] = "http://elasticbox.net/schemas/user"
-            user[u"email_validated_at"] = datetime.utcnow().isoformat()
+            _fill_signup_invitation_request(
+                user, firstname=data["firstname"], lastname=data["lastname"],
+                password=data["password"])
+
             raise Return(user)
 
         else:
@@ -142,11 +152,6 @@ class SignupHandler(AuthHandler):
             self.flush()
 
 
-def _generate_hashed_password(password):
-    salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
-    return {'hash': sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=40000), 'salt': salt}
-
-
 class PasswordHandler(AuthHandler):
 
     @coroutine
@@ -189,30 +194,37 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
         if google_oauth is None:
             raise HTTPError(403, 'Forbidden request')
 
-        code = self.get_argument('code', False)
-
         # Add OAuth settings for GoogleOAuth2Mixin
         self.settings['google_oauth'] = {
             'key': google_oauth['key'],
             'secret': google_oauth['secret']
         }
 
+        code = self.get_argument('code', False)
         if code:
             logging.debug("Google redirect received.")
+
             auth_data = yield self.get_authenticated_user(
                 redirect_uri=google_oauth["redirect_uri"],
                 code=code)
 
-            logging.debug("User Authenticating, getting user info.")
             auth_user = yield self.oauth2_request(
                 "https://www.googleapis.com/oauth2/v1/userinfo",
                 access_token=auth_data['access_token'])
 
             if auth_user["verified_email"]:
-                logging.debug("Google user email verified.")
                 user = yield self.settings["database"].Users.find_one({"email": auth_user["email"]})
 
-                if user:  # TODO: Accept user invitation if user already exists
+                # Validate user if it signup by OAuth2
+                if user and 'email_validated_at' not in user:
+                    logging.debug('User validated via OAuth2 %s', auth_user["email"])
+                    _fill_signup_invitation_request(
+                        user, firstname=auth_data.get('given_name', auth_data.get('name', "")),
+                        lastname=auth_data.get('family_name', ""), password=None)
+
+                    user = yield Query(self.settings["database"], 'Users').update(user)
+
+                if user:
                     yield self.authenticate_user(user)
                     self.redirect('/')
                 else:
