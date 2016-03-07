@@ -81,35 +81,35 @@ class AuthProvidersHandler(RequestHandler):
             self.write(providers)
 
 
-def _validate_data_signup_or_bad_request(data):
-    if "email" not in data:
-        raise HTTPError(400, message="Email is required.")
-
-    if "password" not in data:
-        raise HTTPError(400, message="Password is required.")
-
-    if "firstname" not in data:
-        raise HTTPError(400, message="First name is required.")
-
-    if "lastname" not in data:
-        raise HTTPError(400, message="Last name is required.")
-
-    return True
-
-
 class SignupHandler(AuthHandler):
+
+    @staticmethod
+    def _validate_signup_data(data):
+        if "email" not in data:
+            raise HTTPError(400, message="Email is required.")
+
+        if "password" not in data:
+            raise HTTPError(400, message="Password is required.")
+
+        if "firstname" not in data:
+            raise HTTPError(400, message="First name is required.")
+
+        if "lastname" not in data:
+            raise HTTPError(400, message="Last name is required.")
+
+        return True
 
     @coroutine
     def _update_invited_user(self, validation_token, data):
         user = yield Query(self.settings["database"], "Users").find_one(
             {"invite_token": validation_token, "email": data["email"]})
+
         if user is not None and 'email_validated_at' not in user:
             _fill_signup_invitation_request(
                 user, firstname=data["firstname"], lastname=data["lastname"],
                 password=data["password"])
 
             raise Return(user)
-
         else:
             raise HTTPError(403, message="Invitation not found.")
 
@@ -122,7 +122,7 @@ class SignupHandler(AuthHandler):
 
         validation_token = self.request.headers.get(ELASTICKUBE_VALIDATION_TOKEN_HEADER)
         if validation_token is not None:
-            _validate_data_signup_or_bad_request(data)
+            self._validate_signup_data(data)
             user = yield self._update_invited_user(validation_token, data)
             token = yield self.authenticate_user(user)
             self.write(token)
@@ -133,7 +133,7 @@ class SignupHandler(AuthHandler):
             raise HTTPError(403, message="Onboarding already completed.")
 
         else:
-            _validate_data_signup_or_bad_request(data)
+            self._validate_signup_data(data)
 
             user = dict(
                 email=data["email"],

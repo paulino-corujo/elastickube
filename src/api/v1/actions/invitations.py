@@ -9,63 +9,53 @@ from data.query import Query
 
 class InvitationsActions(object):
 
-    def __init__(self, settings):
+    def __init__(self, settings, user):
         logging.info("Initializing InviteActions")
-        self.database = settings['database']
 
-    def check_permissions(self, user, _operation):
-        if user['role'] == 'administrator':
-            return True
-        else:
-            return False
+        self.database = settings['database']
+        self.user = user
+
+    def check_permissions(self, operation, _document):
+        logging.debug("check_permissions for user %s and operation %s on invitations", self.user["username"], operation)
+        return self.user['role'] == 'administrator'
 
     @coroutine
-    def _invite_user(self, address, hostname):
-        invite_token = str(uuid.uuid4())
-        invite_user = create_invite_user_document(address, invite_token)
+    def _invite_user(self, email_address, hostname):
+        invite_user = {
+            "email": email_address,
+            "role": "user",
+            "schema": "http://elasticbox.net/schemas/user",
+            "username": email_address,
+            "invite_token": str(uuid.uuid4()),
+        }
+
         yield Query(self.database, "Users").insert(invite_user)
         invite_info = {
-            'email': address,
-            'confirm_url': _get_invite_address(
-                hostname, invite_token)
+            "email": email_address,
+            "confirm_url": "%s/invite/%s" % (hostname, invite_user["invite_token"])
         }
-        raise Return((invite_user, invite_info))
+
+        raise Return(invite_info)
 
     @coroutine
     def create(self, document):
-        addresses = document.get('emails', [])
-        note = document.get('note', '')
-        logging.info('Inviting users "%s" with note "%s"', addresses, note)
-        settings = yield self.database.Settings.find_one({"deleted": None})
-        hostname = settings['hostname']
+        addresses = document.get("emails", [])
+        note = document.get("note", "")
 
-        new_users = []
-        invites = []
+        settings = yield Query(self.database, "Settings").find_one()
+        hostname = settings.get("hostname", "")
+
+        logging.info('Inviting users "%s" with note "%s" with hostname "%s"', addresses, note, hostname)
+
+        invitations = []
         for address in addresses:
-            user, invite_info = yield self._invite_user(address, hostname)
-            new_users.append(user)
-            invites.append(invite_info)
+            invite_info = yield self._invite_user(address, hostname)
+            invitations.append(invite_info)
 
-        mail_settings = settings["mail"]
         if "mail" in settings:
-            yield emails.send_invites(mail_settings, invites, note)
+            mail_settings = settings["mail"]
+            yield emails.send_invites(mail_settings, invitations, note)
         else:
             logging.warning("Mail settings not added")
 
-        raise Return([])
-
-
-def _get_invite_address(hostname, token):
-    return '{}/invite/{}'.format(hostname, token)
-
-
-def create_invite_user_document(mail, invite_token):
-    return {
-        "email": mail,
-        "firstname": '',
-        "lastname": '',
-        "role": 'user',
-        "schema": "http://elasticbox.net/schemas/user",
-        "username": mail,  # TODO: What should be the username?
-        "invite_token": invite_token,
-    }
+        raise Return(None)

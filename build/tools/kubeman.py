@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import argparse
 import os
+import random
+import string
 import sys
 import time
 from datetime import datetime
 
+from passlib.hash import sha512_crypt
 from pymongo import MongoClient
 
 
@@ -30,12 +33,18 @@ def remove_oauth_settings(arguments):
 
 def add_user(arguments):
     database = MongoClient(arguments.connection_url).elastickube
-    user = database.Users.find_one({"deleted": None, "email": arguments.email})
+    user = database.Users.find_one({"metadata.deletionTimestamp": None, "email": arguments.email})
     if user is None:
+
+        salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
+        password = dict(
+            hash=sha512_crypt.encrypt((arguments.password + salt).encode("utf-8"), rounds=40000),
+            salt=salt)
+
         user = dict(
             email=arguments.email,
             username=arguments.email,
-            password=arguments.password,
+            password=password,
             firstname=arguments.first,
             lastname=arguments.last,
             role=arguments.role,

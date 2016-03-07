@@ -12,12 +12,23 @@ from api.kube.resources import Resource, NamespacedResource
 
 class HTTPClient(object):
 
-    def __init__(self, server, token, version='v1'):
-        self.server = server
+    def __init__(self, endpoint, token=None):
+        self.endpoint = endpoint
         self.token = token
-        self.version = version
 
-        self._base_url = "https://{0}/api/{1}".format(self.server, self.version)
+        if self.token:
+            if not endpoint.startswith("https"):
+                if endpoint.startswith("http://"):
+                    self._base_url = "https://%s" % self.endpoint.replace("http://", "")
+                else:
+                    self._base_url = "https://%s" % self.endpoint
+        else:
+            if not endpoint.startswith("http"):
+                if endpoint.startswith("https://"):
+                    self._base_url = "http://%s" % self.endpoint.replace("https://", "")
+                else:
+                    self._base_url = "https://%s" % self.endpoint
+
         AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient", defaults=dict(validate_cert=False))
 
     def build_url(self, url_path, **kwargs):
@@ -131,13 +142,12 @@ class HTTPClient(object):
         finally:
             client.close()
 
-    @coroutine
     def watch(self, url_path, on_data, **kwargs):
         class WatchFuture(Future):
 
             def cancel(self):
                 client.close()
-                logging.debug("Closing http connection")
+                logging.debug("AsyncHTTPClient closed")
 
         def data_callback(data):
             on_data(json.loads(data))
@@ -156,7 +166,7 @@ class HTTPClient(object):
         future = WatchFuture()
 
         chain_future(client.fetch(request), future)
-        yield future
+        return future
 
 
 class KubeClient(object):
@@ -167,6 +177,9 @@ class KubeClient(object):
         "componentstatuses": "ComponentStatus",
         "endpoints": "Endpoints",
         "events": "Event",
+        "horizontalpodautoscalers": "HorizontalPodAutoscaler",
+        "ingresses": "Ingress",
+        "jobs": "Jobs",
         "limitranges": "LimitRange",
         "namespaces": "Namespace",
         "nodes": "Node",
@@ -176,13 +189,13 @@ class KubeClient(object):
         "podtemplates": "PodTemplate",
         "replicationcontrollers": "ReplicationController",
         "resourcequotas": "ResourceQuota",
+        "scale": "Scale",
         "secrets": "Secret",
         "serviceaccounts": "ServiceAccount",
         "services": "Service"
     }
 
-    def __init__(self, endpoint, token=None, version='v1'):
-        self.version = version
+    def __init__(self, endpoint, token=None):
         self.http_client = HTTPClient(endpoint, token)
         self.resources = {}
         self.kind_to_resource = {}
@@ -195,20 +208,23 @@ class KubeClient(object):
 
     @coroutine
     def build_resources(self):
-        response = yield self.http_client.get("/")
-        for resource in json.loads(response.body).get("resources", []):
-            if "/" in resource["name"]:
-                continue
+        api_versions_response = yield self.http_client.get("/api")
+        api_versions = json.loads(api_versions_response.body).get("versions", [])
+        if len(api_versions) > 0:
+            api_version = api_versions[0]
+        else:
+            raise Return()
 
-            if resource["name"] in self.RESOURCE_TO_KIND_MAPPING.keys():
-                self.kind_to_resource[self.RESOURCE_TO_KIND_MAPPING[resource["name"]]] = resource["name"]
+        yield self._build_api_resources(api_version)
 
-            if resource["namespaced"]:
-                self.resources[resource["name"]] = NamespacedResource(self, resource["name"])
-            else:
-                self.resources[resource["name"]] = Resource(self, resource["name"])
+        response = yield self.http_client.get("/apis")
+        apis_groups = json.loads(response.body).get("groups", [])
+        if len(apis_groups) > 0 and len(apis_groups[0].get("versions", [])) > 0:
+            group_version = apis_groups[0].get("versions", [])[0].get("groupVersion", [])
+        else:
+            raise Return()
 
-        raise Return()
+        yield self._build_api_extensions(group_version)
 
     def get_resource_type(self, kind):
         if kind not in self.kind_to_resource.keys():
@@ -295,10 +311,9 @@ class KubeClient(object):
 
         raise Return(json.loads(response.body))
 
-    @coroutine
     def watch(self, url_path, on_data, **kwargs):
         try:
-            yield self.http_client.watch(url_path, on_data, **kwargs)
+            return self.http_client.watch(url_path, on_data, **kwargs)
         except HTTPError as http_error:
             message = self.format_error(http_error)
 
@@ -308,3 +323,41 @@ class KubeClient(object):
                 raise WatchDisconnectedException(message)
             else:
                 raise KubernetesException(message, http_error.code)
+
+    @coroutine
+    def _build_api_resources(self, api_version):
+
+        response = yield self.http_client.get("/api/%s" % api_version)
+
+        resources = json.loads(response.body).get("resources", [])
+        for resource in resources:
+            if "/" in resource["name"]:
+                continue
+
+            if resource["name"] in self.RESOURCE_TO_KIND_MAPPING.keys():
+                self.kind_to_resource[self.RESOURCE_TO_KIND_MAPPING[resource["name"]]] = resource["name"]
+
+            if resource["namespaced"]:
+                self.resources[resource["name"]] = NamespacedResource(self, "/api/%s" % api_version, resource["name"])
+            else:
+                self.resources[resource["name"]] = Resource(self, "/api/%s" % api_version, resource["name"])
+
+    @coroutine
+    def _build_api_extensions(self, group_version):
+        response = yield self.http_client.get("/apis/%s" % group_version)
+        for resource in json.loads(response.body).get("resources", []):
+            if "/status" in resource["name"]:
+                continue
+
+            if resource["name"] in self.resources.keys():
+                continue
+
+            resource_name = resource["name"].split("/")[-1] if "/" in resource["name"] else resource["name"]
+            if resource_name in self.RESOURCE_TO_KIND_MAPPING.keys():
+                self.kind_to_resource[self.RESOURCE_TO_KIND_MAPPING[resource_name]] = resource_name
+
+            if resource["namespaced"]:
+                self.resources[resource["name"]] = NamespacedResource(
+                    self, "/apis/%s" % group_version, resource["name"])
+            else:
+                self.resources[resource["name"]] = Resource(self, "/apis/%s" % group_version, resource["name"])
