@@ -1,0 +1,12 @@
+<ek-drop position="bottom right">
+    <ek-drop-target>
+        <md-icon class="ek-instance-actions__icon" ng-click="ctrl.close()"
+                 md-svg-src="{{:: icons.IC_MORE_VERT_48PX  }}">
+        </md-icon>
+    </ek-drop-target>
+    <ek-drop-content class="ek-instance-actions__content" layout="column" layout-align="start center">
+        <div ng-click="ctrl.delete()">Edit Details</div>
+        <div ng-click="ctrl.delete()">Delete</div>
+    </ek-drop-content>
+</ek-drop>
+

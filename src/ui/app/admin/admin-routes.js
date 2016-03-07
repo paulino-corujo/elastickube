@@ -7,8 +7,20 @@ const states = [{
         parent: 'private',
         template: '<ek-admin></ek-admin>',
         url: '/admin',
+        controller: ($scope, settingsActionCreator) => {
+            'ngInject';
+            
+            $scope.$on('$destroy', () => settingsActionCreator.unsubscribe());
+        },
         data: {
             access: profiles.ADMIN
+        },
+        resolve: {
+            loading: (settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.subscribe();
+            }
         }
     }
 }, {
@@ -16,6 +28,11 @@ const states = [{
     config: {
         template: '<ek-admin-settings></ek-admin-settings>',
         url: '/settings',
+
+        /* eslint no-undefined: 0 */
+        params: {
+            focusSection: undefined
+        },
         data: {
             header: {
                 name: 'admin',
@@ -25,13 +42,6 @@ const states = [{
 
                     return actionCreator.settings();
                 }
-            }
-        },
-        resolve: {
-            loading: (settingsActionCreator) => {
-                'ngInject';
-
-                return settingsActionCreator.subscribe();
             }
         }
     }

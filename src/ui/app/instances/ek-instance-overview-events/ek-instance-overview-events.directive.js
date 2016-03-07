@@ -6,15 +6,10 @@ import template from './ek-instance-overview-events.html';
 class InstanceOverviewEventsDirective extends Directive {
     constructor() {
         super({ Controller, template });
-
-        this.bindToController = {
-            instance: '='
-        };
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-instance-overview-events ek-white-box');
+        tElement.addClass('ek-instance-overview-events ek-white-box');
     }
 }
 
