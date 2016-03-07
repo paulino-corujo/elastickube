@@ -90,6 +90,6 @@ angular
     .service('usersActionCreator', UsersActionCreatorService)
     .service('usersStore', UsersStoreService)
 
-    .directive('ekFocus', ($timeout) => new FocusDirective($timeout));
+    .directive('ekFocus', () => new FocusDirective());
 
 export default moduleName;
