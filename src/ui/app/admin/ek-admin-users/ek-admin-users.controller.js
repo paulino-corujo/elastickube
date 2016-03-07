@@ -78,6 +78,7 @@ class AdminUsersController {
 
     inviteUsers() {
         const settings = this._settingsStore.getSettings();
+
         if (_.isUndefined(settings.mail)) {
             return this._adminNavigationActionCreator.warnOutboundEmailDisabled(this._$scope);
         }

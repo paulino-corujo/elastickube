@@ -1,12 +1,18 @@
 const NEW_INSTANCE_STEP = 1;
 
 class ChooseChartController {
-    constructor($scope, $element, chartsStore) {
+    constructor($scope, $element, $stateParams, chartsStore) {
         'ngInject';
 
         this._$element = $element;
+        this._$stateParams = $stateParams;
+
         this._chartStoreService = chartsStore;
-        this.charts = this._chartStoreService.getAll();
+        this.charts = _.orderBy(this._chartStoreService.getAll(), 'name');
+
+        if (_.isFunction(this.onSelection())) {
+            this.onSelection = this.onSelection();
+        }
 
         $scope.$watch('ctrl.step', (step) => {
             if (step === NEW_INSTANCE_STEP) {
@@ -15,6 +21,11 @@ class ChooseChartController {
                 this._$element.removeClass('ek-choose-chart--active');
             }
         });
+
+        if (this._$stateParams.chart) {
+            this.selectedChart = _.find(this.charts, this._$stateParams.chart);
+            this.chartSelected();
+        }
     }
 
     editChart() {

@@ -9,7 +9,7 @@ const states = [{
         url: '/admin',
         controller: ($scope, settingsActionCreator) => {
             'ngInject';
-            
+
             $scope.$on('$destroy', () => settingsActionCreator.unsubscribe());
         },
         data: {
