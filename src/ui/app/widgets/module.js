@@ -35,7 +35,11 @@ angular
 
     .directive('ekAvatar', () => new AvatarDirective())
     .directive('ekButtonGroup', () => new ButtonGroupDirective())
-    .directive('ekConfirm', ($compile, $rootScope) => new ConfirmDirective($compile, $rootScope))
+    .directive('ekConfirm', ($compile, $rootScope) => {
+        'ngInject';
+
+        return new ConfirmDirective($compile, $rootScope);
+    })
     .directive('ekDrop', () => new DropDirective())
     .directive('ekDropContent', () => new DropContentDirective())
     .directive('ekDropTarget', () => new DropTargetDirective())

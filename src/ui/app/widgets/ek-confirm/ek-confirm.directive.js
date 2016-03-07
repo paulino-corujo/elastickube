@@ -6,8 +6,6 @@ import template from './ek-confirm.html';
 class ConfirmDirective extends Directive {
 
     constructor($compile) {
-        'ngInject';
-
         super({ Controller, template });
 
         this._$compile = $compile;
