@@ -25,14 +25,17 @@ class IkonController {
             .join('')
             .value();
 
-        this.fill = colors.FILL_DEFAULT;
-        this.border = colors[this.letters[0]] ? colors[this.letters[0]] : colors.BORDER_DEFAULT;
+        const textColor = colors[this.letters[0]] ? colors[this.letters[0]] : colors.BORDER_DEFAULT;
+
+        this.fill = this.swapBorderFillColor ? textColor : colors.FILL_DEFAULT;
+        this.text = this.swapBorderFillColor ? colors.FILL_DEFAULT : textColor;
+        this.border = this.swapBorderFillColor ? this.fill : this.text;
     }
 
     _createImageIcon() {
         this.image = this.icon.image;
-        this.fill = this.icon.fill;
-        this.border = this.icon.border;
+        this.fill = this.swapBorderFillColor ? this.icon.border : this.icon.fill;
+        this.border = this.swapBorderFillColor ? this.icon.fill : this.icon.border;
     }
 }
 
