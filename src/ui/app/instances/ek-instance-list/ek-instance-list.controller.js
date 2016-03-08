@@ -107,6 +107,15 @@ class InstanceListController {
                 }
             ],
             onRegisterApi: (gridApi) => {
+                const saveGroupStates = () => {
+                    if (!this._synchronizing) {
+                        sessionActionCreator.saveCollapsedInstancesState(_.chain(this.gridApi.grid.rows)
+                            .filter(_.matchesProperty('treeNode.state', 'expanded'))
+                            .map((x) => _.get(x, 'entity.metadata.uid'))
+                            .value());
+                    }
+                };
+
                 this.gridApi = gridApi;
 
                 gridApi.selection.on.rowSelectionChanged($scope, () =>
@@ -116,39 +125,30 @@ class InstanceListController {
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
 
                 if (!_.isUndefined(gridApi.treeBase)) {
-                    gridApi.treeBase.on.rowCollapsed($scope, (row) => {
-                        if (!this._synchronizing) {
-                            sessionActionCreator.saveCollapsedInstancesState(_.chain(sessionStore.getExpandedInstances())
-                                .without(row.entity.metadata.uid)
-                                .value());
-                        }
-                    });
-
-                    gridApi.treeBase.on.rowExpanded($scope, (row) => {
-                        if (!this._synchronizing) {
-                            sessionActionCreator.saveCollapsedInstancesState(_.chain(sessionStore.getExpandedInstances())
-                                .concat(row.entity.metadata.uid)
-                                .uniq()
-                                .value());
-                        }
-                    });
+                    gridApi.treeBase.on.rowCollapsed($scope, saveGroupStates);
+                    gridApi.treeBase.on.rowExpanded($scope, saveGroupStates);
                 }
 
                 gridApi.grid.registerRowsProcessor((renderableRows) => {
                     if (!_.isUndefined(this.gridApi.treeBase)) {
                         this._synchronizing = true;
 
-                        this._expandedInstances.forEach((x) => {
-                            const instance = instancesStore.get(x);
+                        if (_.isUndefined(this._expandedInstances)) {
+                            this.gridApi.treeBase.expandAllRows();
+                        } else {
+                            this._expandedInstances.forEach((x) => {
+                                const instance = instancesStore.get(x);
 
-                            if (!_.isUndefined(instance)) {
-                                const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+                                if (!_.isUndefined(instance)) {
+                                    const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid',
+                                        instance.metadata.uid));
 
-                                if (!_.isUndefined(row)) {
-                                    this.gridApi.treeBase.expandRow(row);
+                                    if (!_.isUndefined(row)) {
+                                        this.gridApi.treeBase.expandRow(row);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
 
                         this._synchronizing = false;
                     }

@@ -50,11 +50,22 @@ class SessionActionCreatorService {
             });
     }
 
-    saveCollapsedInstancesState(collapsedInstances) {
-        this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGE, collapsedInstances });
+    saveCollapsedInstancesState(namespaceExpandedInstances) {
+        const namespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
+        const namespace = this._namespacesStore.get(namespaceUID);
 
-        return this._session.setItem(constants.EXPANDED_INSTANCES, collapsedInstances)
-            .then(() => this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGED, collapsedInstances }));
+        this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGE, namespace, namespaceExpandedInstances });
+
+        const expandedInstances = this._session.getItem(constants.EXPANDED_INSTANCES) || {};
+
+        expandedInstances[namespaceUID] = namespaceExpandedInstances;
+
+        return this._session.setItem(constants.EXPANDED_INSTANCES, expandedInstances)
+            .then(() => this._dispatcher.dispatch({
+                namespace,
+                expandedInstances: namespaceExpandedInstances,
+                type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGED
+            }));
     }
 
     saveCollapsedAdminInstancesState(collapsedInstances) {

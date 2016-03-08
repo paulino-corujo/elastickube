@@ -46,11 +46,14 @@ class SessionStoreService extends AbstractStore {
     }
 
     getExpandedInstances() {
-        return this._session.getItem(constants.EXPANDED_INSTANCES) || [];
+        const namespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
+        const expandedInstances = this._session.getItem(constants.EXPANDED_INSTANCES) || {};
+
+        return expandedInstances[namespaceUID];
     }
 
     getExpandedAdminInstances() {
-        return this._session.getItem(constants.EXPANDED_ADMIN_INSTANCES) || [];
+        return this._session.getItem(constants.EXPANDED_ADMIN_INSTANCES);
     }
 
     addNamespaceChangeListener(callback) {
