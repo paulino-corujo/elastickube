@@ -30,6 +30,9 @@ import UsersActionCreatorService from './dataflow/users-action-creator.service';
 import UsersStoreService from './dataflow/users-store.service.js';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
+
+import FocusDirective from './directives/focus';
+
 import InitializationService from './services/initialization.service';
 import MultiTranscludeService from './services/multi-transclude.service';
 import AuthService from './security/auth.service';
@@ -85,6 +88,8 @@ angular
     .service('settingsStore', SettingsStoreService)
 
     .service('usersActionCreator', UsersActionCreatorService)
-    .service('usersStore', UsersStoreService);
+    .service('usersStore', UsersStoreService)
+
+    .directive('ekFocus', () => new FocusDirective());
 
 export default moduleName;
