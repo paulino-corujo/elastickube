@@ -1,10 +1,10 @@
 class InstanceActionsController {
-    constructor($q, $scope, ekConfirmDialog, instancesActionCreator) {
+    constructor($q, $scope, confirmDialog, instancesActionCreator) {
         'ngInject';
 
         this._$q = $q;
         this._$scope = $scope;
-        this._ekConfirmDialog = ekConfirmDialog;
+        this._confirmDialog = confirmDialog;
         this._instancesActionCreator = instancesActionCreator;
     }
 
@@ -16,7 +16,7 @@ class InstanceActionsController {
             .value()
             .join(', ');
 
-        return this._ekConfirmDialog
+        return this._confirmDialog
             .confirm(this._$scope, {
                 title: 'Confirm Action',
                 content: `Do you want to DELETE ${instanceNames} instance${_.size(this.instances) > 1 ? 's' : ''}?`,
