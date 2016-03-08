@@ -9,7 +9,8 @@ class SelectUsersDirective extends Directive {
         super({ Controller, template });
 
         this.bindToController = {
-            selectedUsers: '='
+            selectedUsers: '=',
+            placeholder: '@'
         };
     }
 

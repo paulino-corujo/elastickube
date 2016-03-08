@@ -31,7 +31,7 @@ angular
         coreModule,
         'ngMaterial'
     ])
-    .service('ekConfirmDialog', ConfirmDialogService)
+    .service('confirmDialog', ConfirmDialogService)
 
     .directive('ekAvatar', () => new AvatarDirective())
     .directive('ekButtonGroup', () => new ButtonGroupDirective())
