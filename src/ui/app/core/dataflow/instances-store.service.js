@@ -56,11 +56,7 @@ class InstancesStoreService extends AbstractStore {
     }
 
     _setInstances(instances) {
-        const newInstances = {};
-
-        _.each(instances, (x) => newInstances[x.metadata.uid] = x);
-
-        this._instances = newInstances;
+        _.each(instances, (x) => this._instances[x.metadata.uid] = x);
     }
 
     _removeInstance(instance) {
