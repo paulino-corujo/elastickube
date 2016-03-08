@@ -1,9 +1,11 @@
 import rowTemplate from './ek-admin-namespaces-row.template.html';
 
 class AdminNamespacesController {
-    constructor($scope, instancesStore, namespacesStore) {
+    constructor($scope, confirmDialog, instancesStore, namespacesStore) {
         'ngInject';
 
+        this._$scope = $scope;
+        this._confirmDialog = confirmDialog;
         this._instancesStore = instancesStore;
 
         this.bulkActions = 'Bulk Actions';
@@ -71,6 +73,14 @@ class AdminNamespacesController {
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
             }
         };
+    }
+
+    newNamespace() {
+        return this._confirmDialog.confirm(this._$scope, {
+            template: '<ek-admin-new-namespace></ek-admin-new-namespace>',
+            ok: 'CREATE',
+            cancel: 'CANCEL'
+        });
     }
 
     getInstances(namespace) {

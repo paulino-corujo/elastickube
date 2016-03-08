@@ -6,7 +6,7 @@
                  md-items="user in ctrl.querySearch(ctrl.searchText)"
                  md-item-text="user.name"
                  md-min-length="0"
-                 placeholder="Add user as an administrator..."
+                 placeholder="{{:: ctrl.placeholder }}"
                  md-menu-class="ek-select-users__menu">
     <md-item-template>
         <ek-user-info username="user.username"></ek-user-info>

@@ -30,8 +30,7 @@ class NamespacesActions(object):
                 ]
             }
         }
-
-        response = self.kube.namespaces.post(body)
+        response = yield self.kube.namespaces.post(body)
         raise Return(response)
 
     @coroutine

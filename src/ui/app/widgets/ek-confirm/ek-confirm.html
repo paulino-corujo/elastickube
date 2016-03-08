@@ -10,7 +10,7 @@
 
     <md-dialog-actions class="ek-confirm__dialog__actions">
         <md-button ng-if="ctrl.isCancelButtonAvailable()" class="ek-confirm__actions__cancel ek-button" ng-click="ctrl.cancel()">{{ ctrl.options.cancel }}</md-button>
-        <md-button ng-if="ctrl.isOKButtonAvailable()" ng-click="ctrl.ok()"
+        <md-button ng-disabled="!ctrl.canAccept" ng-if="ctrl.isOKButtonAvailable()" ng-click="ctrl.ok()"
                    class="ek-button ek-confirm__dialog__actions__ok md-raised md-primary ek-button">{{ ctrl.options.ok }}
         </md-button>
     </md-dialog-actions>

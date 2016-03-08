@@ -1,9 +1,9 @@
 class NavigationActionCreatorService {
-    constructor($mdDialog, ekConfirmDialog, routerHelper, sessionStore) {
+    constructor($mdDialog, confirmDialog, routerHelper, sessionStore) {
         'ngInject';
 
         this._$mdDialog = $mdDialog;
-        this._ekConfirmDialog = ekConfirmDialog;
+        this._confirmDialog = confirmDialog;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
     }
@@ -29,7 +29,7 @@ class NavigationActionCreatorService {
     }
 
     warnOutboundEmailDisabled($scope) {
-        return this._ekConfirmDialog.confirm($scope, {
+        return this._confirmDialog.confirm($scope, {
             title: 'Outbound email is turned off',
             content: 'An outbound email server and no reply address must be specified in order to send invites.',
             ok: 'TURN ON',
