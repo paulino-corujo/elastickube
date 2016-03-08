@@ -8,7 +8,8 @@ class InstanceListDirective extends Directive {
         super({ Controller, template });
 
         this.bindToController = {
-            instances: '=?'
+            instances: '=',
+            selectedInstances: '=?'
         };
     }
 

@@ -11,6 +11,7 @@ class InstancesController {
         sessionStore.addNamespaceChangeListener(removeInstancesListener);
 
         this.instances = instancesStore.getAll(sessionStore.getActiveNamespace().metadata.name);
+        this.selectedInstances = [];
         this.selectedView = 'list';
         this.showEmpty = true;
         this.instancesFilteredByOwnerAndStatus = [];

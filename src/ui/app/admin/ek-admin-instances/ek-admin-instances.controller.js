@@ -114,14 +114,15 @@ class AdminInstancesController {
                             .value());
                     }
                 };
+                const selectItems = () => {
+                    this.selectedInstances = gridApi.selection.getSelectedRows();
+                    this.hasRowsSelected = !_.isEmpty(this.selectedInstances);
+                };
 
                 this.gridApi = gridApi;
 
-                gridApi.selection.on.rowSelectionChanged($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-
-                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+                gridApi.selection.on.rowSelectionChanged($scope, selectItems);
+                gridApi.selection.on.rowSelectionChangedBatch($scope, selectItems);
 
                 if (!_.isUndefined(gridApi.treeBase)) {
                     gridApi.treeBase.on.rowCollapsed($scope, saveGroupStates);
@@ -139,7 +140,8 @@ class AdminInstancesController {
                                 const instance = instancesStore.get(x);
 
                                 if (!_.isUndefined(instance)) {
-                                    const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+                                    const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid',
+                                        instance.metadata.uid));
 
                                     if (!_.isUndefined(row)) {
                                         this.gridApi.treeBase.expandRow(row);
@@ -149,6 +151,23 @@ class AdminInstancesController {
                         }
 
                         this._synchronizing = false;
+                    }
+
+                    if (!_.isEmpty(this.selectedInstances)) {
+                        this.selectedInstances = _.chain(this.selectedInstances)
+                            .map((x) => {
+                                const row = _.find(gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', x.metadata.uid));
+
+                                if (!_.isUndefined(row)) {
+                                    if (!row.isSelected) {
+                                        row.setSelected(true);
+                                    }
+
+                                    return _.get(row, 'entity');
+                                }
+                            })
+                            .compact()
+                            .value();
                     }
 
                     return renderableRows;
