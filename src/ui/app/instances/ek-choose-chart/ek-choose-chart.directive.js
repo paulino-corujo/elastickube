@@ -25,10 +25,6 @@ class ChooseChartDirective extends Directive {
 
             chooseTemplateCtrl.parentController = newInstanceCtrl;
 
-            if (_.isFunction(chooseTemplateCtrl.onSelection())) {
-                chooseTemplateCtrl.onSelection = chooseTemplateCtrl.onSelection();
-            }
-
             _.extend($scope, constants);
         };
     }

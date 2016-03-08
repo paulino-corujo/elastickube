@@ -9,7 +9,8 @@ class IkonDirective extends Directive {
 
         this.bindToController = {
             icon: '=',
-            name: '='
+            name: '=',
+            swapBorderFillColor: '='
         };
     }
 }

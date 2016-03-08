@@ -71,6 +71,11 @@ function instancesRoutes(routerHelperProvider) {
         state: 'new-instance',
         config: {
             url: '/instances/new',
+
+            /* eslint no-undefined: 0 */
+            params: {
+                chart: undefined
+            },
             parent: 'private',
             template: '<ek-new-instance></ek-new-instance>',
             data: {

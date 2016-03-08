@@ -76,6 +76,8 @@ class AdminSettingsController {
             ldap: false
         };
 
+        this.gitChartRepo = _.get(this._settings, 'charts.repo_url');
+
         this.mail = hasValues(settings.mail);
         if (this._$stateParams.focusSection === 'email') {
             this.mail = true;
@@ -94,6 +96,8 @@ class AdminSettingsController {
     _sendForm() {
         if (this.form.$valid) {
             this._settings.hostname = this.hostname;
+
+            _.set(this._settings, 'charts.repo_url', this.gitChartRepo);
 
             if (this.auth.google && hasValues(this.auth.google_data)) {
                 this._settings.authentication.google_oauth = this.auth.google_data;
