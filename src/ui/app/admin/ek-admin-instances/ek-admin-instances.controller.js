@@ -1,11 +1,46 @@
 import rowTemplate from './ek-admin-instances-row.template.html';
 
 class AdminInstancesController {
-    constructor($scope, instancesStore, instancesActionCreator, instancesNavigationActionCreator, namespacesStore) {
+    constructor($scope, instancesStore, instancesActionCreator, instancesNavigationActionCreator, namespacesStore, sessionActionCreator,
+                sessionStore) {
         'ngInject';
 
         const onChange = () => this.instances = instancesStore.getAll();
+        const onCollapsedChange = () => {
+            if (!_.isUndefined(this.gridApi.treeBase)) {
+                this._synchronizing = true;
 
+                _.without(this._expandedInstances, sessionStore.getExpandedAdminInstances()).forEach((x) => {
+                    const instance = instancesStore.get(x);
+
+                    if (!_.isUndefined(instance)) {
+                        const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+
+                        if (!_.isUndefined(row)) {
+                            this.gridApi.treeBase.collapseRow(row);
+                        }
+                    }
+                });
+
+                _.without(sessionStore.getExpandedAdminInstances(), this._expandedInstances).forEach((x) => {
+                    const instance = instancesStore.get(x);
+
+                    if (!_.isUndefined(instance)) {
+                        const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+
+                        if (!_.isUndefined(row)) {
+                            this.gridApi.treeBase.expandRow(row);
+                        }
+                    }
+                });
+
+                this._expandedInstances = sessionStore.getExpandedAdminInstances();
+                this._synchronizing = false;
+            }
+        };
+
+        this._synchronizing = false;
+        this._expandedInstances = sessionStore.getExpandedAdminInstances();
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
 
         this.bulkActions = 'Bulk Actions';
@@ -71,6 +106,15 @@ class AdminInstancesController {
                 }
             ],
             onRegisterApi: (gridApi) => {
+                const saveGroupStates = () => {
+                    if (!this._synchronizing) {
+                        sessionActionCreator.saveCollapsedAdminInstancesState(_.chain(this.gridApi.grid.rows)
+                            .filter(_.matchesProperty('treeNode.state', 'expanded'))
+                            .map((x) => _.get(x, 'entity.metadata.uid'))
+                            .value());
+                    }
+                };
+
                 this.gridApi = gridApi;
 
                 gridApi.selection.on.rowSelectionChanged($scope, () =>
@@ -78,15 +122,52 @@ class AdminInstancesController {
 
                 gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+
+                if (!_.isUndefined(gridApi.treeBase)) {
+                    gridApi.treeBase.on.rowCollapsed($scope, saveGroupStates);
+                    gridApi.treeBase.on.rowExpanded($scope, saveGroupStates);
+                }
+
+                gridApi.grid.registerRowsProcessor((renderableRows) => {
+                    if (!_.isUndefined(this.gridApi.treeBase)) {
+                        this._synchronizing = true;
+
+                        if (_.isUndefined(this._expandedInstances)) {
+                            this.gridApi.treeBase.expandAllRows();
+                        } else {
+                            this._expandedInstances.forEach((x) => {
+                                const instance = instancesStore.get(x);
+
+                                if (!_.isUndefined(instance)) {
+                                    const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+
+                                    if (!_.isUndefined(row)) {
+                                        this.gridApi.treeBase.expandRow(row);
+                                    }
+                                }
+                            });
+                        }
+
+                        this._synchronizing = false;
+                    }
+
+                    return renderableRows;
+                });
             }
         };
+
+        sessionStore.addExpandedAdminInstancesChangeListener(onCollapsedChange);
 
         $scope.$watchCollection('ctrl.filteredInstances', (instances) => {
             this.groupedInstances = this.groupInstances(instances);
             this.containsGroups = _.find(this.groupedInstances, (x) => x.$$treeLevel === 1);
         });
 
-        $scope.$on('$destroy', () => _.map(namespacesStore.getAll(), (x) => instancesActionCreator.unsubscribe(x)));
+        $scope.$on('$destroy', () => {
+            instancesStore.removeChangeListener(onChange);
+            sessionStore.removeExpandedAdminInstancesChangeListener(onCollapsedChange);
+            _.map(namespacesStore.getAll(), (x) => instancesActionCreator.unsubscribe(x));
+        });
     }
 
     groupInstances(instances) {
@@ -109,7 +190,11 @@ class AdminInstancesController {
                     .map((x) => {
                         const item = angular.copy(x);
 
-                        item.$$treeLevel = _.has(item, key) && !_.isUndefined(parent) ? 1 : 0;
+                        if (_.size(items) > 1 && !_.isUndefined(parent)) {
+                            item.$$treeLevel = _.has(item, key) ? 1 : 0;
+                        } else {
+                            item.$$treeLevel = 0;
+                        }
 
                         return item;
                     })

@@ -14,7 +14,7 @@ class InstancesStoreService extends AbstractStore {
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
-                case this._actions.NAMESPACE_CHANGED:
+                case this._actions.SESSION_NAMESPACE_CHANGED:
                     this._isLoading = this._$q.defer();
                     break;
 
@@ -56,11 +56,7 @@ class InstancesStoreService extends AbstractStore {
     }
 
     _setInstances(instances) {
-        const newInstances = {};
-
-        _.each(instances, (x) => newInstances[x.metadata.uid] = x);
-
-        this._instances = newInstances;
+        _.each(instances, (x) => this._instances[x.metadata.uid] = x);
     }
 
     _removeInstance(instance) {
