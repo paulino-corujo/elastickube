@@ -4,7 +4,12 @@
             <ek-ikon name="ctrl.chart.name" icon="ctrl.chart.icon"></ek-ikon>
         </div>
         <span class="ek-chart-card__info__name">{{ ctrl.chart.name }}</span>
-        <span class="ek-chart-card__info__description">{{ ctrl.description }}</span>
+        <div class="ek-chart-card__info__description" layout="row">
+            <span class="ek-chart-card__info__description__text">{{ ctrl.description }}</span>
+            <a ng-if="ctrl.chart.home" target="_blank" href="{{ ctrl.chart.home }}">
+                <img class="ek-chart-card__info__description__icon" src="{{:: icons.GITHUB_MARK_32PX }}">
+            </a>
+        </div>
     </div>
     <div ng-if="hovered" layout="column" layout-align="center" ng-click=ctrl.deploy() class="ek-chart-card__deploy">
         <md-icon md-svg-src="{{:: icons.IC_PLAY_ARROW_48PX }}"></md-icon>
