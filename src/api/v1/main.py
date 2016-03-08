@@ -3,7 +3,6 @@ import logging
 from bson.json_util import loads
 from pymongo.errors import DuplicateKeyError, PyMongoError
 from tornado.gen import coroutine, Return, Future
-from tornado.web import HTTPError
 
 from api.kube.exceptions import KubernetesException
 from api.v1 import SecureWebSocketHandler
@@ -26,52 +25,20 @@ class MainWebSocketHandler(SecureWebSocketHandler):
     def __init__(self, application, request, **kwargs):
         super(MainWebSocketHandler, self).__init__(application, request, **kwargs)
 
+        self.actions_lookup = None
         self.connected = False
         self.current_watchers = dict()
 
-        self.actions_lookup = dict(
-            charts=dict(
-                watcher_cls=CursorWatcher
-            ),
-            instance=dict(
-                watcher_cls=KubeWatcher
-            ),
-            instances=dict(
-                rest=InstancesActions(self.settings),
-                watcher_cls=KubeWatcher
-            ),
-            namespaces=dict(
-                rest=NamespacesActions(self.settings),
-                watcher_cls=CursorWatcher
-            ),
-            settings=dict(
-                rest=SettingsActions(self.settings),
-                watcher_cls=CursorWatcher
-            ),
-            users=dict(
-                rest=UsersActions(self.settings),
-                watcher_cls=CursorWatcher
-            ),
-            invitations=dict(
-                rest=InvitationsActions(self.settings),
-            ),
-        )
-
     def open(self):
         logging.info("Initializing MainWebSocketHandler")
-
-        try:
-            super(MainWebSocketHandler, self).open()
-        except HTTPError as error:
-            logging.exception(error)
-            self.write_message({"error": {"message": error.log_message}})
-            self.close()
+        super(MainWebSocketHandler, self).open()
 
     @coroutine
     def on_message(self, message):
         # Wait the user to be authenticated before accepting message
         if isinstance(self.user, Future):
             self.user = yield self.user
+            self.build_actions_lookup()
 
         if not self.user:
             raise Return()
@@ -97,7 +64,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                     response.update(dict(status_code=405, body=dict(message=error)))
 
                 else:
-                    if not action.check_permissions(self.user, request["operation"]):
+                    if not action.check_permissions(request["operation"], request["body"]):
                         error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
                         response.update(dict(status_code=403, body=dict(message=error)))
 
@@ -218,6 +185,35 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             raise Return(None)
 
         raise Return(request)
+
+    def build_actions_lookup(self):
+        self.actions_lookup = dict(
+            charts=dict(
+                watcher_cls=CursorWatcher
+            ),
+            instance=dict(
+                watcher_cls=KubeWatcher
+            ),
+            instances=dict(
+                rest=InstancesActions(self.settings, self.user),
+                watcher_cls=KubeWatcher
+            ),
+            namespaces=dict(
+                rest=NamespacesActions(self.settings, self.user),
+                watcher_cls=CursorWatcher
+            ),
+            settings=dict(
+                rest=SettingsActions(self.settings, self.user),
+                watcher_cls=CursorWatcher
+            ),
+            users=dict(
+                rest=UsersActions(self.settings, self.user),
+                watcher_cls=CursorWatcher
+            ),
+            invitations=dict(
+                rest=InvitationsActions(self.settings, self.user),
+            ),
+        )
 
     @staticmethod
     def _get_watcher_key(message):

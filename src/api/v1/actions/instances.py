@@ -8,14 +8,15 @@ from data.query import Query, ObjectNotFoundError
 
 class InstancesActions(object):
 
-    def __init__(self, settings):
+    def __init__(self, settings, user):
         logging.info("Initializing InstancesActions")
+
         self.kube = settings["kube"]
         self.database = settings["database"]
+        self.user = user
 
-    @staticmethod
-    def check_permissions(user, operation):
-        logging.debug("Checking permissions for user %s and operation %s on instances", user["username"], operation)
+    def check_permissions(self, operation, _document):
+        logging.debug("check_permissions for user %s and operation %s on instances", self.user["username"], operation)
         return True
 
     @coroutine

@@ -7,17 +7,15 @@ from data.query import Query
 
 class SettingsActions(object):
 
-    def __init__(self, settings):
+    def __init__(self, settings, user):
         logging.info("Initializing SettingsActions")
-        self.database = settings['database']
 
-    @staticmethod
-    def check_permissions(user, operation):
-        logging.debug("Checking permissions for user %s and operation %s on settings", user["username"], operation)
-        if user['role'] == 'administrator':
-            return True
-        else:
-            return False
+        self.database = settings['database']
+        self.user = user
+
+    def check_permissions(self, operation, _document):
+        logging.debug("check_permissions for user %s and operation %s on settings", self.user["username"], operation)
+        return self.user['role'] == 'administrator'
 
     @coroutine
     def update(self, document):
