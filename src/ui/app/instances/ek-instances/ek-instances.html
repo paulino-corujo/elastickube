@@ -2,6 +2,11 @@
     <div transclude-to="header" layout="row" layout-align="start center">
         <h3 class="ek-instances__title ek-title"><span>instances</span></h3>
 
+        <ek-instance-bulk-actions ng-if="ctrl.selectedInstances.length > 0"
+                                  instances="ctrl.selectedInstances"></ek-instance-bulk-actions>
+
+        <div class="separator" ng-if="ctrl.selectedInstances.length > 0"></div>
+
         <ek-search-filter class="ek-instances__search"
                           search-field="metadata.name"
                           collection-to-be-filtered="ctrl.instancesFilteredByOwnerAndStatus"
@@ -23,7 +28,8 @@
                 </div>
 
                 <div ng-if="!ctrl.showEmpty" ng-switch="ctrl.selectedView">
-                    <ek-instance-list instances="ctrl.instancesFilteredBySearch"></ek-instance-list>
+                    <ek-instance-list instances="ctrl.instancesFilteredBySearch"
+                                      selected-instances="ctrl.selectedInstances"></ek-instance-list>
                 </div>
             </div>
         </ek-sidenav-layout>

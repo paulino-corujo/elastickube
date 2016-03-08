@@ -107,6 +107,7 @@ class InstanceListController {
                 }
             ],
             onRegisterApi: (gridApi) => {
+                const selectInstance = () => this.selectedInstances = gridApi.selection.getSelectedRows();
                 const saveGroupStates = () => {
                     if (!this._synchronizing) {
                         sessionActionCreator.saveCollapsedInstancesState(_.chain(this.gridApi.grid.rows)
@@ -118,11 +119,8 @@ class InstanceListController {
 
                 this.gridApi = gridApi;
 
-                gridApi.selection.on.rowSelectionChanged($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-
-                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+                gridApi.selection.on.rowSelectionChanged($scope, selectInstance);
+                gridApi.selection.on.rowSelectionChangedBatch($scope, selectInstance);
 
                 if (!_.isUndefined(gridApi.treeBase)) {
                     gridApi.treeBase.on.rowCollapsed($scope, saveGroupStates);
@@ -149,8 +147,24 @@ class InstanceListController {
                                 }
                             });
                         }
-
                         this._synchronizing = false;
+                    }
+
+                    if (!_.isEmpty(this.selectedInstances)) {
+                        this.selectedInstances = _.chain(this.selectedInstances)
+                            .map((x) => {
+                                const row = _.find(gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', x.metadata.uid));
+
+                                if (!_.isUndefined(row)) {
+                                    if (!row.isSelected) {
+                                        row.setSelected(true);
+                                    }
+
+                                    return _.get(row, 'entity');
+                                }
+                            })
+                            .compact()
+                            .value();
                     }
 
                     return renderableRows;

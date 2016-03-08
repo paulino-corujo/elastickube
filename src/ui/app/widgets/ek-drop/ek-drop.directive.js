@@ -13,6 +13,7 @@ class DropDirective extends Directive {
 
         this.bindToController = {
             openOn: '@?',
+            targetPosition: '@',
             position: '@',
             remove: '@?'
         };
@@ -29,10 +30,10 @@ class DropDirective extends Directive {
                     constraintToWindow: true,
                     constrainToScrollParent: true,
                     openOn: $scope.ctrl.openOn || 'click',
-                    position: $scope.ctrl.position || 'bottom left',
+                    position: $scope.ctrl.targetPosition || 'bottom left',
                     remove: $scope.ctrl.remove === 'true',
                     tetherOptions: {
-                        attachment: 'top right'
+                        attachment: $scope.ctrl.position || 'top right'
                     }
                 });
 

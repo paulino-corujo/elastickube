@@ -1,0 +1,30 @@
+@import "../../colors";
+
+.ek-instance-bulk-actions {
+
+    .drop-enabled {
+        .ek-instance-bulk-actions__button {
+            border: 1px solid @grey450;
+        }
+    }
+
+    &__button {
+        & {
+            padding: 0 0 0 10px;
+            height: 30px;
+            line-height: 30px;
+            background-color: @grey100;
+            border: 1px solid @grey400;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        &:hover {
+            border: 1px solid @grey450;
+        }
+    }
+
+    &__content {
+        width: 180px;
+    }
+}

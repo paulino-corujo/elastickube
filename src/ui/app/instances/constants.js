@@ -1,4 +1,5 @@
 import IC_ADD_CIRCLE_OUTLINE_48PX from 'material-design-icons/content/svg/production/ic_add_circle_outline_48px.svg';
+import IC_ARROW_DROP_DOWN_48PX from 'material-design-icons/navigation/svg/production/ic_arrow_drop_down_48px.svg';
 import IC_CREATE_48PX from 'material-design-icons/content/svg/production/ic_create_48px.svg';
 import IC_ERROR_OUTLINE_48PX from 'material-design-icons/alert/svg/production/ic_error_outline_48px.svg';
 import IC_HIGHLIGHT_OFF_48PX from 'material-design-icons/action/svg/production/ic_highlight_off_48px.svg';
@@ -12,6 +13,7 @@ import IC_VIEW_MODULE_48PX from 'material-design-icons/action/svg/production/ic_
 const constants = {
     icons: {
         IC_ADD_CIRCLE_OUTLINE_48PX,
+        IC_ARROW_DROP_DOWN_48PX,
         IC_CREATE_48PX,
         IC_ERROR_OUTLINE_48PX,
         IC_HIGHLIGHT_OFF_48PX,

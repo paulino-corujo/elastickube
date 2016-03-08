@@ -1,0 +1,18 @@
+<ek-drop target-position="bottom left"
+         position="top left">
+
+    <ek-drop-target>
+        <button class="ek-instance-bulk-actions__button">
+            <div layout="row" layout-align="space-between center">
+                <span>Bulk actions</span>
+                <md-icon md-svg-src="{{:: icons.IC_ARROW_DROP_DOWN_48PX }}"></md-icon>
+            </div>
+        </button>
+    </ek-drop-target>
+
+    <ek-drop-content class="ek-instance-bulk-actions__content" layout="column" layout-align="start center">
+        <div ng-click="ctrl.delete()">Delete</div>
+    </ek-drop-content>
+
+</ek-drop>
+
