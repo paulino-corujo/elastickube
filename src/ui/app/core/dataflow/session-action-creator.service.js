@@ -21,11 +21,11 @@ class SessionActionCreatorService {
     selectNamespace(namespace) {
         const oldNamespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
 
-        this._dispatcher.dispatch({ type: this._actions.NAMESPACE_CHANGE, namespace });
+        this._dispatcher.dispatch({ type: this._actions.SESSION_NAMESPACE_CHANGE, namespace });
 
         return this._session.setItem(constants.ACTIVE_NAMESPACE, namespace.metadata.uid)
             .then(() => {
-                this._dispatcher.dispatch({ type: this._actions.NAMESPACE_CHANGED, namespace });
+                this._dispatcher.dispatch({ type: this._actions.SESSION_NAMESPACE_CHANGED, namespace });
 
                 if (!_.isUndefined(oldNamespaceUID)) {
                     const oldNamespace = this._namespacesStore.get(oldNamespaceUID);
@@ -48,6 +48,31 @@ class SessionActionCreatorService {
                 return this._instancesAPI.subscribe({ namespace: namespace.metadata.name })
                     .then((x) => this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBED, namespace, instances: x }));
             });
+    }
+
+    saveCollapsedInstancesState(namespaceExpandedInstances) {
+        const namespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
+        const namespace = this._namespacesStore.get(namespaceUID);
+
+        this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGE, namespace, namespaceExpandedInstances });
+
+        const expandedInstances = this._session.getItem(constants.EXPANDED_INSTANCES) || {};
+
+        expandedInstances[namespaceUID] = namespaceExpandedInstances;
+
+        return this._session.setItem(constants.EXPANDED_INSTANCES, expandedInstances)
+            .then(() => this._dispatcher.dispatch({
+                namespace,
+                expandedInstances: namespaceExpandedInstances,
+                type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGED
+            }));
+    }
+
+    saveCollapsedAdminInstancesState(collapsedInstances) {
+        this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_ADMIN_INSTANCES_CHANGE, collapsedInstances });
+
+        return this._session.setItem(constants.EXPANDED_ADMIN_INSTANCES, collapsedInstances)
+            .then(() => this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_ADMIN_INSTANCES_CHANGED, collapsedInstances }));
     }
 
     destroy() {

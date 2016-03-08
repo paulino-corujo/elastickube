@@ -56,6 +56,9 @@
     "deleted": {
       "type": "string"
     },
+    "hostname": {
+      "type": "string"
+    },
     "mail": {
       "type": "object",
       "required": [
@@ -95,9 +98,6 @@
           "default": false
         }
       }
-    },
-    "hostname": {
-      "type": "string"
     },
     "metadata": {
       "type": "object",

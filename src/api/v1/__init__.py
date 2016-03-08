@@ -1,15 +1,13 @@
-import datetime
 import logging
 import json
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import jwt
 from bson.json_util import dumps
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine
 from tornado.ioloop import IOLoop
-from tornado.web import HTTPError
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from api.v1.sync import SyncNamespaces
@@ -63,26 +61,28 @@ class SecureWebSocketHandler(WebSocketHandler):
                 encoded_token = self.get_cookie(ELASTICKUBE_TOKEN_HEADER)
 
             if encoded_token is None:
-                raise HTTPError(401, "Invalid token.")
+                self.write_message({"error": {"message": "Invalid token."}})
+                self.close()
+            else:
+                token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
+                self.user = self.settings["database"].Users.find_one({"username": token["username"]})
 
-            token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
-            self.user = self.settings["database"].Users.find_one({"username": token["username"]})
+                if self.user is None:
+                    logging.debug("User not found.")
+                    self.write_message({"error": {"message": "Invalid token."}})
+                    self.close()
 
-            if self.user is None:
-                logging.debug("User not found.")
-                raise HTTPError(401, "Invalid token.")
-
-        except jwt.DecodeError as e:
-            logging.exception(e)
-            logging.debug("The token could not decoded.")
-            raise HTTPError(401, "Invalid token.")
+        except jwt.DecodeError as jwt_error:
+            logging.exception(jwt_error)
+            self.write_message({"error": {"message": "Invalid token."}})
+            self.close()
 
     def on_message(self, message):
         pass
 
-    def write_message(self, message):
+    def write_message(self, message, binary=False):
         serialized = dumps(message)
-        super(SecureWebSocketHandler, self).write_message(serialized)
+        super(SecureWebSocketHandler, self).write_message(serialized, binary=binary)
 
     @coroutine
     def send_ping(self):
@@ -122,7 +122,7 @@ def get_icon_template(icon_template_file):
 
     return {
         "template": template,
-        "last_modified": datetime.datetime.utcfromtimestamp(timestamp)
+        "last_modified": datetime.utcfromtimestamp(timestamp)
     }
 
 

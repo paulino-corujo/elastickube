@@ -13,7 +13,6 @@ class AbstractStore extends EventEmitter {
     }
 
     destroy() {
-        throw new Error('This method should be overriden');
     }
 }
 

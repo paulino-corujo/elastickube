@@ -14,14 +14,17 @@ class ConfirmDirective extends Directive {
     compile(tElement) {
         tElement.addClass('ek-confirm');
 
-        return ($scope, $element, attrs, ctrl) => {
-            if (ctrl.options.template) {
-                const compiledElement = this._$compile(
-                    `<md-dialog-content class="ek-confirm__dialog__content">
+        return {
+            pre: ($scope, $element, attrs, ctrl) => {
+                if (ctrl.options.template) {
+                    const element = angular.element(`<md-dialog-content class="ek-confirm__dialog__content">
                         ${ctrl.options.template}
-                    </md-dialog-content>`)($scope);
+                    </md-dialog-content>`);
 
-                $element.find('.ek-confirm__dialog').append(compiledElement);
+                    $element.find('.ek-confirm__dialog').append(element);
+
+                    this._$compile(element)($scope);
+                }
             }
         };
     }

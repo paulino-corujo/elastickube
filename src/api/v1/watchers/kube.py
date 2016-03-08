@@ -1,105 +1,106 @@
+import copy
 import logging
 
 from tornado.gen import coroutine, Return
 
 from api.kube.exceptions import WatchDisconnectedException
 
-ACTIONS_METADATA = {
-    "instances": {
-        "required_params": [],
-        "resources": {
-            "pods": {
-                "type": "PodList",
-                "arguments": ["namespace"],
-                "selector": None
-            },
-            "replicationcontrollers": {
-                "type": "ReplicationControllerList",
-                "arguments": ["namespace"],
-                "selector": None
-            },
-            "services": {
-                "type": "ServiceList",
-                "arguments": ["namespace"],
-                "selector": None
-            }
-        }
-    },
-    "instance": {
-        "required_params": ["namespace", "kind", "name"],
-        "Pod": {
+
+class KubeWatcher(object):
+
+    ACTIONS_METADATA = {
+        "instances": {
+            "required_params": [],
             "resources": {
                 "pods": {
-                    "type": "Pod",
-                    "arguments": ["namespace", "name"],
+                    "type": "PodList",
+                    "arguments": ["namespace"],
                     "selector": None
                 },
-                "events": {
-                    "type": "EventList",
-                    "arguments": ["namespace"],
-                    "selector": {
-                        "fieldSelector": {
-                            "involvedObject.name": "%(name)s",
-                            "involvedObject.namespace": "%(namespace)s",
-                            "involvedObject.uid": "%(uid)s"
-                        }
-
-                    }
-                }
-            }
-        },
-        "ReplicationController": {
-            "resources": {
                 "replicationcontrollers": {
-                    "type": "ReplicationController",
-                    "arguments": ["namespace", "name"],
+                    "type": "ReplicationControllerList",
+                    "arguments": ["namespace"],
                     "selector": None
                 },
-                "events": {
-                    "type": "EventList",
+                "services": {
+                    "type": "ServiceList",
                     "arguments": ["namespace"],
-                    "selector": {
-                        "fieldSelector": {
-                            "involvedObject.name": "%(name)s",
-                            "involvedObject.kind": "%(kind)s",
-                            "involvedObject.namespace": "%(namespace)s",
-                            "involvedObject.uid": "%(uid)s"
-                        }
-                    }
+                    "selector": None
                 }
             }
         },
-        "Service": {
-            "resources": {
-                "services": {
-                    "type": "Service",
-                    "arguments": ["namespace", "name"],
-                    "selector": None
-                },
-                "endpoints": {
-                    "type": "Endpoints",
-                    "arguments": ["namespace", "name"],
-                    "selector": None
-                },
-                "events": {
-                    "type": "EventList",
-                    "arguments": ["namespace"],
-                    "selector": {
-                        "fieldSelector": {
-                            "involvedObject.name": "%(name)s",
-                            "involvedObject.kind": "%(kind)s",
-                            "involvedObject.namespace": "%(namespace)s",
-                            "involvedObject.uid": "%(uid)s"
+        "instance": {
+            "required_params": ["namespace", "kind", "name"],
+            "Pod": {
+                "resources": {
+                    "pods": {
+                        "type": "Pod",
+                        "arguments": ["namespace", "name"],
+                        "selector": None
+                    },
+                    "events": {
+                        "type": "EventList",
+                        "arguments": ["namespace"],
+                        "selector": {
+                            "fieldSelector": {
+                                "involvedObject.name": "%(name)s",
+                                "involvedObject.namespace": "%(namespace)s",
+                                "involvedObject.uid": "%(uid)s"
+
+                            }
+                        }
+                    }
+                }
+            },
+            "ReplicationController": {
+                "resources": {
+                    "replicationcontrollers": {
+                        "type": "ReplicationController",
+                        "arguments": ["namespace", "name"],
+                        "selector": None
+                    },
+                    "events": {
+                        "type": "EventList",
+                        "arguments": ["namespace"],
+                        "selector": {
+                            "fieldSelector": {
+                                "involvedObject.name": "%(name)s",
+                                "involvedObject.kind": "%(kind)s",
+                                "involvedObject.namespace": "%(namespace)s",
+                                "involvedObject.uid": "%(uid)s"
+                            }
+                        }
+                    }
+                }
+            },
+            "Service": {
+                "resources": {
+                    "services": {
+                        "type": "Service",
+                        "arguments": ["namespace", "name"],
+                        "selector": None
+                    },
+                    "endpoints": {
+                        "type": "Endpoints",
+                        "arguments": ["namespace", "name"],
+                        "selector": None
+                    },
+                    "events": {
+                        "type": "EventList",
+                        "arguments": ["namespace"],
+                        "selector": {
+                            "fieldSelector": {
+                                "involvedObject.name": "%(name)s",
+                                "involvedObject.kind": "%(kind)s",
+                                "involvedObject.namespace": "%(namespace)s",
+                                "involvedObject.uid": "%(uid)s"
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
-
-
-class KubeWatcher(object):
 
     def __init__(self, message, settings, callback):
         logging.info("Initializing KubeWatcher")
@@ -139,7 +140,7 @@ class KubeWatcher(object):
                             self.watchers[watcher_key]["watcher"].add_done_callback(done_callback)
                             logging.debug("Reconnected watcher for %s", watcher_key)
 
-        logging.info("Starting watch KubeWatcher for action %s", self.message["action"])
+        logging.info("Starting watch KubeWatcher for action %s with params %s", self.message["action"], self.params)
         yield self.initialize_data()
 
         self.connected = True
@@ -203,9 +204,11 @@ class KubeWatcher(object):
         items = []
 
         for resource, resource_metadata in self.resources_config.iteritems():
-            result = yield self.settings["kube"][resource].filter(self.get_selector(
-                resource_metadata["selector"])).get(
-                    **self.get_params(resource_metadata["arguments"]))
+            select = self.get_selector(
+                resource_metadata["selector"])
+
+            result = yield self.settings["kube"][resource].filter(select).get(
+                **self.get_params(resource_metadata["arguments"]))
 
             self.watchers[result['kind']] = dict(resourceVersion=result['metadata']['resourceVersion'])
 
@@ -213,6 +216,9 @@ class KubeWatcher(object):
             if "items" in result:
                 for item in result.get("items", []):
                     item["kind"] = result["kind"].replace("List", "")
+                    if item["kind"] == "Event":
+                        logging.debug(item["message"])
+
                     documents.append(item)
             else:
                 self.params["uid"] = result["metadata"]["uid"]
@@ -229,16 +235,17 @@ class KubeWatcher(object):
         ))
 
     def unwatch(self):
-        logging.info("Stopping watch %s for namespace %s", self.message["action"], self.params["namespace"])
+        logging.info("Stopping watch %s with params %s", self.message["action"], self.params)
         for watcher in self.watchers.values():
-            if 'watcher' in watcher:
-                watcher['watcher'].cancel()
+            if "watcher" in watcher:
+                watcher["watcher"].cancel()
 
         self.watchers = dict()
         self.connected = False
+        self.params = dict(namespace=None, name=None)
 
     def validate_message(self):
-        for required_param in ACTIONS_METADATA[self.message["action"]]["required_params"]:
+        for required_param in self.ACTIONS_METADATA[self.message["action"]]["required_params"]:
             if required_param not in self.message["body"]:
                 self.callback(dict(
                     action=self.message["action"],
@@ -253,9 +260,10 @@ class KubeWatcher(object):
                 self.params[required_param] = self.message["body"][required_param]
 
         if "kind" in self.params:
-            self.resources_config = ACTIONS_METADATA[self.message["action"]][self.params["kind"]]["resources"]
+            self.resources_config = copy.deepcopy(
+                self.ACTIONS_METADATA[self.message["action"]][self.params["kind"]]["resources"])
         else:
-            self.resources_config = ACTIONS_METADATA[self.message["action"]]["resources"]
+            self.resources_config = copy.deepcopy(self.ACTIONS_METADATA[self.message["action"]]["resources"])
 
     def get_params(self, arguments):
         params = dict()

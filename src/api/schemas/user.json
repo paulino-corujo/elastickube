@@ -39,6 +39,9 @@
       "type": "string",
       "maxLength": 256
     },
+    "invite_token": {
+      "type": "string"
+    },
     "last_login": {
       "type": "string",
       "maxLength": 2048
@@ -82,9 +85,6 @@
         "administrator",
         "user"
       ]
-    },
-    "invite_token": {
-      "type": "string"
     },
     "schema": {
       "type": "string",

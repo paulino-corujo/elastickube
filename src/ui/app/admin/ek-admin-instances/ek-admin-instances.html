@@ -1,14 +1,10 @@
 <div layout="column">
     <div class="ek-admin-instances__header" layout="row" layout-align="space-between center">
         <div layout="row" layout-align="start center">
-            <md-select class="ek-select-button"
-                       ng-model="ctrl.bulkActions"
-                       ng-if="ctrl.hasRowsSelected"
-                       aria-label="bulk actions">
-                <md-option>Bulk Actions</md-option>
-            </md-select>
+            <ek-instance-bulk-actions ng-if="ctrl.selectedInstances.length > 0"
+                                      instances="ctrl.selectedInstances"></ek-instance-bulk-actions>
 
-            <div class="separator" ng-if="ctrl.hasRowsSelected"></div>
+            <div class="separator" ng-if="ctrl.selectedInstances.length > 0"></div>
 
             <ek-search-filter class="ek-admin-instances__search"
                               collection-to-be-filtered="ctrl.instances"

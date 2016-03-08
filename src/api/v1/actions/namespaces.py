@@ -7,14 +7,15 @@ from data.query import Query
 
 class NamespacesActions(object):
 
-    def __init__(self, settings):
+    def __init__(self, settings, user):
         logging.info("Initializing NamespacesActions")
+
         self.kube = settings['kube']
         self.database = settings["database"]
+        self.user = user
 
-    @staticmethod
-    def check_permissions(user, operation):
-        logging.debug("Checking permissions for user %s and operation %s on namespaces", user["username"], operation)
+    def check_permissions(self, operation, _document):
+        logging.debug("check_permissions for user %s and operation %s on namespaces", self.user["username"], operation)
         return True
 
     @coroutine
@@ -30,8 +31,7 @@ class NamespacesActions(object):
                 ]
             }
         }
-
-        response = self.kube.namespaces.post(body)
+        response = yield self.kube.namespaces.post(body)
         raise Return(response)
 
     @coroutine

@@ -1,8 +1,44 @@
 import rowTemplate from './ek-instance-list-row.template.html';
 
 class InstanceListController {
-    constructor($scope) {
+    constructor($scope, instancesStore, sessionActionCreator, sessionStore) {
         'ngInject';
+
+        const onCollapsedChange = () => {
+            if (!_.isUndefined(this.gridApi.treeBase)) {
+                this._synchronizing = true;
+
+                _.without(this._expandedInstances, sessionStore.getExpandedInstances()).forEach((x) => {
+                    const instance = instancesStore.get(x);
+
+                    if (!_.isUndefined(instance)) {
+                        const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+
+                        if (!_.isUndefined(row)) {
+                            this.gridApi.treeBase.collapseRow(row);
+                        }
+                    }
+                });
+
+                _.without(sessionStore.getExpandedInstances(), this._expandedInstances).forEach((x) => {
+                    const instance = instancesStore.get(x);
+
+                    if (!_.isUndefined(instance)) {
+                        const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
+
+                        if (!_.isUndefined(row)) {
+                            this.gridApi.treeBase.expandRow(row);
+                        }
+                    }
+                });
+
+                this._expandedInstances = sessionStore.getExpandedInstances();
+                this._synchronizing = false;
+            }
+        };
+
+        this._synchronizing = false;
+        this._expandedInstances = sessionStore.getExpandedInstances();
 
         this.groupedInstances = [];
 
@@ -71,20 +107,79 @@ class InstanceListController {
                 }
             ],
             onRegisterApi: (gridApi) => {
+                const selectInstance = () => this.selectedInstances = gridApi.selection.getSelectedRows();
+                const saveGroupStates = () => {
+                    if (!this._synchronizing) {
+                        sessionActionCreator.saveCollapsedInstancesState(_.chain(this.gridApi.grid.rows)
+                            .filter(_.matchesProperty('treeNode.state', 'expanded'))
+                            .map((x) => _.get(x, 'entity.metadata.uid'))
+                            .value());
+                    }
+                };
+
                 this.gridApi = gridApi;
 
-                gridApi.selection.on.rowSelectionChanged($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+                gridApi.selection.on.rowSelectionChanged($scope, selectInstance);
+                gridApi.selection.on.rowSelectionChangedBatch($scope, selectInstance);
 
-                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
+                if (!_.isUndefined(gridApi.treeBase)) {
+                    gridApi.treeBase.on.rowCollapsed($scope, saveGroupStates);
+                    gridApi.treeBase.on.rowExpanded($scope, saveGroupStates);
+                }
+
+                gridApi.grid.registerRowsProcessor((renderableRows) => {
+                    if (!_.isUndefined(this.gridApi.treeBase)) {
+                        this._synchronizing = true;
+
+                        if (_.isUndefined(this._expandedInstances)) {
+                            this.gridApi.treeBase.expandAllRows();
+                        } else {
+                            this._expandedInstances.forEach((x) => {
+                                const instance = instancesStore.get(x);
+
+                                if (!_.isUndefined(instance)) {
+                                    const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid',
+                                        instance.metadata.uid));
+
+                                    if (!_.isUndefined(row)) {
+                                        this.gridApi.treeBase.expandRow(row);
+                                    }
+                                }
+                            });
+                        }
+                        this._synchronizing = false;
+                    }
+
+                    if (!_.isEmpty(this.selectedInstances)) {
+                        this.selectedInstances = _.chain(this.selectedInstances)
+                            .map((x) => {
+                                const row = _.find(gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', x.metadata.uid));
+
+                                if (!_.isUndefined(row)) {
+                                    if (!row.isSelected) {
+                                        row.setSelected(true);
+                                    }
+
+                                    return _.get(row, 'entity');
+                                }
+                            })
+                            .compact()
+                            .value();
+                    }
+
+                    return renderableRows;
+                });
             }
         };
+
+        sessionStore.addExpandedInstancesChangeListener(onCollapsedChange);
 
         $scope.$watchCollection('ctrl.instances', (instances) => {
             this.groupedInstances = this.groupInstances(instances);
             this.containsGroups = _.find(this.groupedInstances, (x) => x.$$treeLevel === 1);
         });
+
+        $scope.$on('$destroy', () => sessionStore.removeExpandedInstancesChangeListener(onCollapsedChange));
     }
 
     groupInstances(instances) {
@@ -107,7 +202,11 @@ class InstanceListController {
                     .map((x) => {
                         const item = angular.copy(x);
 
-                        item.$$treeLevel = _.has(item, key) && !_.isUndefined(parent) ? 1 : 0;
+                        if (_.size(items) > 1 && !_.isUndefined(parent)) {
+                            item.$$treeLevel = _.has(item, key) ? 1 : 0;
+                        } else {
+                            item.$$treeLevel = 0;
+                        }
 
                         return item;
                     })

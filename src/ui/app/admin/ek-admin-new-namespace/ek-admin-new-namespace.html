@@ -1,0 +1,24 @@
+<div class="ek-admin-new-namespace__content" ng-form="ctrl.form">
+    <h2 class="ek-admin-new-namespace__content__title">Create Namespace</h2>
+
+    <div class="ek-admin-new-namespace__content__body" layout="column" layout-align="center start">
+        <h3>Name</h3>
+        <input type="text" class="ek-admin-new-namespace__content__body__input ek-input"
+               placeholder="Enter " ng-model="ctrl.namespaceName" required>
+
+        <ek-select-users placeholder="Add users to namespace..." selected-users="ctrl.users"></ek-select-users>
+        <div class="ek-admin-new-namespace__content__body__users" layout="column"
+             ng-if="ctrl.users.length > 0">
+            <div class="ek-admin-new-namespace__content__body__users__user"
+                 layout="row" layout-align="space-between center"
+                 ng-repeat="user in ctrl.users track by user.username">
+                <ek-user-info username="user.username"
+                              show-username="true"></ek-user-info>
+                <md-icon class="ek-admin-new-namespace__content__body__users__user__clear"
+                         ng-click="ctrl.removeUser(user)"
+                         md-svg-src="{{:: icons.IC_CLEAR_48PX }}"></md-icon>
+            </div>
+        </div>
+
+    </div>
+</div>
