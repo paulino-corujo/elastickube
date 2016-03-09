@@ -1,0 +1,32 @@
+@import "../../colors";
+
+.ek-ink-ripple {
+    position: relative;
+
+    &__container {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+
+        &__ripple {
+            & {
+                position: absolute;
+                display: block;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                opacity: 0.4;
+                background-color: @white;
+                transform: translate(-50%, -50%);
+                transition: width 400ms linear, height 400ms linear, opacity 200ms linear;
+            }
+
+            &--dark {
+                background-color: @grey500;
+            }
+        }
+    }
+}

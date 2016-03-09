@@ -1,5 +1,4 @@
 class InstanceActionsController {
-
     constructor($q, $scope, confirmDialog, instancesActionCreator) {
         'ngInject';
 
