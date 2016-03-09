@@ -1,4 +1,5 @@
-<div class="ek-instance-state-selector__state"
+<div ek-ink-ripple="dark"
+     class="ek-instance-state-selector__state"
      ng-repeat="state in ctrl.states track by $index"
      ng-class="{'ek-instance-state-selector__state--selected': ctrl.selectedState === state }"
      ng-click="ctrl.selectState(state)"

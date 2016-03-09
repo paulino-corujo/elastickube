@@ -13,6 +13,7 @@ import DropContentDirective from './ek-drop/ek-drop-content.directive.js';
 import DropTargetDirective from './ek-drop/ek-drop-target.directive.js';
 import HeaderDirective from './ek-header/ek-header.directive';
 import IkonDirective from './ek-ikon/ek-ikon.directive';
+import InkRippleDirective from './ek-ink-ripple/ek-ink-ripple.directive';
 import InsertEmailsDirective from './ek-insert-emails/ek-insert-emails.directive';
 import InsertLabelsDirective from './ek-insert-labels/ek-insert-labels.directive';
 import InstanceNameDirective from './ek-instance-name/ek-instance-name.directive';
@@ -46,6 +47,11 @@ angular
     .directive('ekDonutChart', () => new DonutChartDirective())
     .directive('ekHeader', () => new HeaderDirective())
     .directive('ekIkon', () => new IkonDirective())
+    .directive('ekInkRipple', ($timeout) => {
+        'ngInject';
+
+        return new InkRippleDirective($timeout);
+    })
     .directive('ekInsertEmails', () => new InsertEmailsDirective())
     .directive('ekInsertLabels', () => new InsertLabelsDirective())
     .directive('ekLabels', () => new LabelsDirective())
