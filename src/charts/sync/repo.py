@@ -4,40 +4,59 @@ import logging
 import os
 
 from git.repo import Repo
-from git.exc import InvalidGitRepositoryError
 from tornado.gen import coroutine, Return, sleep
 from yaml import load, load_all
 
+
+from data import DEFAULT_GITREPO
 from data.query import Query
+from data.watch import add_callback
 
 REPO_DIRECTORY = '/var/elastickube/charts'
 
 
 class GitSync(object):
 
-    def __init__(self, settings):
-        logging.info("Initializing GitSync for '%s'", settings["charts"]["repo_url"])
+    def __init__(self, database):
+        logging.info("Initializing GitSync.")
 
-        self.database = settings["database"]
+        self.database = database
+        self.repo = Repo(REPO_DIRECTORY)
         self.charts = dict()
+        self.url = DEFAULT_GITREPO
 
-        try:
-            self.repo = Repo(REPO_DIRECTORY)
-        except InvalidGitRepositoryError:
-            logging.info("Cloning repository in %s", REPO_DIRECTORY)
-            self.repo = Repo.clone_from(settings["charts"]["repo_url"], REPO_DIRECTORY)
+    @coroutine
+    def update_repo(self, document):
+        if document['o']["charts"]["repo_url"] != self.url:
+            logging.info("Repo url updated to '%s'.", document['o']["charts"]["repo_url"])
+            self.url = document['o']["charts"]["repo_url"]
 
     @coroutine
     def sync_loop(self):
-        yield self.sync()
+        logging.info("Initializing sync loop.")
+        yield add_callback("Settings", self.update_repo)
+
+        settings = yield Query(self.database, "Settings").find_one() or dict()
+        if settings["charts"]:
+            self.url = settings["charts"]["repo_url"]
+
+        synced_head = None
 
         while True:
-            synced_head = self.repo.head
             try:
-                self.repo.remotes.origin.pull()
+                if self.url != self.repo.remotes.origin.url:
+                    logging.info("Changing reference from '%s' to '%s'.", self.repo.remotes.origin.url, self.url)
+                    self.repo.delete_remote('origin')
+                    self.repo.create_remote('origin', url=self.url)
+                    synced_head = None
 
-                if synced_head != self.repo.head:
+                self.repo.git.fetch('--all')
+                self.repo.git.reset('--hard', 'origin/master')
+
+                if synced_head != self.repo.head.ref.commit:
                     yield self.sync()
+                    synced_head = self.repo.head.ref.commit
+
             except:
                 logging.exception("Failed to pull repository.")
 
@@ -45,7 +64,7 @@ class GitSync(object):
 
     @coroutine
     def sync(self):
-        logging.info("Syncing %s", REPO_DIRECTORY)
+        logging.info("Syncing '%s'.", REPO_DIRECTORY)
 
         charts = yield Query(self.database, "Charts").find()
         for chart in charts:
@@ -77,7 +96,10 @@ class GitSync(object):
         for path, discovered in discovered_charts.iteritems():
             if discovered and "_id" not in discovered:
                 logging.debug("Inserting new chart %(name)s", discovered)
-                yield Query(self.database, "Charts").insert(discovered)
+                try:
+                    yield Query(self.database, "Charts").insert(discovered)
+                except:
+                    logging.error("Failed to insert chart %(name)s", discovered)
 
         self.charts = discovered_charts
 
