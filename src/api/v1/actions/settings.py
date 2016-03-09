@@ -29,9 +29,10 @@ class SettingsActions(object):
         self.database = settings['database']
         self.user = user
 
+    @coroutine
     def check_permissions(self, operation, _document):
         logging.debug("check_permissions for user %s and operation %s on settings", self.user["username"], operation)
-        return self.user['role'] == 'administrator'
+        raise Return(self.user['role'] == 'administrator')
 
     @coroutine
     def update(self, document):

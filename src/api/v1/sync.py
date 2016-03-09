@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 import logging
-import time
 
 from tornado.gen import coroutine
 
@@ -31,6 +30,30 @@ class SyncNamespaces(object):
         self.settings = settings
         self.resource_version = None
 
+    def _convert_namespace(self, kube_namespace):
+        labels = dict()
+        if "labels" in kube_namespace["metadata"]:
+            labels = kube_namespace["metadata"]["labels"]
+
+        return dict(
+            _id=kube_namespace["metadata"]["uid"],
+            name=kube_namespace["metadata"]["name"],
+            metadata=dict(
+                name=kube_namespace["metadata"]["name"],
+                labels=labels,
+                uid=kube_namespace["metadata"]["uid"]
+            )
+        )
+
+    @coroutine
+    def _update_namespace(self, namespace):
+        update = {
+            "metadata.name": namespace["metadata"]["name"],
+            "metadata.labels": namespace["metadata"]["labels"]
+        }
+
+        yield Query(self.settings["database"], "Namespaces").update_fields({"_id": namespace["_id"]}, update)
+
     @coroutine
     def start_sync(self):
         @coroutine
@@ -39,24 +62,15 @@ class SyncNamespaces(object):
 
             self.resource_version = data["object"]["metadata"]["resourceVersion"]
 
+            converted_namespace = self._convert_namespace(data["object"])
             if data["type"] == "ADDED":
-                yield Query(self.settings["database"], "Namespaces").insert(dict(
-                    _id=data["object"]["metadata"]["uid"],
-                    metadata=dict(
-                        name=data["object"]["metadata"]["name"],
-                        labels=data["object"]["metadata"]["labels"]
-                    )
-                ))
+                yield Query(self.settings["database"], "Namespaces").insert(converted_namespace)
 
             elif data["type"] == "DELETED":
-                yield Query(self.settings["database"], "Namespaces").update_fields(
-                    {"_id": data["object"]["metadata"]["uid"]},
-                    {"metadata.deletionTimestamp": time.time()})
+                yield Query(self.settings["database"], "Namespaces").remove(converted_namespace)
 
             else:
-                yield Query(self.settings["database"], "Namespaces").update_fields(
-                    {"_id": data["object"]["metadata"]["uid"]},
-                    {"metadata.labels": data["object"]["metadata"]["labels"]})
+                yield self._update_namespace(converted_namespace)
 
         def done_callback(future):
             logging.warn("Disconnected from kubeclient in SyncNamespaces")
@@ -73,10 +87,16 @@ class SyncNamespaces(object):
 
         self.resource_version = None
         try:
+            existing_namespaces = yield Query(self.settings["database"], "Namespaces").find(projection=["_id"])
+            namespace_ids = [namespace["_id"] for namespace in existing_namespaces]
+
             result = yield self.settings["kube"].namespaces.get()
             for item in result.get("items", []):
-                item["_id"] = item["metadata"]["uid"]
-                self.settings["database"].Namespaces.save(item)
+                namespace = self._convert_namespace(item)
+                if namespace["_id"] in namespace_ids:
+                    yield self._update_namespace(namespace)
+                else:
+                    yield Query(self.settings["database"], "Namespaces").insert(namespace)
 
             self.resource_version = result["metadata"]["resourceVersion"]
             watcher = self.settings["kube"].namespaces.watch(

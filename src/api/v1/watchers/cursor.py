@@ -18,37 +18,43 @@ import logging
 
 from tornado.gen import coroutine, Return
 
+from api.v1.watchers import filter_namespaces
 from data.query import Query
 from data.watch import add_callback, remove_callback
 
 ACTIONS_METADATA = {
     "users": {
         "collection": "Users",
-        "projection": {"password": 0}
+        "projection": {"password": 0},
+        "filter_data": None
     },
     "namespaces": {
         "collection": "Namespaces",
-        "projection": None
+        "projection": None,
+        "filter_data": filter_namespaces
     },
     "settings": {
         "collection": "Settings",
-        "projection": None
+        "projection": None,
+        "filter_data": None
     },
     "charts": {
         "collection": "Charts",
-        "projection": None
+        "projection": None,
+        "filter_data": None
     }
 }
 
 
 class CursorWatcher(object):
 
-    def __init__(self, message, settings, callback):
+    def __init__(self, message, settings, user, callback):
         logging.info("Initializing CursorWatcher")
 
         self.callback = callback
         self.message = message
         self.settings = settings
+        self.user = user
 
         self.validate_message()
 
@@ -60,6 +66,7 @@ class CursorWatcher(object):
         data = yield Query(self.settings["database"], ACTIONS_METADATA[action]["collection"]).find(
             projection=ACTIONS_METADATA[action]["projection"])
 
+        data = self.filter_data(data)
         self.callback(dict(
             action=self.message["action"],
             operation="watched",
@@ -86,11 +93,12 @@ class CursorWatcher(object):
                 if key in document["o"]:
                     del document["o"][key]
 
+        data = self.filter_data(document["o"])
         self.callback(dict(
             action=self.message["action"],
             operation=operation,
             status_code=200,
-            body=document["o"]
+            body=data
         ))
 
         raise Return()
@@ -98,6 +106,17 @@ class CursorWatcher(object):
     def unwatch(self):
         logging.info("Stopping watch for collection %s", ACTIONS_METADATA[self.message["action"]]["collection"])
         remove_callback(ACTIONS_METADATA[self.message["action"]]["collection"], self.data_callback)
+
+    def filter_data(self, data):
+        if ACTIONS_METADATA[self.message["action"]]["filter_data"]:
+            return ACTIONS_METADATA[self.message["action"]]["filter_data"](data, self.user)
+        else:
+            return data
+
+    @coroutine
+    def check_permissions(self, operation, _document):
+        logging.debug("check_permissions for user %s and operation %s on db watch", self.user["username"], operation)
+        raise Return(True)
 
     def validate_message(self):
         if self.message["action"] not in ACTIONS_METADATA.keys():

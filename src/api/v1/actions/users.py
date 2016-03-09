@@ -31,21 +31,22 @@ class UsersActions(object):
         self.database = settings['database']
         self.user = user
 
+    @coroutine
     def check_permissions(self, operation, document):
         logging.debug("check_permissions for user %s and operation %s on users", self.user["username"], operation)
         if operation in ["create", "delete"] and self.user["role"] != "administrator":
-            return False
+            raise Return(False)
 
         if operation == "update" and str(self.user["_id"]) != document["_id"] and self.user["role"] != "administrator":
-            return False
+            raise Return(False)
 
         if (operation == "update" and
                 self.user["_id"] == document["_id"] and
                 self.user["role"] == "user" and
                 self.user["role"] != document["role"]):
-            return False
+            raise Return(False)
 
-        return True
+        raise Return(True)
 
     @coroutine
     def update(self, document):

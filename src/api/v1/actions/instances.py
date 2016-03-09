@@ -31,9 +31,15 @@ class InstancesActions(object):
         self.database = settings["database"]
         self.user = user
 
-    def check_permissions(self, operation, _document):
+    @coroutine
+    def check_permissions(self, operation, document):
         logging.debug("check_permissions for user %s and operation %s on instances", self.user["username"], operation)
-        return True
+        if self.user["role"] != "administrator":
+            namespace = yield Query(self.database, "Namespaces").find_one({"name": document["namespace"]})
+            if self.user["username"] not in namespace["members"]:
+                raise Return(False)
+
+        raise Return(True)
 
     @coroutine
     def create(self, document):
