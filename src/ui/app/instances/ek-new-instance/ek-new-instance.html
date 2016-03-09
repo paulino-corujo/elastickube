@@ -8,10 +8,9 @@
     </div>
 
     <div transclude-to="body">
-        <div layout="row" layout-align="center">
+        <div class="ek-new-instance__body" layout="row" layout-align="center">
             <div layout="row">
-
-                <div layout="column" layout-align="start center" class="ek-new-instance__container">
+                <div layout="column" layout-align="start center">
                     <ek-choose-chart step="ctrl.step" on-selection="ctrl.chartSelected()"></ek-choose-chart>
                     <ek-customize-deployment step="ctrl.step"></ek-customize-deployment>
                 </div>
