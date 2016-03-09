@@ -41,12 +41,19 @@
         }
 
         &__content {
-            margin-left: 5px;
+            width: 100%;
+            margin-left: 10px;
+            margin-right: 55px;
 
             &__title {
                 font-size: 16px;
                 font-weight: 500;
                 margin: 30px 30px 25px 0;
+            }
+
+            &__search {
+                width: 100%;
+                font-weight: normal;
             }
 
             &__charticon {
@@ -65,21 +72,21 @@
                 margin-right: 20px;
                 cursor: pointer;
             }
-            input {
-                font-weight: normal;
-            }
         }
     }
 
-    &__footer {
-        border-top: 1px solid @grey300;
-        height: 70px;
+    &__grid{
 
-        .md-button {
-            height: 30px;
-            min-height: 0;
-            margin: 20px 20px 0 0;
-            line-height: 29px;
+        &__select {
+            border-top: 1px solid @grey300;
+            height: 70px;
+
+            .md-button {
+                height: 30px;
+                min-height: 0;
+                margin: 20px 20px 0 0;
+                line-height: 29px;
+            }
         }
     }
 }
