@@ -2,16 +2,8 @@
 
 .ek-application-layout {
     display: block;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-
-    & > [layout] {
-        height: 100%;
-    }
 
     &__header {
-        display: flex;
         height: 60px;
         background-color: @indigo500;
 
@@ -27,7 +19,11 @@
         }
     }
 
-    &__body {
-        position: relative;
+    [transclude-id="header"] {
+        height: 60px;
+    }
+
+    [transclude-id="body"] {
+        height: 100%;
     }
 }
