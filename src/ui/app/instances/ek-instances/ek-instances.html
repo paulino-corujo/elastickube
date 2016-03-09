@@ -20,8 +20,8 @@
                                  filtered-instances="ctrl.instancesFilteredByOwnerAndStatus"></ek-instance-filters>
         </div>
 
-        <div class="ek-instances__body" transclude-to="body">
-            <div class="ek-instances__body__not-found-message"
+        <div class="ek-instances__body" transclude-to="body" fill-parent>
+            <div class="ek-instances__body__not-found-message" fill-parent
                  layout="column" layout-align="center center"
                  ng-if="ctrl.showEmpty">No instance found
             </div>

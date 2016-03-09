@@ -1,9 +1,6 @@
 @import "../../colors";
 
 .ek-charts {
-    position: absolute;
-    height: 100%;
-    width: 100%;
 
     &__search {
         width: 360px;
@@ -26,22 +23,8 @@
         margin: 20px 0 16px 20px;
     }
 
-    &__body {
-        display: block;
-        position: absolute;
-        height: 100%;
-        width: 100%;
-
-        &__not-found-message {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            background-color: @grey100;
-            color: @grey600;
-        }
-
-        md-content {
-            height: 100%;
-        }
+    &__not-found-message {
+        background-color: @grey100;
+        color: @grey600;
     }
 }

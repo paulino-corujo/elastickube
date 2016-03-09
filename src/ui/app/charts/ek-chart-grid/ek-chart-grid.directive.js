@@ -28,7 +28,7 @@ class ChartGridDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement.addClass('ek-chart-grid');
+        tElement.addClass('ek-chart-grid layout-column');
     }
 }
 

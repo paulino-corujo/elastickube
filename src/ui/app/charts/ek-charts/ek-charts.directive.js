@@ -30,9 +30,7 @@ class ChartsDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-charts')
-            .attr('layout', 'column');
+        tElement.addClass('ek-charts layout-column');
 
         return ($scope) => _.extend($scope, constants);
     }
