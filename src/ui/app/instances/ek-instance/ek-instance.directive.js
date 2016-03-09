@@ -25,7 +25,7 @@ class InstanceDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement.addClass('ek-instance');
+        tElement.addClass('ek-instance layout-column');
     }
 }
 
