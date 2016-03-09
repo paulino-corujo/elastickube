@@ -4,7 +4,7 @@
     &__namespace {
         font-size: 13px;
         font-weight: 500;
-        margin-right: 10px;
+        margin: 0 10px 0 0;
 
         &, &:not([disabled]):focus {
             .md-select-value {
@@ -21,6 +21,10 @@
                     font-size: 11px;
                     height: 10px;
                     width: 10px;
+                    margin: 0 6px;
+                    &:after {
+                        top: -2px;
+                    }
                 }
             }
         }
