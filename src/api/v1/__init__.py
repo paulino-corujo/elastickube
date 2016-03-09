@@ -1,9 +1,9 @@
 import logging
 import json
+import jwt
 import os
 from datetime import datetime, timedelta
 
-import jwt
 from bson.json_util import dumps
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine

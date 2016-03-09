@@ -4,8 +4,8 @@ import os
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine, Return, sleep
 
-from data.query import Query
 from charts.sync.repo import GitSync
+from data import watch
 
 
 @coroutine
@@ -17,12 +17,7 @@ def initialize():
         os.getenv("ELASTICKUBE_MONGO_SERVICE_PORT", 27017)
     )
 
-    database = MotorClient(mongo_url).elastickube
-    settings = yield Query(database, "Settings").find_one()
-    while not settings:
-        yield sleep(1)
-        settings = yield Query(database, "Settings").find_one()
+    motor_client = MotorClient(mongo_url)
 
-    settings["database"] = database
-
-    yield GitSync(settings).sync_loop()
+    watch.start_monitor(motor_client)
+    yield GitSync(motor_client.elastickube).sync_loop()
