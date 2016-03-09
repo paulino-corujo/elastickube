@@ -23,7 +23,6 @@ class AdminUsersController {
         const onUsersChange = () => this.users = usersStore.getAll();
         const onRowSelectionChanged = () => this.hasRowsSelected = !_.isEmpty(this.gridApi.selection.getSelectedRows());
 
-        this._$scope = $scope;
         this._settingsStore = settingsStore;
         this._adminNavigationActionCreator = adminNavigationActionCreator;
 
@@ -96,7 +95,7 @@ class AdminUsersController {
         const settings = this._settingsStore.getSettings();
 
         if (_.isUndefined(settings.mail)) {
-            return this._adminNavigationActionCreator.warnOutboundEmailDisabled(this._$scope);
+            return this._adminNavigationActionCreator.warnOutboundEmailDisabled();
         }
         return this._adminNavigationActionCreator.inviteUsers();
     }

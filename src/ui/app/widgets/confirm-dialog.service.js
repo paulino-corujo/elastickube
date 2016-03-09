@@ -15,25 +15,26 @@ limitations under the License.
 */
 
 class ConfirmDialogService {
-    constructor($mdDialog) {
+    constructor($rootScope, $mdDialog) {
         'ngInject';
 
         this._$mdDialog = $mdDialog;
+        this._$rootScope = $rootScope;
     }
 
-    confirm($scope, options) {
-        const dialogScope = $scope.$new(true);
+    confirm(options) {
+        const scope = this._$rootScope.$new();
 
-        dialogScope.options = options;
+        scope.options = options;
 
         return this._$mdDialog.show({
             parent: angular.element(document.body),
             clickOutsideToClose: false,
             openFrom: 'left',
             closeTo: 'right',
-            scope: dialogScope,
             disableParentScroll: true,
-            template: '<ek-confirm></ek-confirm>'
+            template: '<ek-confirm></ek-confirm>',
+            scope
         });
     }
 }

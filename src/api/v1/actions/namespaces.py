@@ -66,7 +66,7 @@ class NamespacesActions(object):
         result, namespace = yield [self.kube.namespaces.post(body),
                                    self._wait_namespace_creation(cursor, last_timestamp, document["name"])]
 
-        namespace["members"] = [member["username"] for member in document["members"]]
+        namespace["members"] = document["members"]
         namespace = yield Query(self.database, "Namespaces").update(namespace)
         raise Return(namespace)
 
@@ -74,13 +74,13 @@ class NamespacesActions(object):
     def update(self, document):
         logging.debug("Updating namespace %s", document["_id"])
 
-        namespace = yield Query(self.database, "Namespaces").find_one(document['_id'])
+        namespace = yield Query(self.database, "Namespaces").find_one({"_id": document['_id']})
         if not namespace:
             raise ObjectNotFoundError("User %s not found." % document["_id"])
 
         # TODO: validate members before inserting and do an intersection for race conditions
         namespace["members"] = document["members"]
-        updated_namespace = yield Query(self.database, "Users").update(namespace)
+        updated_namespace = yield Query(self.database, "Namespaces").update(namespace)
 
         raise Return(updated_namespace)
 

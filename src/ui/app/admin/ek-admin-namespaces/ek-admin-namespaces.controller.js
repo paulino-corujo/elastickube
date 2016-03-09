@@ -84,6 +84,15 @@ class AdminNamespacesController {
 
                         return 0;
                     }
+                },
+                {
+                    name: 'actions',
+                    displayName: '',
+                    enableSorting: false,
+                    enableColumnMenu: false,
+                    cellTemplate: `<div class="ek-admin-namespaces__body__table__actions" layout="row" layout-align="end center">
+                            <ek-namespace-actions namespace="row.entity"></ek-namespace-actions>
+                        </div>`
                 }
             ],
             onRegisterApi: (gridApi) => {
@@ -103,8 +112,8 @@ class AdminNamespacesController {
     }
 
     newNamespace() {
-        return this._confirmDialog.confirm(this._$scope, {
-            template: '<ek-admin-new-namespace></ek-admin-new-namespace>',
+        return this._confirmDialog.confirm({
+            template: '<ek-admin-edit-namespace></ek-admin-edit-namespace>',
             ok: 'CREATE',
             cancel: 'CANCEL'
         });

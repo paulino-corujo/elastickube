@@ -44,8 +44,8 @@ class NavigationActionCreatorService {
         return this._routerHelper.changeToState('admin.instances');
     }
 
-    warnOutboundEmailDisabled($scope) {
-        return this._confirmDialog.confirm($scope, {
+    warnOutboundEmailDisabled() {
+        return this._confirmDialog.confirm({
             title: 'Outbound email is turned off',
             content: 'An outbound email server and no reply address must be specified in order to send invites.',
             ok: 'TURN ON',

@@ -23,24 +23,23 @@ class ConfirmDirective extends Directive {
 
     constructor($compile) {
         super({ Controller, template });
-
         this._$compile = $compile;
     }
 
     compile(tElement) {
         tElement.addClass('ek-confirm');
 
-        return {
-            pre: ($scope, $element, attrs, ctrl) => {
-                if (ctrl.options.template) {
-                    const element = angular.element(`<md-dialog-content class="ek-confirm__dialog__content">
+        return ($scope, $element, attrs, ctrl) => {
+            ctrl.options = $scope.$parent.options;
+            _.extend($scope, $scope.$parent.options.scope);
+
+            if (ctrl.options.template) {
+                const element = angular.element(`<md-dialog-content class="ek-confirm__dialog__content">
                         ${ctrl.options.template}
                     </md-dialog-content>`);
 
-                    $element.find('.ek-confirm__dialog').append(element);
-
-                    this._$compile(element)($scope);
-                }
+                $element.find('.ek-confirm__dialog').append(element);
+                this._$compile(element)($scope);
             }
         };
     }

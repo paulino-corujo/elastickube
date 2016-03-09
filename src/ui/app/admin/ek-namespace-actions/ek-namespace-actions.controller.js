@@ -14,27 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-class InstanceActionsController {
-    constructor(confirmDialog, instancesActionCreator) {
+class NamespaceActionsController {
+    constructor(confirmDialog) {
         'ngInject';
 
         this._confirmDialog = confirmDialog;
-        this._instancesActionCreator = instancesActionCreator;
     }
 
-    delete() {
+    edit() {
         this.drop.close();
         return this._confirmDialog
             .confirm({
-                title: 'Confirm Action',
-                content: `Do you want to DELETE ${this.instance.metadata.name} instance?`,
-                ok: 'OK',
-                cancel: 'CANCEL'
-            })
-            .then(() => {
-                 return this._instancesActionCreator.delete(this.instance);
+                template: `<ek-admin-edit-namespace namespace="namespace"></ek-admin-edit-namespace>`,
+                ok: 'SAVE',
+                cancel: 'CANCEL',
+                scope: {
+                    namespace: this.namespace
+                }
             });
     }
 }
 
-export default InstanceActionsController;
+export default NamespaceActionsController;
