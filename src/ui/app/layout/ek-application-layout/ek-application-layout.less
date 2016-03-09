@@ -1,11 +1,14 @@
 @import "../../colors";
 
 .ek-application-layout {
-    display: block;
 
     &__header {
         height: 60px;
         background-color: @indigo500;
+
+        & > [transclude-id="header"] {
+            height: 60px;
+        }
 
         &__logo {
             & {
@@ -17,13 +20,5 @@
                 cursor: pointer;
             }
         }
-    }
-
-    [transclude-id="header"] {
-        height: 60px;
-    }
-
-    [transclude-id="body"] {
-        height: 100%;
     }
 }

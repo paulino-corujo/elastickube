@@ -29,7 +29,7 @@ class SideNavLayoutDirective {
     }
 
     compile(tElement) {
-        tElement.addClass('ek-sidenav-layout');
+        tElement.addClass('ek-sidenav-layout layout-row');
 
         return ($scope, $element, $attrs, controller, $transcludeFn) => {
             this._multiTransclude.transclude($element, $transcludeFn);

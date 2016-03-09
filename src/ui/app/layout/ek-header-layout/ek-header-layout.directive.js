@@ -29,7 +29,8 @@ class HeaderLayoutDirective {
     }
 
     compile(tElement) {
-        tElement.addClass('ek-header-layout');
+        tElement
+            .addClass('ek-header-layout layout-column flex');
 
         return ($scope, $element, $attrs, controller, $transcludeFn) => {
             $scope.title = $attrs.title;

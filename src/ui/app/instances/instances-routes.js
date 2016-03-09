@@ -22,7 +22,7 @@ function instancesRoutes(routerHelperProvider) {
         config: {
             url: '/:namespace/instances',
             parent: 'private',
-            template: '<ek-instances></ek-instances>',
+            template: '<ek-instances flex></ek-instances>',
             controller: (checkNamespace) => {
                 'ngInject';
 
