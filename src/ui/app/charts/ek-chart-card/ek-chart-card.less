@@ -68,12 +68,22 @@
 
     &__deploy {
         cursor: pointer;
-        width: 30px;
-        height: 30px;
-        background-color: @grey100;
-        border: 1px solid #d9d9d9;
         position: absolute;
         top: 10px;
         right: 10px;
+        border-radius: 2px;
+        border: 1px solid @grey400;
+        height: 30px;
+        width: 30px;
+        background-color: @grey100;
+        text-transform: capitalize;
+
+        &:hover {
+            border-color: @grey450;
+        }
+        &:active {
+            box-shadow: inset 0 2px 1px rgba(0,0,0,0.07);
+            background-color: @grey200;
+        }
     }
 }

@@ -72,6 +72,7 @@ class InstanceListController {
                     name: 'name',
                     field: 'metadata.name',
                     enableColumnMenu: false,
+                    width: '25%',
                     cellTemplate: `<div ng-class="{'ek-instance-list__child-row': row.entity.$$treeLevel === 1}">
                         <ek-instance-name instance="row.entity"></ek-instance-name>
                     </div>`
@@ -80,12 +81,14 @@ class InstanceListController {
                     name: 'state',
                     field: 'status.phase',
                     enableColumnMenu: false,
+                    width: '15%',
                     cellTemplate: `<ek-instance-state instance="row.entity"></ek-instance-state>`
                 },
                 {
                     name: 'kind',
                     field: 'kind',
                     enableColumnMenu: false,
+                    width: '18%',
                     cellTemplate: `<p>{{ row.entity.kind }}</p>`
                 },
                 {
