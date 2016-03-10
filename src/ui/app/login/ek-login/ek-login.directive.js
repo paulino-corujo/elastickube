@@ -31,9 +31,7 @@ class LoginDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-login')
-            .attr('layout', 'column');
+        tElement.addClass('ek-login layout-column layout-align-center-center');
 
         return ($scope) => $scope.icons = icons;
     }

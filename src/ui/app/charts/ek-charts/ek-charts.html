@@ -13,14 +13,12 @@
         </div>
     </div>
 
-    <div transclude-to="body" layout="column">
-        <div class="ek-charts__body" transclude-to="body">
-            <div class="ek-charts__body__not-found-message"
-                 layout="column" layout-align="center center"
-                 ng-if="ctrl.showEmpty">No charts found
-            </div>
-
-            <ek-chart-grid charts="ctrl.chartsSortedByType"></ek-chart-grid>
+    <div transclude-to="body" layout="column" fill-parent>
+        <div class="ek-charts__not-found-message"
+             layout="column" layout-align="center center"
+             ng-if="ctrl.showEmpty">No charts found
         </div>
+
+        <ek-chart-grid charts="ctrl.chartsSortedByType" fill-parent></ek-chart-grid>
     </div>
 </ek-header-layout>

@@ -21,7 +21,7 @@ const states = [{
     config: {
         abstract: true,
         parent: 'private',
-        template: '<ek-admin></ek-admin>',
+        template: '<ek-admin flex></ek-admin>',
         url: '/admin',
         controller: ($scope, settingsActionCreator) => {
             'ngInject';

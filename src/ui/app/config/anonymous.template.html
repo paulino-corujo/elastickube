@@ -1,5 +1,5 @@
-<ek-application-layout>
-    <div transclude-to="body">
-        <ui-view></ui-view>
+<ek-application-layout flex>
+    <div transclude-to="body" layout="column" fill-parent>
+        <div ui-view layout="column" flex></div>
     </div>
 </ek-application-layout>

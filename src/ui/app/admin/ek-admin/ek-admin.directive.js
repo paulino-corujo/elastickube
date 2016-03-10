@@ -24,9 +24,7 @@ class AdminDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-admin')
-            .attr('layout', 'column');
+        tElement.addClass('ek-admin layout-column');
     }
 }
 

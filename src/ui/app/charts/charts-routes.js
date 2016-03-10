@@ -18,7 +18,7 @@ const states = [{
     state: 'charts',
     config: {
         parent: 'private',
-        template: '<ek-charts></ek-charts>',
+        template: '<ek-charts flex></ek-charts>',
         url: '/:namespace/charts',
         data: {
             header: {

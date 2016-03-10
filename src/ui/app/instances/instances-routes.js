@@ -22,7 +22,7 @@ function instancesRoutes(routerHelperProvider) {
         config: {
             url: '/:namespace/instances',
             parent: 'private',
-            template: '<ek-instances></ek-instances>',
+            template: '<ek-instances flex></ek-instances>',
             controller: (checkNamespace) => {
                 'ngInject';
 
@@ -52,7 +52,7 @@ function instancesRoutes(routerHelperProvider) {
         config: {
             url: '/:namespace/instances/{instanceId:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}}',
             parent: 'private',
-            template: '<ek-instance></ek-instance>',
+            template: '<ek-instance flex></ek-instance>',
             controller: ($scope, $stateParams, checkNamespace, instanceActionCreator, instancesStore) => {
                 'ngInject';
                 const namespace = $stateParams.namespace;
@@ -93,7 +93,7 @@ function instancesRoutes(routerHelperProvider) {
                 chart: undefined
             },
             parent: 'private',
-            template: '<ek-new-instance></ek-new-instance>',
+            template: '<ek-new-instance flex></ek-new-instance>',
             data: {
                 header: {
                     name: 'instances'

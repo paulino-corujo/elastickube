@@ -1,48 +1,47 @@
-<div layout="column" layout-align="center center">
-    <h2 class="ek-login__title">Login</h2>
+<h2 class="ek-login__title">Login</h2>
 
-    <form ng-submit="ctrl.submit()" name="loginForm" ng-if="ctrl.authProviders.password">
-        <div layout="row">
-            <md-input-container class="ek-login__email md-block animate">
-                <label>Username</label>
-                <input type="email" name="username" required
-                       ng-model="ctrl.user.username"
-                       ng-maxlength="254" maxlength="254">
-                <div ng-messages="loginForm.username.$error">
-                    <div ng-message="required">Your username is required.</div>
-                    <div ng-message="email">Your username is invalid.</div>
-                    <div ng-message="maxlength">Your username is too long.</div>
-                </div>
-            </md-input-container>
-        </div>
-        <div layout="row">
-            <md-input-container class="ek-login__password md-block animate">
-                <label>Password</label>
-                <input type="password" name="password" required
-                       ng-model="ctrl.user.password"
-                       ng-pattern="ctrl.authProviders.password.regex">
-                <div ng-messages="loginForm.password.$error">
-                    <div ng-message="required">Your password is required.</div>
-                    <div ng-message="pattern">Your password not match the specified format.</div>
-                </div>
-            </md-input-container>
-        </div>
-
-        <div layout="row" layout-align="center">
-            <md-button type="submit"
-                       class="ek-login__submit-btn md-raised md-primary md-ink-ripple"
-                       ng-disabled="loginForm.$invalid">login
-            </md-button>
-        </div>
-    </form>
-
-    <div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && ctrl.authProviders.google">
-        <div class="ek-login__divider"><span>OR</span></div>
+<form ng-submit="ctrl.submit()" name="loginForm" ng-if="ctrl.authProviders.password">
+    <div layout="row">
+        <md-input-container class="ek-login__email md-block animate">
+            <label>Username</label>
+            <input type="email" name="username" required
+                   ng-model="ctrl.user.username"
+                   ng-maxlength="254" maxlength="254">
+            <div ng-messages="loginForm.username.$error">
+                <div ng-message="required">Your username is required.</div>
+                <div ng-message="email">Your username is invalid.</div>
+                <div ng-message="maxlength">Your username is too long.</div>
+            </div>
+        </md-input-container>
+    </div>
+    <div layout="row">
+        <md-input-container class="ek-login__password md-block animate">
+            <label>Password</label>
+            <input type="password" name="password" required
+                   ng-model="ctrl.user.password"
+                   ng-pattern="ctrl.authProviders.password.regex">
+            <div ng-messages="loginForm.password.$error">
+                <div ng-message="required">Your password is required.</div>
+                <div ng-message="pattern">Your password not match the specified format.</div>
+            </div>
+        </md-input-container>
     </div>
 
-    <div layout="row" layout-align="center" ng-if="ctrl.authProviders.google">
-        <md-button href="/api/v1/auth/google" target="_self"
-                   class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Login with Google
+    <div layout="row" layout-align="center">
+        <md-button type="submit"
+                   class="ek-login__submit-btn md-raised md-primary md-ink-ripple"
+                   ng-disabled="loginForm.$invalid">login
         </md-button>
     </div>
+</form>
+
+<div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && ctrl.authProviders.google">
+    <div class="ek-login__divider"><span>OR</span></div>
 </div>
+
+<div layout="row" layout-align="center" ng-if="ctrl.authProviders.google">
+    <md-button href="/api/v1/auth/google" target="_self"
+               class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Login with Google
+    </md-button>
+</div>
+

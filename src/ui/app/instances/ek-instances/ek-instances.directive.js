@@ -27,8 +27,7 @@ class InstancesDirective extends Directive {
 
     compile(tElement) {
         tElement
-            .addClass('ek-instances')
-            .attr('layout', 'column');
+            .addClass('ek-instances layout-column');
 
         return ($scope) => _.extend($scope, constants);
     }

@@ -32,7 +32,7 @@ class ApplicationLayoutDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement.addClass('ek-application-layout');
+        tElement.addClass('ek-application-layout layout-fill layout-column');
 
         return ($scope, $element, $attrs, controller, $transcludeFn) => {
             $scope.title = $attrs.title;
