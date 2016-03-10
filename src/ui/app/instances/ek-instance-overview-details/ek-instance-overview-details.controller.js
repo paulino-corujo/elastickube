@@ -42,6 +42,7 @@ class InstanceOverviewDetailsController {
     _createPodDetails() {
         const details = {};
 
+        details.Kind = this.instance.kind;
         details['Image(s)'] = _.chain(this.instance.spec.containers).map((x) => x.image).join(', ').value();
         details.Node = this.instance.spec.nodeName;
         details['Start Time'] = moment.utc(this.instance.metadata.creationTimestamp).local().format('ddd, D MMM GGGG HH:mm:ss');
@@ -54,6 +55,7 @@ class InstanceOverviewDetailsController {
         const details = {};
         const pods = getPods(this.instance, this._instancesStore.getAll());
 
+        details.Kind = this.instance.kind;
         details['Image(s)'] = _.chain(this.instance.spec.template.spec.containers).map((x) => x.image).join(', ').value();
         details.Node = _.chain(pods).map((x) => x.spec.nodeName).uniq().join('/').value();
         details['Start Time'] = moment.utc(this.instance.metadata.creationTimestamp).local().format('ddd, D MMM GGGG HH:mm:ss');
