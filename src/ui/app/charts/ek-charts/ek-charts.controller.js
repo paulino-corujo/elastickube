@@ -37,14 +37,7 @@ class ChartsController {
     }
 
     checkIsEmpty() {
-        this.showEmpty = this.selectedView === 'list'
-            ? _.isEmpty(this.chartsFilteredBySearch)
-            : _.isEmpty(this.chartsSortedByType);
-    }
-
-    selectView(name) {
-        this.selectedView = name;
-        this.checkIsEmpty();
+        this.showEmpty = _.isEmpty(this.chartsSortedByType);
     }
 }
 
