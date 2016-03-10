@@ -22,8 +22,20 @@
                 &, i {
                     cursor: pointer;
 
-                    &:before {
-                        color: @grey500;
+                    &.ui-grid-icon-minus-squared {
+                        background-image: url('../../../images/icon-collapse.svg');
+                    }
+                    &.ui-grid-icon-plus-squared {
+                        background-image: url('../../../images/icon-expand.svg');
+                    }
+                    
+                    &.ui-grid-icon-minus-squared,
+                    &.ui-grid-icon-plus-squared {
+                        background-repeat: no-repeat;
+                        background-size: 16px;
+                        &:before {
+                            content: '';
+                        }
                     }
                 }
             }
