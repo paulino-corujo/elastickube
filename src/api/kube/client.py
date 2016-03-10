@@ -23,6 +23,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
 from tornado.httputil import url_concat
 
 from api.kube.exceptions import KubernetesException, WatchDisconnectedException, ResourceNotFoundException
+from api.kube.pods import Pods
 from api.kube.resources import Resource, NamespacedResource
 
 
@@ -82,6 +83,15 @@ class HTTPClient(object):
             headers["Content-type"] = content_type
 
         return headers
+
+    @coroutine
+    def request(self, url, method="GET", **kwargs):
+        client = AsyncHTTPClient(force_instance=True)
+        try:
+            result = yield client.fetch(url, method=method, headers=self.build_headers(), **kwargs)
+            raise Return(result)
+        finally:
+            client.close()
 
     @coroutine
     def get(self, url_path, **kwargs):
@@ -354,7 +364,13 @@ class KubeClient(object):
                 self.kind_to_resource[self.RESOURCE_TO_KIND_MAPPING[resource["name"]]] = resource["name"]
 
             if resource["namespaced"]:
-                self.resources[resource["name"]] = NamespacedResource(self, "/api/%s" % api_version, resource["name"])
+                # TODO: generate it from swagger api
+                if resource["name"] == "pods":
+                    self.resources[resource["name"]] = Pods(self, "/api/%s" % api_version, resource["name"])
+                else:
+                    self.resources[resource["name"]] = NamespacedResource(self,
+                                                                          "/api/%s" % api_version,
+                                                                          resource["name"])
             else:
                 self.resources[resource["name"]] = Resource(self, "/api/%s" % api_version, resource["name"])
 
