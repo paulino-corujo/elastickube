@@ -1,0 +1,27 @@
+@import "../../colors";
+
+.ek-label {
+    font-size: 11px;
+    line-height: 22px;
+
+    &__name,
+    &__value {
+        padding: 0 4px;
+        border: 1px solid @grey300;
+    }
+
+    &__name {
+        border-bottom-left-radius: 2px;
+        border-top-left-radius: 2px;
+        color: @grey500;
+        background-color: @grey100;
+    }
+
+    &__value {
+        border-bottom-right-radius: 2px;
+        border-top-right-radius: 2px;
+        border-left-width: 0;
+        color: @black;
+        background-color: @white;
+    }
+}
