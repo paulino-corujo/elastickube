@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import httplib
 import logging
 import json
 import jwt
@@ -68,6 +69,18 @@ class SecureWebSocketHandler(WebSocketHandler):
         self.ping_timeout_handler = None
 
     def open(self):
+        def _check_user(future):
+            try:
+                user = future.result()
+                if user is None:
+                    logging.debug("User not found.")
+                    self.write_message({"error": {"message": "Invalid token."}})
+                    self.close(httplib.UNAUTHORIZED, "Invalid token.")
+            except Exception:
+                logging.exception("Login exception retrieving the user.")
+                self.write_message({"error": {"message": "Invalid token."}})
+                self.close(httplib.UNAUTHORIZED, "Invalid token.")
+
         self.ping_timeout_handler = IOLoop.current().add_timeout(PING_FREQUENCY, self.send_ping)
 
         try:
@@ -78,20 +91,16 @@ class SecureWebSocketHandler(WebSocketHandler):
 
             if encoded_token is None:
                 self.write_message({"error": {"message": "Invalid token."}})
-                self.close()
+                self.close(httplib.UNAUTHORIZED, "Invalid token.")
             else:
                 token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
                 self.user = self.settings["database"].Users.find_one({"username": token["username"]})
-
-                if self.user is None:
-                    logging.debug("User not found.")
-                    self.write_message({"error": {"message": "Invalid token."}})
-                    self.close()
+                self.user.add_done_callback(_check_user)
 
         except jwt.DecodeError as jwt_error:
             logging.exception(jwt_error)
             self.write_message({"error": {"message": "Invalid token."}})
-            self.close()
+            self.close(httplib.UNAUTHORIZED, "Invalid token.")
 
     def on_message(self, message):
         pass

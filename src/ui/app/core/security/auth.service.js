@@ -31,6 +31,9 @@ class AuthService {
         this._sessionStore = sessionStore;
         this._websocketClient = websocketClient;
 
+        websocketClient.addErrorEventListener(() => initialization.initializeUnloggedUser()
+            .then(() => this.logout()));
+
         if (_.isUndefined(sessionToken)) {
             sessionToken = this._sessionStore.getSessionToken();
 

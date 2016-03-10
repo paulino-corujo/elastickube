@@ -16,6 +16,7 @@ limitations under the License.
 
 import { EventEmitter } from 'events';
 
+const ERROR = 'ERROR';
 const EVENT = 'EVENT';
 
 class WebsocketClientService extends EventEmitter {
@@ -73,8 +74,10 @@ class WebsocketClientService extends EventEmitter {
 
             this._websocket.onerror = () => defer.reject();
 
-            this._websocket.onclose = () => {
-                if (this._reconnect) {
+            this._websocket.onclose = (event) => {
+                if (event.code === 401) {
+                    this.emit(ERROR, event.reason);
+                } else if (this._reconnect) {
                     const time = generateInterval(this._connectionAttempts);
 
                     setTimeout(() => {
@@ -177,6 +180,14 @@ class WebsocketClientService extends EventEmitter {
         };
 
         return this._$q.when(this.sendMessage(message));
+    }
+
+    addErrorEventListener(callback) {
+        this.on(ERROR, callback);
+    }
+
+    removeErrorEventListener(callback) {
+        this.removeListener(ERROR, callback);
     }
 
     addEventListener(callback) {
