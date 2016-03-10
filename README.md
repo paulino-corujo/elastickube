@@ -1,6 +1,6 @@
 ## ElasticKube - The Kubernetes Management Platform
 
-ElasticKube is open source management platform for Kuberenetes with the goal of providing a self-service experience for contenarized applications.
+ElasticKube is an open source management platform for Kuberenetes with the goal of providing a self-service experience for containerized applications.
 
 
 ### Designed for Kubernetes
@@ -9,17 +9,17 @@ Kubernetes (https://github.com/kubernetes/kubernetes) is ready to serve your pro
 
 We designed ElasticKube with the following principles in mind:
 
-* **non opinionated**: unrestricted kubernetes expirence
+* **non opinionated**: unrestricted kubernetes experience
 * **standarized**: works in any kubernetes cluster
 * **stateless**: lifecycle and state is always stored in kubernetes
-* **integrated**: git, jenkins, sso
+* **integrated**: git, jenkins, sso authentication
 
 ### Getting started
 
-ElastiKube runs as contenarized application inside you Kubernetes cluster. To deploy ElasticKube the only requirement is access to a terminal with `kubectl` configured.
+ElastiKube runs as a containerized application inside your Kubernetes cluster. To deploy ElasticKube the only requirement is access to a terminal with `kubectl` configured.
 
 To install ElasticKube execute the following command:
 
   `curl -s elastickube.com | bash`
 
-Once ElasticKube is installed, please complete the onboarding process using the load balancer address produced by the installation script.
+Once ElasticKube is installed, please complete the onboarding process using the load balancer IP address produced by the installation script.
