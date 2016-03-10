@@ -31,10 +31,10 @@ class NamespacesActionCreatorService {
             .then((namespaces) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_SUBSCRIBED, namespaces }));
     }
 
-    createNamespace(namespaceName, users) {
+    createNamespace(namespaceName, members) {
         const createBody = {
             name: namespaceName,
-            users
+            members
         };
 
         return this._namespacesAPI.create(createBody);
