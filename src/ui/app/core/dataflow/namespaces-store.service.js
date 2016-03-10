@@ -41,12 +41,18 @@ class NamespacesStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.NAMESPACES_CREATED:
+                    this._setNamespace(action.namespace);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
                 case this._actions.NAMESPACES_UPDATED:
-                    if (action.operation === 'deleted') {
-                        this._removeNamespace(action.namespace);
-                    } else {
-                        this._setNamespace(action.namespace);
-                    }
+                    this._setNamespace(action.namespace);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.NAMESPACES_DELETED:
+                    this._removeNamespace(action.namespace);
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -68,7 +74,7 @@ class NamespacesStoreService extends AbstractStore {
     }
 
     _removeNamespace(namespace) {
-        delete this._namespaces[namespace.metadata.uid];
+        delete this._namespaces[namespace._id];
     }
 
     destroy() {

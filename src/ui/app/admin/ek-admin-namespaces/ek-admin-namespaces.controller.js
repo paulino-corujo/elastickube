@@ -20,6 +20,9 @@ class AdminNamespacesController {
     constructor($scope, confirmDialog, instancesStore, namespacesStore) {
         'ngInject';
 
+        const onChange = () => this.namespaces = namespacesStore.getAll();
+        namespacesStore.addChangeListener(onChange);
+
         this._$scope = $scope;
         this._confirmDialog = confirmDialog;
         this._instancesStore = instancesStore;
@@ -60,7 +63,11 @@ class AdminNamespacesController {
                         return 0;
                     }
                 },
-                { name: 'members', enableColumnMenu: false },
+                {
+                    name: 'members',
+                    cellTemplate: `<div>{{ row.entity.members.length }}</div>`,
+                    enableColumnMenu: false
+                },
                 {
                     name: 'instances',
                     enableColumnMenu: false,
@@ -89,6 +96,10 @@ class AdminNamespacesController {
                     this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
             }
         };
+
+        $scope.$on('$destroy', () => {
+            namespacesStore.removeChangeListener(onChange);
+        });
     }
 
     newNamespace() {

@@ -22,6 +22,11 @@ class NamespacesActionCreatorService {
         this._confirmDialog = confirmDialog;
         this._namespacesAPI = namespacesAPI;
         this._dispatcher = dispatcher;
+
+        namespacesAPI.addOnCreatedListener((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_CREATED, namespace }));
+
+        namespacesAPI.addOnUpdatedListener((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_UPDATED, namespace }));
+        namespacesAPI.addOnDeletedListener((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_DELETED, namespace }));
     }
 
     subscribe() {
@@ -31,13 +36,16 @@ class NamespacesActionCreatorService {
             .then((namespaces) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_SUBSCRIBED, namespaces }));
     }
 
-    createNamespace(namespaceName, users) {
+    createNamespace(namespaceName, members) {
         const createBody = {
             name: namespaceName,
-            users
+            members
         };
 
-        return this._namespacesAPI.create(createBody);
+        this._dispatcher.dispatch({ type: this._actions.NAMESPACES_CREATE });
+
+        return this._namespacesAPI.create(createBody)
+            .then((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_CREATED, namespace }));
     }
 }
 

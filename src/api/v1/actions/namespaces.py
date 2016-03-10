@@ -66,8 +66,7 @@ class NamespacesActions(object):
         result, namespace = yield [self.kube.namespaces.post(body),
                                    self._wait_namespace_creation(cursor, last_timestamp, document["name"])]
 
-        members = ",".join([user["username"] for user in document["users"]])
-        namespace["members"] = members
+        namespace["members"] = [member["username"] for member in document["members"]]
         namespace = yield Query(self.database, "Namespaces").update(namespace)
         raise Return(namespace)
 
