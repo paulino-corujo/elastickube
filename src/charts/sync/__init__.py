@@ -18,11 +18,11 @@ import logging
 import os
 
 from motor.motor_tornado import MotorClient
-from tornado.gen import coroutine, Return, sleep
+from tornado.gen import coroutine
+from tornado.ioloop import IOLoop
 
 from charts.sync.repo import GitSync
 from data import watch
-
 
 @coroutine
 def initialize():
@@ -35,5 +35,9 @@ def initialize():
 
     motor_client = MotorClient(mongo_url)
 
-    watch.start_monitor(motor_client)
-    yield GitSync(motor_client.elastickube).sync_loop()
+    try:
+        watch.start_monitor(motor_client)
+        yield GitSync(motor_client.elastickube).sync_loop()
+    except:
+        logging.exception("Unexpected error executing GitSync sync loop.")
+        IOLoop.current().stop()
