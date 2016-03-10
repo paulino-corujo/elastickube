@@ -19,7 +19,9 @@
              transclude-to="sidenav" flex
              layout="column" layout-align="start center">
 
-            <ek-ikon class="ek-instance__ikon" name="ctrl.instance.metadata.name"></ek-ikon>
+            <ek-ikon class="ek-instance__ikon"
+                     name="ctrl.instance.metadata.name"
+                     swap-border-fill-color="ctrl.instance.kind === 'ReplicationController'"></ek-ikon>
         </div>
 
         <div class="ek-instance__body__content"
