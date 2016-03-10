@@ -20,6 +20,7 @@ import logging
 import os
 
 from git.repo import Repo
+from git.exc import InvalidGitRepositoryError
 from tornado.gen import coroutine, Return, sleep
 from yaml import load, load_all
 
@@ -37,9 +38,14 @@ class GitSync(object):
         logging.info("Initializing GitSync.")
 
         self.database = database
-        self.repo = Repo(REPO_DIRECTORY)
         self.charts = dict()
         self.url = DEFAULT_GITREPO
+
+        try:
+            self.repo = Repo(REPO_DIRECTORY)
+        except InvalidGitRepositoryError:
+            logging.info("Cloning repository in %s", REPO_DIRECTORY)
+            self.repo = Repo.clone_from(settings["charts"]["repo_url"], REPO_DIRECTORY)
 
     @coroutine
     def update_repo(self, document):
@@ -52,11 +58,11 @@ class GitSync(object):
         logging.info("Initializing sync loop.")
         yield add_callback("Settings", self.update_repo)
 
+        synced_head = None
+
         settings = yield Query(self.database, "Settings").find_one() or dict()
         if settings["charts"]:
             self.url = settings["charts"]["repo_url"]
-
-        synced_head = None
 
         while True:
             try:
