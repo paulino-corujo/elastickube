@@ -30,13 +30,30 @@ class InstanceOverviewDetailsController {
 
         instanceStore.addChangeListener(onChange);
 
-        if (_.has(this.instance, 'status.replicas')) {
-            this.details = this._createReplicationControllerDetails();
-        } else {
-            this.details = this._createPodDetails();
+        switch (this.instance.kind) {
+
+            case 'Service':
+                this.details = this._createServiceDetails();
+                break;
+
+            case 'ReplicationController':
+                this.details = this._createReplicationControllerDetails();
+                break;
+
+            default:
+                this.details = this._createPodDetails();
         }
 
         $scope.$on('$destroy', () => instanceStore.removeChangeListener(onChange));
+    }
+
+    _createServiceDetails() {
+        const details = {};
+
+        details.Kind = this.instance.kind;
+        details['Start Time'] = moment.utc(this.instance.metadata.creationTimestamp).local().format('ddd, D MMM GGGG HH:mm:ss');
+
+        return _.omitBy(details, _.isEmpty);
     }
 
     _createPodDetails() {
@@ -53,31 +70,14 @@ class InstanceOverviewDetailsController {
 
     _createReplicationControllerDetails() {
         const details = {};
-        const pods = getPods(this.instance, this._instancesStore.getAll());
 
         details.Kind = this.instance.kind;
-        details['Image(s)'] = _.chain(this.instance.spec.template.spec.containers).map((x) => x.image).join(', ').value();
-        details.Node = _.chain(pods).map((x) => x.spec.nodeName).uniq().join('/').value();
+        details['Volume(s)'] = _.chain(this.instance.spec.template.spec.volumes).map((x) => x.name).join(', ').value();
         details['Start Time'] = moment.utc(this.instance.metadata.creationTimestamp).local().format('ddd, D MMM GGGG HH:mm:ss');
-        details['IP(s)'] = _.chain(pods).map((x) => x.status.podIP).uniq().join('/').value();
+        details.Replicas = `${this.instance.status.replicas}/${this.instance.spec.replicas} replicas created`;
 
         return _.omitBy(details, _.isEmpty);
     }
-}
-
-function getPods(instance, instances) {
-    return _.chain(instances)
-        .filter((x) => {
-            if (_.has(x, ['metadata', 'annotations', 'kubernetes.io/created-by'])) {
-                const createdBy = JSON.parse(x.metadata.annotations['kubernetes.io/created-by']);
-
-                return createdBy.reference.uid === instance.metadata.uid;
-            }
-
-            return false;
-        })
-        .flatMap((x) => [x].concat(getPods(x, instances)))
-        .value();
 }
 
 export default InstanceOverviewDetailsController;

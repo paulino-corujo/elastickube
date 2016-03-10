@@ -35,6 +35,7 @@ import InstanceOverviewContainersDirective from './ek-instance-overview-containe
 import InstanceOverviewDetailsDirective from './ek-instance-overview-details/ek-instance-overview-details.directive';
 import InstanceOverviewLabelsDirective from './ek-instance-overview-labels/ek-instance-overview-labels.directive';
 import InstanceOverviewEventsDirective from './ek-instance-overview-events/ek-instance-overview-events.directive';
+import InstanceOverviewSelectorsDirective from './ek-instance-overview-selectors/ek-instance-overview-selectors.directive';
 import InstanceFiltersDirective from './ek-instance-filters/ek-instance-filters.directive';
 import InstanceListDirective from './ek-instance-list/ek-instance-list.directive';
 import InstanceStateSelectorDirective from './ek-instance-state-selector/ek-instance-state-selector.directive';
@@ -67,6 +68,7 @@ angular
     .directive('ekInstanceOverviewDetails', () => new InstanceOverviewDetailsDirective())
     .directive('ekInstanceOverviewLabels', () => new InstanceOverviewLabelsDirective())
     .directive('ekInstanceOverviewEvents', () => new InstanceOverviewEventsDirective())
+    .directive('ekInstanceOverviewSelectors', () => new InstanceOverviewSelectorsDirective())
     .directive('ekInstanceFilters', () => new InstanceFiltersDirective())
     .directive('ekInstanceList', () => new InstanceListDirective())
     .directive('ekInstanceStateSelector', () => new InstanceStateSelectorDirective())

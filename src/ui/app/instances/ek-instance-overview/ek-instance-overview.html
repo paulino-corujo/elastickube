@@ -1,6 +1,7 @@
 <div layout="row">
     <div class="ek-instance-overview__first-column" layout="column" flex>
-        <ek-instance-overview-containers></ek-instance-overview-containers>
+        <ek-instance-overview-selectors ng-if="ctrl.instance.kind !== 'Pod'"></ek-instance-overview-selectors>
+        <ek-instance-overview-containers ng-if="ctrl.instance.kind === 'Pod'"></ek-instance-overview-containers>
         <ek-instance-overview-events></ek-instance-overview-events>
     </div>
     <div class="ek-instance-overview__second-column" layout="column">
