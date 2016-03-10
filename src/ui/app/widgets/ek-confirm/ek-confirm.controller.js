@@ -15,12 +15,11 @@ limitations under the License.
 */
 
 class ConfirmController {
-    constructor($q, $mdDialog, $scope) {
+    constructor($q, $mdDialog) {
         'ngInject';
 
         this._$q = $q;
         this._$mdDialog = $mdDialog;
-        this.options = $scope.$parent.options;
         this.canAccept = true;
     }
 
