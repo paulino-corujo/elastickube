@@ -5,26 +5,26 @@
 
         <div layout="row">
             <md-input-container class="ek-signup__name md-block animate">
-                <label>Your Name</label>
+                <label>First Name</label>
                 <input type="text" name="firstname" required
                        ng-model="user.firstname"
                        ng-maxlength="128" maxlength="128">
                 <div ng-messages="signupForm.firstname.$error">
-                    <div ng-message="required">Your firstname is required.</div>
-                    <div ng-message="maxlength">Your firstname is too long.</div>
+                    <div ng-message="required">Your first name is required.</div>
+                    <div ng-message="maxlength">Your first name is too long.</div>
                 </div>
             </md-input-container>
         </div>
 
         <div layout="row">
             <md-input-container class="ek-signup__name md-block animate">
-                <label>Your Lastname</label>
+                <label>Last Name</label>
                 <input type="text" name="lastname" required
                        ng-model="user.lastname"
                        ng-maxlength="128" maxlength="128">
                 <div ng-messages="signupForm.lastname.$error">
-                    <div ng-message="required">Your lastname is required.</div>
-                    <div ng-message="maxlength">Your lastname is too long.</div>
+                    <div ng-message="required">Your last name is required.</div>
+                    <div ng-message="maxlength">Your last name is too long.</div>
                 </div>
             </md-input-container>
         </div>
@@ -51,7 +51,7 @@
                        ng-pattern="ctrl.PASSWORD_REGEX">
                 <div ng-messages="signupForm.password.$error">
                     <div ng-message="required">Your password is required.</div>
-                    <div ng-message="pattern">Your password not match the specified format.</div>
+                    <div ng-message="pattern">Your password does not match the specified format.</div>
                 </div>
             </md-input-container>
         </div>
@@ -64,7 +64,7 @@
                        match-password="password">
                 <div ng-messages="signupForm.confirm.$error">
                     <div ng-message="required">Password confirmation is required.</div>
-                    <div ng-message="passwordMatch">Password and password confirmation does not match.</div>
+                    <div ng-message="passwordMatch">Password and password confirmation do not match.</div>
                 </div>
             </md-input-container>
         </div>
