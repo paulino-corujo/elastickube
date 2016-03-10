@@ -1,18 +1,18 @@
 /*
-Copyright 2016 ElasticBox All rights reserved.
+ Copyright 2016 ElasticBox All rights reserved.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 import AbstractStore from './abstract-store';
 
@@ -41,12 +41,18 @@ class NamespacesStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.NAMESPACE_CREATED:
+                    this._setNamespace(action.namespace);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
                 case this._actions.NAMESPACES_UPDATED:
-                    if (action.operation === 'deleted') {
-                        this._removeNamespace(action.namespace);
-                    } else {
-                        this._setNamespace(action.namespace);
-                    }
+                    this._setNamespace(action.namespace);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.NAMESPACES_DELETED:
+                    this._removeNamespace(action.namespace);
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -68,7 +74,7 @@ class NamespacesStoreService extends AbstractStore {
     }
 
     _removeNamespace(namespace) {
-        delete this._namespaces[namespace.metadata.uid];
+        delete this._namespaces[namespace._id];
     }
 
     destroy() {
