@@ -18,7 +18,8 @@ class InstanceContainerChartController {
     constructor() {
         'ngInject';
 
-        this.dataset = [{ cpu: Math.floor(Math.random() * 100) + 1 }, { memory: Math.floor(Math.random() * 100) + 1 }];
+        this.dataset = [{ cpu: _.get(this.container, 'metrics.cpuUsage') || 0 },
+            { memory: _.get(this.container, 'metrics.memUsage') || 0 }];
     }
 }
 
