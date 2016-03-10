@@ -1,0 +1,18 @@
+<h3>Selectors</h3>
+
+<div class="ek-instance-overview-selectors__selector"
+     layout="row" layout-align="space-between center"
+     ng-repeat="instance in ctrl.selectedInstances track by instance.metadata.uid">
+
+    <div layout="row" layout-align="start center">
+        <ek-instance-name instance="instance"></ek-instance-name>
+    </div>
+
+    <div layout="row" layout-align="end center">
+        <ek-label class="ek-instance-overview-selectors__label"
+                  ng-repeat="(name, value) in instance.metadata.labels"
+                  ng-class="{'ek-instance-overview-selectors__label--disabled': !ctrl.containsLabel(name, value)}"
+                  name="name"
+                  value="value"></ek-label>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+@import "../../colors";
+
+.ek-instance-overview-selectors {
+	h3 {
+		font-size: 22px;
+	}
+
+	&__selector {
+		&:not(:first-child) {
+			margin-bottom: 10px;
+		}
+	}
+
+	&__label {
+		& {
+			margin-left: 5px;
+		}
+
+		&--disabled {
+			opacity: 0.4;
+		}
+	}
+}
