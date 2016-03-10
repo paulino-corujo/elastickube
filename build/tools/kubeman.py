@@ -59,6 +59,17 @@ def add_user(arguments):
 
         database.Users.insert(user)
 
+    if arguments.role != "administrator":
+        default_namespace = database.Namespaces.find_one({"name": "default"})
+        if default_namespace:
+            if "members" not in default_namespace:
+                default_namespace["members"] = [arguments.email]
+            else:
+                if arguments.email not in default_namespace["members"]:
+                    default_namespace["members"].append(arguments.email)
+
+            database.Namespaces.update({"_id": default_namespace["_id"]}, default_namespace)
+
 
 def delete_database(arguments):
     client = MongoClient(arguments.connection_url)

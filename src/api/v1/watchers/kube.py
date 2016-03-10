@@ -20,6 +20,7 @@ import logging
 from tornado.gen import coroutine, Return
 
 from api.kube.exceptions import WatchDisconnectedException
+from data.query import Query
 
 
 class KubeWatcher(object):
@@ -118,7 +119,7 @@ class KubeWatcher(object):
         }
     }
 
-    def __init__(self, message, settings, callback):
+    def __init__(self, message, settings, user, callback):
         logging.info("Initializing KubeWatcher")
 
         self.watchers = dict()
@@ -129,6 +130,7 @@ class KubeWatcher(object):
         self.settings = settings
         self.callback = callback
         self.message = message
+        self.user = user
 
         self.validate_message()
 
@@ -280,6 +282,19 @@ class KubeWatcher(object):
                 self.ACTIONS_METADATA[self.message["action"]][self.params["kind"]]["resources"])
         else:
             self.resources_config = copy.deepcopy(self.ACTIONS_METADATA[self.message["action"]]["resources"])
+
+    @coroutine
+    def check_permissions(self, operation, document):
+        logging.debug("check_permissions for user %s and operation %s on kube watch", self.user["username"], operation)
+        if self.user["role"] != "administrator":
+            if "namespace" not in document:
+                raise Return(False)
+
+            namespace = yield Query(self.settings["database"], "Namespaces").find_one({"name": document["namespace"]})
+            if self.user["username"] not in namespace["members"]:
+                raise Return(False)
+
+        raise Return(True)
 
     def get_params(self, arguments):
         params = dict()

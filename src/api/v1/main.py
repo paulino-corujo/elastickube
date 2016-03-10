@@ -80,7 +80,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                     response.update(dict(status_code=405, body=dict(message=error)))
 
                 else:
-                    if not action.check_permissions(request["operation"], request["body"]):
+                    if not (yield action.check_permissions(request["operation"], request["body"])):
                         error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
                         response.update(dict(status_code=403, body=dict(message=error)))
 
@@ -129,9 +129,15 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                         self.write_message(response)
 
                     else:
-                        watcher = watcher_cls(request, self.settings, self.write_message)
-                        yield watcher.watch()
-                        self.current_watchers[watcher_key] = watcher
+                        watcher = watcher_cls(request, self.settings, self.user, self.write_message)
+                        body = request["body"] if "body" in request else dict()
+
+                        if not (yield watcher.check_permissions(request["operation"], body)):
+                            error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
+                            response.update(dict(status_code=403, body=dict(message=error)))
+                        else:
+                            yield watcher.watch()
+                            self.current_watchers[watcher_key] = watcher
                 else:
                     response["body"] = {"message": "Action not supported for operation watch."}
                     response["status_code"] = 400
