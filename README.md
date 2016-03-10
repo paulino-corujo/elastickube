@@ -1,6 +1,6 @@
 ## ElasticKube - The Kubernetes Management Platform
 
-ElasticKube is an open source management platform for Kuberenetes with the goal of providing a self-service experience for containerized applications.
+ElasticKube is an open source management platform for Kubernetes with the goal of providing a self-service experience for containerized applications.
 
 
 ### Designed for Kubernetes
