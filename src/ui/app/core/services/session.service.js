@@ -31,7 +31,11 @@ class SessionService extends EventEmitter {
         for (let i = 0; i < storage.length; i++) {
             const key = storage.key(i);
 
-            this._session[key] = JSON.parse(storage.getItem(key));
+            try {
+                this._session[key] = JSON.parse(storage.getItem(key));
+            } catch (error) {
+                storage.removeItem(key);
+            }
         }
     }
 
@@ -42,7 +46,7 @@ class SessionService extends EventEmitter {
     setItem(key, value) {
         this._session[key] = value;
 
-        return this._$q.when(this._storage.setItem(key, JSON.stringify(value)));
+        return this._$q.when(!_.isUndefined(value) && this._storage.setItem(key, JSON.stringify(value)));
     }
 
     removeItem(key) {

@@ -21,7 +21,7 @@ class NamespacesSelectorController {
         'ngInject';
 
         const onChange = () => {
-            this.namespaces = this._namespacesStoreService.getAll();
+            this.namespaces = _.sortBy(this._namespacesStoreService.getAll(), 'metadata.name');
             this.namespace = _.find(this.namespaces, _.matchesProperty('metadata.uid', this.namespace.metadata.uid)) || this.namespaces[0];
         };
         const onNamespaceChange = () => this.namespace = this._sessionStoreService.getActiveNamespace();
@@ -36,7 +36,7 @@ class NamespacesSelectorController {
         this._sessionStoreService.addNamespaceChangeListener(onNamespaceChange);
         this._namespacesStoreService.addChangeListener(onChange);
 
-        this.namespaces = this._namespacesStoreService.getAll();
+        this.namespaces = _.sortBy(this._namespacesStoreService.getAll(), 'metadata.name');
         this.namespace = this._sessionStoreService.getActiveNamespace();
 
         $scope.$on('$destroy', () => {
