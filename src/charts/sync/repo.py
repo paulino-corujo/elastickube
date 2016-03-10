@@ -45,7 +45,7 @@ class GitSync(object):
             self.repo = Repo(REPO_DIRECTORY)
         except InvalidGitRepositoryError:
             logging.info("Cloning repository in %s", REPO_DIRECTORY)
-            self.repo = Repo.clone_from(settings["charts"]["repo_url"], REPO_DIRECTORY)
+            self.repo = Repo.clone_from(self.url, REPO_DIRECTORY)
 
     @coroutine
     def update_repo(self, document):
