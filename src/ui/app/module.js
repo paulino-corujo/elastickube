@@ -56,3 +56,8 @@ angular
 
     .run(authConfig)
     .run(dataFlowInitialization);
+
+/* eslint no-undef: 0 */
+if (PRODUCTION) {
+    require('./config/production-config');
+}
