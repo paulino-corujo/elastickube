@@ -36,10 +36,13 @@ class NamespacesActionCreatorService {
             .then((namespaces) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_SUBSCRIBED, namespaces }));
     }
 
-    createNamespace(namespaceName, users) {
+    createNamespace(namespaceInfo) {
         const createBody = {
-            name: namespaceName,
-            members: _.map(users, 'username')
+            name: namespaceInfo.namespaceName,
+            metadata: {
+                labels: namespaceInfo.labels
+            },
+            members: _.map(namespaceInfo.users, 'username')
         };
 
         this._dispatcher.dispatch({ type: this._actions.NAMESPACES_CREATE });
@@ -48,10 +51,9 @@ class NamespacesActionCreatorService {
             .then((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_CREATED, namespace }));
     }
 
-    updateNamespace(namespace, namespaceName, users) {
+    updateNamespace(namespace, users) {
         const updateBody = {
             _id: _.get(namespace, 'metadata.uid'),
-            name: namespaceName,
             members: _.map(users, 'username')
         };
 

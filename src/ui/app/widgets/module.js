@@ -34,6 +34,7 @@ import InsertEmailsDirective from './ek-insert-emails/ek-insert-emails.directive
 import InsertLabelsDirective from './ek-insert-labels/ek-insert-labels.directive';
 import InstanceNameDirective from './ek-instance-name/ek-instance-name.directive';
 import InstanceStateDirective from './ek-instance-state/ek-instance-state.directive';
+import LabelEditorDirective from './ek-label-editor/ek-label-editor.directive';
 import LabelDirective from './ek-label/ek-label.directive';
 import LabelsDirective from './ek-labels/ek-labels.directive';
 import NamespaceSelectorDirective from './ek-namespaces-selector/ek-namespace-selector.directive';
@@ -72,6 +73,7 @@ angular
     .directive('ekInsertEmails', () => new InsertEmailsDirective())
     .directive('ekInsertLabels', () => new InsertLabelsDirective())
     .directive('ekLabel', () => new LabelDirective())
+    .directive('ekLabelEditor', () => new LabelEditorDirective())
     .directive('ekLabels', () => new LabelsDirective())
     .directive('ekInstanceName', () => new InstanceNameDirective())
     .directive('ekInstanceState', () => new InstanceStateDirective())
