@@ -18,7 +18,7 @@ class NewInstanceController {
     constructor($log, instancesActionCreator, instancesNavigationActionCreator, sessionStore) {
         'ngInject';
 
-        this._$log = $log;
+        this._$log = $log.getInstance(this.constructor.name);
         this._instancesActionCreator = instancesActionCreator;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._sessionStore = sessionStore;
@@ -48,7 +48,7 @@ class NewInstanceController {
     deploy() {
         return this._instancesActionCreator
             .deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
-            .catch((error) => this._$log.error(error))
+            .catch((error) => this._$log.error(error.statusText))
             .finally(() => this.goToInstances());
     }
 }

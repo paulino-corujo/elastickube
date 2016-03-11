@@ -19,7 +19,7 @@ class ConfirmController {
         'ngInject';
 
         this._$q = $q;
-        this._$log = $log;
+        this._$log = $log.getInstance(this.constructor.name);
         this._$mdDialog = $mdDialog;
         this.canAccept = true;
     }
@@ -43,7 +43,7 @@ class ConfirmController {
     ok() {
         return this._$q.when(this._acceptListener && this._acceptListener.accept())
             .then(() => this._$mdDialog.hide())
-            .catch((error) => this._$log.error(error));
+            .catch((error) => this._$log.error(error.statusText));
     }
 }
 

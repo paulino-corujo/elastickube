@@ -1,0 +1,40 @@
+@import "../../colors";
+
+.ek-notifications {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+
+    .ek-notification {
+        & {
+            border-radius: 2px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
+            padding: 7px 20px;
+            margin-top: 5px;
+        }
+
+        &--info {
+            background: #B3E5FC;
+            border: 1px solid #81D4FA;
+        }
+
+        &--warn {
+            background: #F9EEBC;
+            border: 1px solid #F1C466;
+        }
+
+        &--error {
+            background: #ffcdd2;
+            border: 1px solid #e57373;
+        }
+
+        &__dismiss {
+            margin-left: 10px;
+            cursor: pointer;
+            color: @indigo500
+        }
+    }
+}
