@@ -53,6 +53,11 @@ class InstancesActions(object):
 
         result = []
         for resource in chart["resources"]:
+            if "labels" in document:
+                if "labels" in resource["metadata"]:
+                    resource["metadata"]["labels"].update(document["labels"])
+                else:
+                    resource["metadata"]["labels"] = document["labels"]
             response = yield self.kube[self.kube.get_resource_type(resource["kind"])].post(
                 resource, namespace=namespace)
             result.append(response)
