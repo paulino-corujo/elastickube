@@ -15,9 +15,10 @@ limitations under the License.
 */
 
 class NewInstanceController {
-    constructor(instancesActionCreator, instancesNavigationActionCreator, sessionStore) {
+    constructor($log, instancesActionCreator, instancesNavigationActionCreator, sessionStore) {
         'ngInject';
 
+        this._$log = $log;
         this._instancesActionCreator = instancesActionCreator;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._sessionStore = sessionStore;
@@ -45,14 +46,10 @@ class NewInstanceController {
     }
 
     deploy() {
-        this._instancesActionCreator.deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
-            .then(() => {
-                this.goToInstances();
-            }, () => {
-                this.goToInstances();
-
-                // FIXME we should show an error message here
-            });
+        return this._instancesActionCreator
+            .deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
+            .catch((error) => this._$log.error(error))
+            .finally(() => this.goToInstances());
     }
 }
 

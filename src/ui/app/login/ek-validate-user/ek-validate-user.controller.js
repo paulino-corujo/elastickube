@@ -17,9 +17,10 @@ limitations under the License.
 import constants from 'constants';
 
 class SignupController {
-    constructor($scope, $stateParams, initialization, instancesNavigationActionCreator, principalActionCreator) {
+    constructor($log, $scope, $stateParams, initialization, instancesNavigationActionCreator, principalActionCreator) {
         'ngInject';
 
+        this._$log = $log;
         this._$scope = $scope;
         this._initialization = initialization;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
@@ -38,10 +39,10 @@ class SignupController {
             .catch((response) => {
                 switch (response.status) {
                     case constants.httpStatusCode.BAD_REQUEST:
-                        console.error('BAD REQUEST: Invalid field');
+                        this._$log.error('BAD REQUEST: Invalid field');
                         break;
                     case constants.httpStatusCode.FORBIDDEN:
-                        console.warn('FORBIDDEN: An admin user was already created');
+                        this._$log.warn('FORBIDDEN: An admin user was already created');
                         break;
                     default:
                 }

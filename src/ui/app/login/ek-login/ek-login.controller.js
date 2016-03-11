@@ -15,9 +15,10 @@ limitations under the License.
 */
 
 class LoginController {
-    constructor($scope, initialization, instancesNavigationActionCreator, principalActionCreator) {
+    constructor($log, $scope, initialization, instancesNavigationActionCreator, principalActionCreator) {
         'ngInject';
 
+        this._$log = $log;
         this._$scope = $scope;
         this._initialization = initialization;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
@@ -28,7 +29,7 @@ class LoginController {
         return this._principalActionCreator.login(this.user)
             .then(() => this._initialization.initializeLoggedInUser())
             .then(() => this._instancesNavigationActionCreator.instances())
-            .catch(() => console.warn('Invalid User or Password.'));
+            .catch(() => this._$log.warn('Invalid User or Password.'));
     }
 }
 
