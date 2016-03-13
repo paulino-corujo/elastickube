@@ -20,6 +20,6 @@ ElastiKube runs as a containerized application inside your Kubernetes cluster. T
 
 To install ElasticKube execute the following command:
 
-  `curl -s elastickube.com | bash`
+  `curl -s https://elastickube.com | bash`
 
 Once ElasticKube is installed, please complete the onboarding process using the load balancer IP address produced by the installation script.
