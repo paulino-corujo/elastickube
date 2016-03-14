@@ -3,7 +3,9 @@
         <div class="ek-chart-card__info__icon" layout="row" layout-align="center">
             <ek-ikon name="ctrl.chart.name" icon="ctrl.chart.icon"></ek-ikon>
         </div>
+
         <span class="ek-chart-card__info__name">{{ ctrl.chart.name }}</span>
+
         <div class="ek-chart-card__info__description" layout="row">
             <span class="ek-chart-card__info__description__text">{{ ctrl.description }}</span>
             <a ng-if="ctrl.chart.home" target="_blank" href="{{ ctrl.chart.home }}">
@@ -11,7 +13,12 @@
             </a>
         </div>
     </div>
-    <div ng-if="hovered" layout="column" layout-align="center" ng-click=ctrl.deploy() class="ek-chart-card__deploy">
+
+    <div ek-ink-ripple="dark"
+         ng-if="hovered"
+         layout="column" layout-align="center"
+         ng-click="ctrl.deploy()"
+         class="ek-chart-card__deploy">
         <md-icon md-svg-src="{{:: icons.IC_PLAY_ARROW_48PX }}"></md-icon>
     </div>
 </div>
