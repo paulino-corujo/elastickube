@@ -24,6 +24,7 @@ from tornado.ioloop import IOLoop
 from charts.sync.repo import GitSync
 from data import watch
 
+
 @coroutine
 def initialize():
     logging.info("Initializing charts sync")
