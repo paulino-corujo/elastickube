@@ -15,10 +15,11 @@ limitations under the License.
 */
 
 class ConfirmController {
-    constructor($q, $mdDialog) {
+    constructor($q, $log, $mdDialog) {
         'ngInject';
 
         this._$q = $q;
+        this._$log = $log.getInstance(this.constructor.name);
         this._$mdDialog = $mdDialog;
         this.canAccept = true;
     }
@@ -42,12 +43,7 @@ class ConfirmController {
     ok() {
         return this._$q.when(this._acceptListener && this._acceptListener.accept())
             .then(() => this._$mdDialog.hide())
-            .catch((error) => {
-                this._$mdDialog.hide();
-
-                // FIXME show message error and remove hide() call
-                console.error(error);
-            });
+            .catch((error) => this._$log.error(error.statusText));
     }
 }
 
