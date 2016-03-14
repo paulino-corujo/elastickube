@@ -14,19 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-overview-labels.less';
-import Directive from 'directive';
-import Controller from './ek-instance-overview-labels.controller';
-import template from './ek-instance-overview-labels.html';
+class InstanceLabelsBlockController {
+    constructor($scope, instanceStore) {
+        'ngInject';
 
-class InstanceOverviewLabelsDirective extends Directive {
-    constructor() {
-        super({ Controller, template });
-    }
+        const onChange = () => this.instance = instanceStore.getInstance();
 
-    compile(tElement) {
-        tElement.addClass('ek-instance-overview-labels ek-white-box');
+        this.instance = instanceStore.getInstance();
+
+        instanceStore.addChangeListener(onChange);
+
+        $scope.$on('$destroy', () => instanceStore.removeChangeListener(onChange));
     }
 }
 
-export default InstanceOverviewLabelsDirective;
+export default InstanceLabelsBlockController;

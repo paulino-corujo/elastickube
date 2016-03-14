@@ -30,10 +30,10 @@ import InstanceDirective from './ek-instance/ek-instance.directive';
 import InstanceContainerChartDirective from './ek-instance-container-chart/ek-instance-container-chart.directive';
 import InstanceActionsDirective from './ek-instance-actions/ek-instance-actions.directive';
 import InstanceBulkActionsDirective from './ek-instance-bulk-actions/ek-instance-bulk-actions.directive';
+import InstanceDetailsBlockDirective from './ek-instance-details-block/ek-instance-details-block.directive';
+import InstanceLabelsBlockDirective from './ek-instance-labels-block/ek-instance-labels-block.directive';
 import InstanceOverviewDirective from './ek-instance-overview/ek-instance-overview.directive';
 import InstanceOverviewContainersDirective from './ek-instance-overview-containers/ek-instance-overview-containers.directive';
-import InstanceOverviewDetailsDirective from './ek-instance-overview-details/ek-instance-overview-details.directive';
-import InstanceOverviewLabelsDirective from './ek-instance-overview-labels/ek-instance-overview-labels.directive';
 import InstanceOverviewEventsDirective from './ek-instance-overview-events/ek-instance-overview-events.directive';
 import InstanceOverviewSelectorsDirective from './ek-instance-overview-selectors/ek-instance-overview-selectors.directive';
 import InstanceFiltersDirective from './ek-instance-filters/ek-instance-filters.directive';
@@ -62,10 +62,10 @@ angular
     .directive('ekInstanceContainerChart', () => new InstanceContainerChartDirective())
     .directive('ekInstanceActions', () => new InstanceActionsDirective())
     .directive('ekInstanceBulkActions', () => new InstanceBulkActionsDirective())
+    .directive('ekInstanceDetailsBlock', () => new InstanceDetailsBlockDirective())
+    .directive('ekInstanceLabelsBlock', () => new InstanceLabelsBlockDirective())
     .directive('ekInstanceOverview', () => new InstanceOverviewDirective())
     .directive('ekInstanceOverviewContainers', () => new InstanceOverviewContainersDirective())
-    .directive('ekInstanceOverviewDetails', () => new InstanceOverviewDetailsDirective())
-    .directive('ekInstanceOverviewLabels', () => new InstanceOverviewLabelsDirective())
     .directive('ekInstanceOverviewEvents', () => new InstanceOverviewEventsDirective())
     .directive('ekInstanceOverviewSelectors', () => new InstanceOverviewSelectorsDirective())
     .directive('ekInstanceFilters', () => new InstanceFiltersDirective())

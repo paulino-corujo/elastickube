@@ -16,7 +16,7 @@ limitations under the License.
 
 import moment from 'moment';
 
-class InstanceOverviewDetailsController {
+class InstanceDetailsBlockController {
     constructor($scope, instanceStore, instancesStore) {
         'ngInject';
 
@@ -80,4 +80,4 @@ class InstanceOverviewDetailsController {
     }
 }
 
-export default InstanceOverviewDetailsController;
+export default InstanceDetailsBlockController;
