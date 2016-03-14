@@ -68,8 +68,28 @@
             }
 
             &__edit {
-                color: @grey450;
                 cursor: pointer;
+                padding: 1px;
+
+                md-icon {
+                    color: @grey500;
+                }
+
+                &:hover {
+                    padding: 0;
+                    background-color: @grey100;
+                    border: 1px solid @grey400;
+                    
+                    md-icon {
+                        color: @black;
+                    }
+                }
+
+                &:active {
+                    padding: 0;
+                    border: 1px solid @grey450;
+                    box-shadow: inset 0 2px 1px rgba(0,0,0,0.07);
+                }
             }
         }
     }
