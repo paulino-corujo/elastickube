@@ -17,8 +17,8 @@ limitations under the License.
 import logging
 
 from tornado.gen import coroutine
+from tornado.httpclient import HTTPError
 
-from api.kube.exceptions import WatchDisconnectedException
 from data.query import Query
 
 
@@ -78,31 +78,23 @@ class SyncNamespaces(object):
             if future and future.exception():
                 logging.exception(future.exception())
 
-            if future is None or isinstance(future.exception(), WatchDisconnectedException):
-                watcher = self.settings["kube"].namespaces.watch(
-                    resource_version=self.resource_version,
-                    on_data=data_callback)
+                if isinstance(future.exception(), HTTPError) and future.exception().code == 599:
+                    self.settings["kube"].namespaces.watch(
+                        resourceVersion=self.resource_version,
+                        on_data=data_callback).add_done_callback(done_callback)
 
-                watcher.add_done_callback(done_callback)
+        existing_namespaces = yield Query(self.settings["database"], "Namespaces").find(projection=["_id"])
+        namespace_ids = [namespace["_id"] for namespace in existing_namespaces]
 
-        self.resource_version = None
-        try:
-            existing_namespaces = yield Query(self.settings["database"], "Namespaces").find(projection=["_id"])
-            namespace_ids = [namespace["_id"] for namespace in existing_namespaces]
+        result = yield self.settings["kube"].namespaces.get()
+        for item in result.get("items", []):
+            namespace = self._convert_namespace(item)
+            if namespace["_id"] in namespace_ids:
+                yield self._update_namespace(namespace)
+            else:
+                yield Query(self.settings["database"], "Namespaces").insert(namespace)
 
-            result = yield self.settings["kube"].namespaces.get()
-            for item in result.get("items", []):
-                namespace = self._convert_namespace(item)
-                if namespace["_id"] in namespace_ids:
-                    yield self._update_namespace(namespace)
-                else:
-                    yield Query(self.settings["database"], "Namespaces").insert(namespace)
-
-            self.resource_version = result["metadata"]["resourceVersion"]
-            watcher = self.settings["kube"].namespaces.watch(
-                resource_version=self.resource_version,
-                on_data=data_callback)
-            watcher.add_done_callback(done_callback)
-
-        except Exception as e:
-            logging.exception(e)
+        self.resource_version = result["metadata"]["resourceVersion"]
+        self.settings["kube"].namespaces.watch(
+            on_data=data_callback,
+            resourceVersion=self.resource_version).add_done_callback(done_callback)

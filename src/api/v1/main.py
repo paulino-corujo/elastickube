@@ -23,6 +23,7 @@ from tornado.gen import coroutine, Return, Future
 
 from api.kube.exceptions import KubernetesException
 from api.v1 import SecureWebSocketHandler
+from api.v1.actions.logs import LogsActions
 from api.v1.actions.instances import InstancesActions
 from api.v1.actions.namespaces import NamespacesActions
 from api.v1.actions.settings import SettingsActions
@@ -89,7 +90,11 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
                     else:
                         try:
-                            if request["operation"] == "create":
+                            if request["operation"] == "retrieve":
+                                response["body"] = yield action.retrieve(request["body"])
+                                response["operation"] = "retrieved"
+
+                            elif request["operation"] == "create":
                                 response["body"] = yield action.create(request["body"])
                                 response["operation"] = "created"
 
@@ -215,6 +220,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
         self.actions_lookup = dict(
             charts=dict(
                 watcher_cls=CursorWatcher
+            ),
+            logs=dict(
+                rest=LogsActions(self.settings, self.user)
             ),
             instance=dict(
                 watcher_cls=KubeWatcher

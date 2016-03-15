@@ -8,7 +8,7 @@ layout="row" layout-align="center center">
 
 <div layout="column" layout-align="center center">
     <div class="ek-instance-container-chart__name">{{ ctrl.container.name }}</div>
-    <div ng-if="!!ctrl.container.metrics">
+    <div ng-if="ctrl.metrics.length > 0">
         <div class="ek-instance-container-chart__legend-cpu" layout="row" layout-align="center center">
             <span></span>
             <div>CPU: {{ ctrl.dataset[0].cpu }}%</div>
@@ -18,7 +18,7 @@ layout="row" layout-align="center center">
             <div>Memory: {{ ctrl.dataset[1].memory }}%</div>
         </div>
     </div>
-    <div ng-if="!ctrl.container.metrics">
+    <div ng-if="ctrl.metrics.length < 1">
         No metrics available
     </div>
 </div>

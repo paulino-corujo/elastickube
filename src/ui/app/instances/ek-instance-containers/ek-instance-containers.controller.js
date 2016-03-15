@@ -18,9 +18,13 @@ class InstanceContainersController {
     constructor($scope, instanceStore) {
         'ngInject';
 
-        const onChange = () => this.instance = instanceStore.getInstance();
+        const onChange = () => {
+            this.instance = instanceStore.getInstance();
+            this.metrics = instanceStore.getMetrics();
+        };
 
         this.instance = instanceStore.getInstance();
+        this.metrics = instanceStore.getMetrics();
 
         instanceStore.addChangeListener(onChange);
 

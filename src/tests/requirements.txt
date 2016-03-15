@@ -7,3 +7,4 @@ pep8
 pycurl
 PyJWT
 pylint
+tornado

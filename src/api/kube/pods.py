@@ -16,6 +16,7 @@ limitations under the License.
 
 import json
 import logging
+import time
 
 from tornado.gen import coroutine, Return
 from tornado.httpclient import HTTPError
@@ -26,73 +27,72 @@ from api.kube.resources import NamespacedResource
 class Pods(NamespacedResource):
 
     @coroutine
-    def get(self, name=None, namespace=None):
-        result = yield super(Pods, self).get(name=name, namespace=namespace)
-
-        if self.api.heapster_base_url and name:
+    def metrics(self, namespace, name, **kwargs):
+        metrics = dict(kind="MetricList", items=[], metadata=dict(resourceVersion=time.time()))
+        if self.api.heapster_base_url:
             node_cpu_limit = None
             node_mem_limit = None
-            if "containerStatuses" in result["status"]:
-                for container_status in result["status"]["containerStatuses"]:
-                    for container in result["spec"]["containers"]:
-                        if container_status["name"] == container["name"]:
-                            container_spec = container
-                            break
 
-                    if "limits" not in container_spec["resources"]:
-                        if not node_cpu_limit:
-                            node_cpu_limit, node_mem_limit = yield self._get_node_metrics(result["status"]["hostIP"])
+            containers_url = "%s/namespaces/%s/pods/%s/containers/" % (
+                self.api.heapster_base_url, namespace, name)
 
-                        container_cpu_limit = node_cpu_limit
-                        container_mem_limit = node_mem_limit
-                    else:
-                        if (("cpu" not in container_spec["resources"]["limits"] or
-                             "memory" not in container_spec["resources"]["limits"]) and not node_cpu_limit):
-                            node_cpu_limit, node_mem_limit = yield self._get_node_metrics(result["status"]["hostIP"])
+            try:
+                containers = yield self.api.http_client.request(containers_url, **kwargs)
+            except HTTPError as http_error:
+                logging.exception(http_error)
+                raise Return(metrics)
 
-                        if "cpu" in container_spec["resources"]["limits"]:
-                            container_cpu_limit = int(container_spec["resources"]["limits"]["cpu"].replace("m", ""))
-                        else:
-                            container_cpu_limit = node_cpu_limit
+            for container in json.loads(containers.body):
+                container_stats_url = "%s/namespaces/%s/pods/%s/containers/%s/stats" % (
+                    self.api.heapster_base_url, namespace, name, container["name"])
 
-                        if "memory" in container_spec["resources"]["limits"]:
-                            container_mem_limit = (int(container_spec["resources"]["limits"]["memory"].replace("Mi", "")) *
-                                                   pow(10, 6))
-                        else:
-                            container_mem_limit = node_mem_limit
+                try:
+                    container_stats_response = yield self.api.http_client.request(container_stats_url, **kwargs)
+                except HTTPError as http_error:
+                    logging.exception(http_error)
+                    continue
 
-                    url_cpu_usage = "%s/namespaces/%s/pods/%s/containers/%s/metrics/cpu-usage" % (
-                        self.api.heapster_base_url, namespace, name, container_spec["name"])
+                container_stats = json.loads(container_stats_response.body)["stats"]
+                container_cpu_limit = container_stats["cpu-limit"]["minute"]["average"]
+                if container_cpu_limit < 2:
+                    if not node_cpu_limit:
+                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(namespace, name)
 
-                    try:
-                        cpu_result = yield self.api.http_client.request(url_cpu_usage)
-                    except HTTPError as http_error:
-                        logging.exception(http_error)
-                        continue
+                    container_cpu_limit = node_cpu_limit
 
-                    cpu_metrics = json.loads(cpu_result.body).get("metrics")
-                    container_cpu_usage = cpu_metrics[0]["value"]
+                container_mem_limit = container_stats["memory-limit"]["minute"]["average"]
+                if container_mem_limit == 0:
+                    if not node_cpu_limit:
+                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(namespace, name)
 
-                    url_mem_usage = "%s/namespaces/%s/pods/%s/containers/%s/metrics/memory-usage" % (
-                        self.api.heapster_base_url, namespace, name, container_spec["name"])
+                    container_mem_limit = node_mem_limit
 
-                    try:
-                        mem_result = yield self.api.http_client.request(url_mem_usage)
-                    except HTTPError as http_error:
-                        logging.exception(http_error)
-                        continue
+                container_metrics = dict(
+                    name=container["name"],
+                    cpuUsage=int(container_stats["cpu-usage"]["minute"]["average"] / float(container_cpu_limit) * 100),
+                    memUsage=int(container_stats["memory-usage"]["minute"]["average"] /
+                                 float(container_mem_limit) * 100)
+                )
 
-                    mem_metrics = json.loads(mem_result.body).get("metrics")
-                    container_mem_usage = mem_metrics[0]["value"]
+                metrics["items"].append(container_metrics)
 
-                    container_status["metrics"] = dict(cpuUsage=int(container_cpu_usage / float(container_cpu_limit) * 100),
-                                                       memUsage=int(container_mem_usage / float(container_mem_limit) * 100))
-
-        raise Return(result)
+        raise Return(metrics)
 
     @coroutine
-    def _get_node_metrics(self, host_ip):
-        node_metrics_url = "%s/nodes/%s/metrics" % (self.api.heapster_base_url, host_ip)
+    def _get_node_metrics(self, namespace, name):
+        node_name = None
+
+        nodes_url = "%s/nodes" % self.api.heapster_base_url
+        nodes_response = yield self.api.http_client.request(nodes_url)
+        for node in json.loads(nodes_response.body):
+            node_pods_url = "%s/nodes/%s/pods" % (self.api.heapster_base_url, node["name"])
+            node_pods_response = yield self.api.http_client.request(node_pods_url)
+            for pod in json.loads(node_pods_response.body):
+                if pod["name"] == "%s/%s/%s" % (namespace, namespace, name):
+                    node_name = node["name"]
+                    break
+
+        node_metrics_url = "%s/nodes/%s/metrics" % (self.api.heapster_base_url, node_name)
 
         cpu_result = yield self.api.http_client.request(node_metrics_url + "/cpu-limit")
         cpu_metrics = json.loads(cpu_result.body).get("metrics")
@@ -101,3 +101,45 @@ class Pods(NamespacedResource):
         mem_metrics = json.loads(mem_result.body).get("metrics")
 
         raise Return((cpu_metrics[0]["value"], mem_metrics[0]["value"]))
+
+    @coroutine
+    def logs(self, namespace, name, **kwargs):
+        logs = dict(kind="LogList", items=[], metadata=dict(resourceVersion=time.time()))
+
+        pod = yield self.get(namespace=namespace, name=name)
+        for container_status in pod["status"]["containerStatuses"]:
+            result = yield self.log(namespace, name, container_status["name"], **kwargs)
+            logs["items"].extend(result.get("items", []))
+
+        raise Return(logs)
+
+    @coroutine
+    def log(self, namespace, name, container, **kwargs):
+        url_path = self.api_path + "/namespaces/{namespace}/pods/{name}/log"
+        params = dict(namespace=namespace, timestamps=True, name=name, container=container)
+
+        for key in kwargs.iterkeys():
+            params[key] = kwargs[key]
+
+        result = yield self.api.http_client.request(url_path, **params)
+
+        logs = dict(kind="LogList", items=[], metadata=dict(resourceVersion=time.time()))
+
+        lines = result.body.splitlines()
+        for line in lines:
+            text = line
+            timestamp = None
+
+            if params["timestamps"]:
+                parsed_line = line.split(" ", 1)
+                text = parsed_line[1]
+                timestamp = parsed_line[0]
+
+            logs["items"].append(dict(
+                pod=name,
+                container=container,
+                text=text,
+                timestamp=timestamp
+            ))
+
+        raise Return(logs)
