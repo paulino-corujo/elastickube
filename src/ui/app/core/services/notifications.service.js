@@ -55,8 +55,8 @@ class NotificationsService extends EventEmitter {
 
     info(text) {
         const logMessage = {
-            text,
             id: _.uniqueId(),
+            text: text.message || text,
             type: types.INFO
         };
 
@@ -66,8 +66,8 @@ class NotificationsService extends EventEmitter {
 
     warn(text) {
         const logMessage = {
-            text,
             id: _.uniqueId(),
+            text: text.message || text,
             type: types.WARN
         };
 
@@ -76,7 +76,7 @@ class NotificationsService extends EventEmitter {
     }
 
     error(text) {
-        this._addMessage({ text, id: _.uniqueId(), type: types.ERROR });
+        this._addMessage({ id: _.uniqueId(), text: text.message || text, type: types.ERROR });
     }
 
     addChangeListener(callback) {

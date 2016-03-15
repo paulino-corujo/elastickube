@@ -23,6 +23,7 @@ import ConfirmDialogService from './confirm-dialog.service';
 import AvatarDirective from './ek-avatar/ek-avatar.directive';
 import ButtonGroupDirective from './ek-button-group/ek-button-group.directive';
 import ConfirmDirective from './ek-confirm/ek-confirm.directive';
+import ContainerStateDirective from './ek-container-state/ek-container-state.directive';
 import DonutChartDirective from './ek-donut-chart/ek-donut-chart.directive';
 import DropDirective from './ek-drop/ek-drop.directive';
 import DropContentDirective from './ek-drop/ek-drop-content.directive.js';
@@ -60,6 +61,7 @@ angular
 
         return new ConfirmDirective($compile, $rootScope);
     })
+    .directive('ekContainerState', () => new ContainerStateDirective())
     .directive('ekDrop', () => new DropDirective())
     .directive('ekDropContent', () => new DropContentDirective())
     .directive('ekDropTarget', () => new DropTargetDirective())

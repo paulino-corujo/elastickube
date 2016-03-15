@@ -22,7 +22,7 @@ class NavigationActionCreatorService {
         this._sessionStore = sessionStore;
     }
 
-    instance({ namespace, instanceId } = {}) {
+    instance({ namespace, instanceId } = {}, options) {
         if (_.isUndefined(namespace)) {
             throw Error('namespace parameter is mandatory');
         }
@@ -31,7 +31,31 @@ class NavigationActionCreatorService {
             throw Error('instanceId parameter is mandatory');
         }
 
-        return this._routerHelper.changeToState('instance', { namespace, instanceId });
+        return this._routerHelper.changeToState('instance.overview', { namespace, instanceId }, options);
+    }
+
+    instanceEvents({ namespace, instanceId } = {}) {
+        if (_.isUndefined(namespace)) {
+            throw Error('namespace parameter is mandatory');
+        }
+
+        if (_.isUndefined(instanceId)) {
+            throw Error('instanceId parameter is mandatory');
+        }
+
+        return this._routerHelper.changeToState('instance.events', { namespace, instanceId });
+    }
+
+    instanceContainers({ namespace, instanceId } = {}) {
+        if (_.isUndefined(namespace)) {
+            throw Error('namespace parameter is mandatory');
+        }
+
+        if (_.isUndefined(instanceId)) {
+            throw Error('instanceId parameter is mandatory');
+        }
+
+        return this._routerHelper.changeToState('instance.containers', { namespace, instanceId });
     }
 
     instances(namespace = this._sessionStore.getActiveNamespace()) {

@@ -14,23 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-container-chart.less';
-import Directive from 'directive';
-import Controller from './ek-instance-container-chart.controller';
-import template from './ek-instance-container-chart.html';
-
-class InstanceContainerChartDirective extends Directive {
+class ContainerStateController {
     constructor() {
-        super({ Controller, template });
-
-        this.bindToController = {
-            container: '='
-        };
     }
 
-    compile(tElement) {
-        tElement.addClass('ek-instance-container-chart layout-column layout-align-center-center');
+    getContainerState() {
+        return _.chain(this.container)
+            .get('state')
+            .keys()
+            .first()
+            .value();
     }
 }
 
-export default InstanceContainerChartDirective;
+export default ContainerStateController;

@@ -20,7 +20,7 @@ class AdminEditNamespaceController {
 
         this._namespacesActionCreator = namespacesActionCreator;
 
-        this.labels =  _.get(this.namespace, 'metadata.labels') || {};
+        this.labels = _.get(this.namespace, 'metadata.labels') || {};
         this.namespaceName = _.get(this.namespace, 'metadata.name');
         this.users = this.namespace ? _.map(this.namespace.members, (username) => usersStore.get(username))
             : [principalStore.getPrincipal()];

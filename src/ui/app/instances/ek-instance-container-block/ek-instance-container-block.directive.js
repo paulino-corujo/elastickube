@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-container-chart.less';
+import './ek-instance-container-block.less';
 import Directive from 'directive';
-import Controller from './ek-instance-container-chart.controller';
-import template from './ek-instance-container-chart.html';
+import Controller from './ek-instance-container-block.controller';
+import template from './ek-instance-container-block.html';
 
-class InstanceContainerChartDirective extends Directive {
+class InstanceContainerBlockDirective extends Directive {
     constructor() {
         super({ Controller, template });
 
@@ -29,8 +29,8 @@ class InstanceContainerChartDirective extends Directive {
     }
 
     compile(tElement) {
-        tElement.addClass('ek-instance-container-chart layout-column layout-align-center-center');
+        tElement.addClass('ek-instance-container-block ek-white-box');
     }
 }
 
-export default InstanceContainerChartDirective;
+export default InstanceContainerBlockDirective;

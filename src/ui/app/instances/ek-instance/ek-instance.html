@@ -11,13 +11,13 @@
              layout="row" layout-align="center end">
             <div class="ek-tab"
                  ng-class="{'ek-tab--selected': ctrl.tab === 'overview'}"
-                 ng-click="ctrl.tab = 'overview'">overview</div>
+                 ng-click="ctrl.selectTab('overview')">overview</div>
             <div class="ek-tab"
                  ng-class="{'ek-tab--selected': ctrl.tab === 'events'}"
-                 ng-click="ctrl.tab = 'events'">events</div>
+                 ng-click="ctrl.selectTab('events')">events</div>
             <div class="ek-tab"
                  ng-class="{'ek-tab--selected': ctrl.tab === 'containers'}"
-                 ng-click="ctrl.tab = 'containers'">containers</div>
+                 ng-click="ctrl.selectTab('containers')">containers</div>
         </div>
     </div>
 
@@ -36,10 +36,7 @@
         <div class="ek-instance__body__content"
              transclude-to="body" layout="column" flex>
             <div layout="row">
-                <div class="ek-instance__body__content__first-column" layout="column" flex>
-                    <ek-instance-overview ng-if="ctrl.tab === 'overview'"></ek-instance-overview>
-                    <ek-instance-events-block ng-if="ctrl.tab === 'events'"></ek-instance-events-block>
-                </div>
+                <div class="ek-instance__body__content__first-column" layout="column" flex ui-view></div>
                 <div class="ek-instance__body__content__second-column" layout="column">
                     <ek-instance-details-block></ek-instance-details-block>
                     <ek-instance-labels-block></ek-instance-labels-block>

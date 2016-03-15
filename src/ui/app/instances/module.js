@@ -27,6 +27,8 @@ import ChooseChartCardDirective from './ek-choose-chart-card/ek-choose-chart-car
 import ChooseChartGridDirective from './ek-choose-chart-grid/ek-choose-chart-grid.directive';
 import CustomizeDeploymentDirective from './ek-customize-deployment/ek-customize-deployment.directive';
 import InstanceDirective from './ek-instance/ek-instance.directive';
+import InstanceContainersDirective from './ek-instance-containers/ek-instance-containers.directive';
+import InstanceContainerBlockDirective from './ek-instance-container-block/ek-instance-container-block.directive';
 import InstanceContainerChartDirective from './ek-instance-container-chart/ek-instance-container-chart.directive';
 import InstanceActionsDirective from './ek-instance-actions/ek-instance-actions.directive';
 import InstanceBulkActionsDirective from './ek-instance-bulk-actions/ek-instance-bulk-actions.directive';
@@ -59,6 +61,8 @@ angular
     .directive('ekChooseChartGrid', () => new ChooseChartGridDirective())
     .directive('ekCustomizeDeployment', () => new CustomizeDeploymentDirective())
     .directive('ekInstance', () => new InstanceDirective())
+    .directive('ekInstanceContainers', () => new InstanceContainersDirective())
+    .directive('ekInstanceContainerBlock', () => new InstanceContainerBlockDirective())
     .directive('ekInstanceContainerChart', () => new InstanceContainerChartDirective())
     .directive('ekInstanceActions', () => new InstanceActionsDirective())
     .directive('ekInstanceBulkActions', () => new InstanceBulkActionsDirective())

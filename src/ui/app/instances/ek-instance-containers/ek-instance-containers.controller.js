@@ -14,23 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-container-chart.less';
-import Directive from 'directive';
-import Controller from './ek-instance-container-chart.controller';
-import template from './ek-instance-container-chart.html';
+class InstanceContainersController {
+    constructor($scope, instanceStore) {
+        'ngInject';
 
-class InstanceContainerChartDirective extends Directive {
-    constructor() {
-        super({ Controller, template });
+        const onChange = () => this.instance = instanceStore.getInstance();
 
-        this.bindToController = {
-            container: '='
-        };
-    }
+        this.instance = instanceStore.getInstance();
 
-    compile(tElement) {
-        tElement.addClass('ek-instance-container-chart layout-column layout-align-center-center');
+        instanceStore.addChangeListener(onChange);
+
+        $scope.$on('$destroy', () => instanceStore.removeChangeListener(onChange));
     }
 }
 
-export default InstanceContainerChartDirective;
+export default InstanceContainersController;
