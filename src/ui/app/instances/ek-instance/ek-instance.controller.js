@@ -23,6 +23,8 @@ class InstanceController {
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._instanceStore = instanceStore;
 
+        this.tab = 'overview';
+
         this._updateInstance();
 
         instanceStore.addChangeListener(onChange);

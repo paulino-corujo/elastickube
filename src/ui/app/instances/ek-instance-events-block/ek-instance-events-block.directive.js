@@ -14,19 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-overview-events.less';
+import './ek-instance-events-block.less';
 import Directive from 'directive';
-import Controller from './ek-instance-overview-events.controller';
-import template from './ek-instance-overview-events.html';
+import Controller from './ek-instance-events-block.controller';
+import template from './ek-instance-events-block.html';
 
-class InstanceOverviewEventsDirective extends Directive {
+class InstanceEventsBlockDirective extends Directive {
     constructor() {
         super({ Controller, template });
     }
 
     compile(tElement) {
-        tElement.addClass('ek-instance-overview-events ek-white-box');
+        tElement.addClass('ek-instance-events-block ek-white-box');
     }
 }
 
-export default InstanceOverviewEventsDirective;
+export default InstanceEventsBlockDirective;

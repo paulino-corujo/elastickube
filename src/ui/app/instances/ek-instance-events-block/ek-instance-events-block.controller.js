@@ -18,7 +18,7 @@ import constants from '../constants';
 
 const LIMIT = 6;
 
-class InstanceOverviewEventsController {
+class InstanceEventsBlockController {
     constructor($scope, instanceStore) {
         'ngInject';
 
@@ -53,4 +53,4 @@ class InstanceOverviewEventsController {
     }
 }
 
-export default InstanceOverviewEventsController;
+export default InstanceEventsBlockController;

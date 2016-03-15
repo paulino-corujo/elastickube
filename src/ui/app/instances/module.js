@@ -31,10 +31,10 @@ import InstanceContainerChartDirective from './ek-instance-container-chart/ek-in
 import InstanceActionsDirective from './ek-instance-actions/ek-instance-actions.directive';
 import InstanceBulkActionsDirective from './ek-instance-bulk-actions/ek-instance-bulk-actions.directive';
 import InstanceDetailsBlockDirective from './ek-instance-details-block/ek-instance-details-block.directive';
+import InstanceEventsBlockDirective from './ek-instance-events-block/ek-instance-events-block.directive';
 import InstanceLabelsBlockDirective from './ek-instance-labels-block/ek-instance-labels-block.directive';
 import InstanceOverviewDirective from './ek-instance-overview/ek-instance-overview.directive';
 import InstanceOverviewContainersDirective from './ek-instance-overview-containers/ek-instance-overview-containers.directive';
-import InstanceOverviewEventsDirective from './ek-instance-overview-events/ek-instance-overview-events.directive';
 import InstanceOverviewSelectorsDirective from './ek-instance-overview-selectors/ek-instance-overview-selectors.directive';
 import InstanceFiltersDirective from './ek-instance-filters/ek-instance-filters.directive';
 import InstanceListDirective from './ek-instance-list/ek-instance-list.directive';
@@ -63,10 +63,10 @@ angular
     .directive('ekInstanceActions', () => new InstanceActionsDirective())
     .directive('ekInstanceBulkActions', () => new InstanceBulkActionsDirective())
     .directive('ekInstanceDetailsBlock', () => new InstanceDetailsBlockDirective())
+    .directive('ekInstanceEventsBlock', () => new InstanceEventsBlockDirective())
     .directive('ekInstanceLabelsBlock', () => new InstanceLabelsBlockDirective())
     .directive('ekInstanceOverview', () => new InstanceOverviewDirective())
     .directive('ekInstanceOverviewContainers', () => new InstanceOverviewContainersDirective())
-    .directive('ekInstanceOverviewEvents', () => new InstanceOverviewEventsDirective())
     .directive('ekInstanceOverviewSelectors', () => new InstanceOverviewSelectorsDirective())
     .directive('ekInstanceFilters', () => new InstanceFiltersDirective())
     .directive('ekInstanceList', () => new InstanceListDirective())

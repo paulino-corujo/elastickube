@@ -1,29 +1,29 @@
-<div class="ek-instance-overview-events__container">
+<div class="ek-instance-events-block__container">
     <h3>events</h3>
 
-    <div class="ek-instance-overview-events__message"
+    <div class="ek-instance-events-block__message"
          layout="row" layout-align="center center"
          ng-if="ctrl.events.length === 0">
         No events found.
     </div>
 
-    <div class="ek-instance-overview-events__event"
+    <div class="ek-instance-events-block__event"
          ng-repeat="event in ctrl.events | limitTo: ctrl.limit track by event.metadata.uid"
          layout="row" layout-align="space-between center">
 
         <div layout="row" layout-align="start center">
-            <md-icon class="ek-instance-overview-events__event__icon"
+            <md-icon class="ek-instance-events-block__event__icon"
                      md-svg-src="{{:: ctrl.getIcon(event) }}"></md-icon>
             <span class="ek-instance-overview-events__event__message">{{:: event.message }}</span>
         </div>
 
-        <span class="ek-instance-overview-events__event__date">{{ event.lastTimestamp | ekHumanizeDate }} ago</span>
+        <span class="ek-instance-events-block__event__date">{{ event.lastTimestamp | ekHumanizeDate }} ago</span>
 
     </div>
 </div>
 
 <div layout="row" layout-align="center center"
-     class="ek-instance-overview-events__paginator"
+     class="ek-instance-events-block__paginator"
      ng-if="ctrl.limit < ctrl.events.length">
 
     <md-button class="md-primary"
