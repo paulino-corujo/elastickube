@@ -10,7 +10,7 @@ Kubernetes (https://github.com/kubernetes/kubernetes) is ready to serve your pro
 We designed ElasticKube with the following principles in mind:
 
 * **non opinionated**: unrestricted kubernetes experience
-* **standarized**: works in any kubernetes cluster
+* **standardized**: works in any kubernetes cluster
 * **stateless**: lifecycle and state is always stored in kubernetes
 * **integrated**: git, jenkins, sso authentication
 
