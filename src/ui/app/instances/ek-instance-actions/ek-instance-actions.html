@@ -1,9 +1,11 @@
 <ek-drop target-position="bottom right">
 
     <ek-drop-target>
-        <md-icon class="ek-instance-actions__icon" ng-click="ctrl.close()"
-                 md-svg-src="{{:: icons.IC_MORE_VERT_48PX  }}">
-        </md-icon>
+        <div ek-ink-ripple="dark"
+             class="ek-instance-actions__icon"
+             ng-click="ctrl.close()">
+            <md-icon md-svg-src="{{:: icons.IC_MORE_VERT_48PX  }}"></md-icon>
+        </div>
     </ek-drop-target>
 
     <ek-drop-content class="ek-instance-actions__content" layout="column" layout-align="start center">

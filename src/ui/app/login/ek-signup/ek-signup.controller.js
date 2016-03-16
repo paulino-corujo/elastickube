@@ -18,9 +18,10 @@ import constants from 'constants';
 import defaultPasswordRegexString from 'text!../../../../api/resources/password_default_regex';
 
 class SignupController {
-    constructor($scope, adminNavigationActionCreator, initialization, principalActionCreator) {
+    constructor($log, $scope, adminNavigationActionCreator, initialization, principalActionCreator) {
         'ngInject';
 
+        this._$log = $log.getInstance(this.constructor.name);
         this._$scope = $scope;
         this._adminNavigationActionCreator = adminNavigationActionCreator;
         this._initialization = initialization;
@@ -36,10 +37,10 @@ class SignupController {
             .catch((response) => {
                 switch (response.status) {
                     case constants.httpStatusCode.BAD_REQUEST:
-                        console.error('BAD REQUEST: Invalid field');
+                        this._$log.error(response.statusText);
                         break;
                     case constants.httpStatusCode.FORBIDDEN:
-                        console.warn('FORBIDDEN: An admin user was already created');
+                        this._$log.warn(response.statusText);
                         break;
                     default:
                 }

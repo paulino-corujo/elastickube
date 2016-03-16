@@ -14,26 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-actions.less';
-import Directive from 'directive';
-import constants from '../constants';
-import Controller from './ek-instance-actions.controller';
-import template from './ek-instance-actions.html';
+class NotificationsController {
+    constructor($scope, notifications) {
+        'ngInject';
 
-class InstanceActionsDirective extends Directive {
-    constructor() {
-        super({ Controller, template });
+        const onChange = () => $scope.$evalAsync(() => this.messages = notifications.getMessages());
 
-        this.bindToController = {
-            instance: '='
-        };
+        this._notifications = notifications;
+
+        this.messages = notifications.getMessages();
+
+        notifications.addChangeListener(onChange);
+
+        $scope.$on('$destroy', () => notifications.removeChangeListener(onChange));
     }
 
-    compile(tElement) {
-        tElement.addClass('ek-instance-actions');
-
-        return ($scope) => _.extend($scope, constants);
+    removeMessage(message) {
+        this._notifications.removeMessage(message);
     }
 }
 
-export default InstanceActionsDirective;
+export default NotificationsController;

@@ -18,15 +18,21 @@ class LabelEditorController {
     constructor() {
         'ngInject';
 
-        this.labels = {};
+        this.editable = _.isUndefined(this.editable) || this.editable;
+        this.labels = angular.copy(this.labels) || {};
+        this.label = {};
     }
 
     addLabel() {
-        if (this.form.$valid) {
+        if (this.isValidLabel()) {
             this.labels[this.label.key] = this.label.value;
             this.setLabelsCallback(this.labels);
-            delete this.label;
+            this.label = {};
         }
+    }
+
+    isValidLabel() {
+        return !_.isUndefined(this.label.key) && !_.isUndefined(this.label.value) && !this.labels[this.label.key];
     }
 
     removeLabel(key) {

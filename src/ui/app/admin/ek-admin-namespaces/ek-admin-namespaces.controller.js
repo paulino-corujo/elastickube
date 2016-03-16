@@ -21,6 +21,7 @@ class AdminNamespacesController {
         'ngInject';
 
         const onChange = () => this.namespaces = namespacesStore.getAll();
+
         namespacesStore.addChangeListener(onChange);
 
         this._$scope = $scope;

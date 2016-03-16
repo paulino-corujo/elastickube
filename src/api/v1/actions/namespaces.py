@@ -41,9 +41,10 @@ class NamespacesActions(object):
     def create(self, document):
         logging.info("Creating namespace for request %s", document)
 
-        labels = dict(name=document["name"])
-        if "metadata" in document and labels in document["metadata"]:
-            labels.update(document["metadata"]["labels"])
+        labels = dict()
+
+        if "metadata" in document and "labels" in document["metadata"]:
+            labels = document["metadata"]["labels"]
 
         body = dict(
             kind="Namespace",

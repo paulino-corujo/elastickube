@@ -20,6 +20,10 @@
         }
     }
 
+    &__header {
+        min-height: 45px;
+    }
+
     &__body {
 
         & > [transclude-id="sidenav"] {
@@ -27,16 +31,24 @@
         }
 
         &__sidenav {
-            padding-top: 130px;
+            & {
+                padding-top: 20px;
+            }
 
             .ek-instance__ikon {
-                position: absolute;
-                top: -50px;
-                left: 20px;
-
                 &, & > .ek-ikon {
                     width: 170px;
                     height: 170px;
+                }
+            }
+
+            &--pod {
+                padding-top: 130px;
+
+                .ek-instance__ikon {
+                    position: absolute;
+                    top: -50px;
+                    left: 20px;
                 }
             }
         }

@@ -40,7 +40,6 @@ import InstanceFiltersDirective from './ek-instance-filters/ek-instance-filters.
 import InstanceListDirective from './ek-instance-list/ek-instance-list.directive';
 import InstanceStateSelectorDirective from './ek-instance-state-selector/ek-instance-state-selector.directive';
 import InstancesDirective from './ek-instances/ek-instances.directive';
-import LabelEditorDirective from './ek-label-editor/ek-label-editor.directive';
 import NewInstanceDirective from './ek-new-instance/ek-new-instance.directive';
 
 const moduleName = 'app.instances';
@@ -73,7 +72,6 @@ angular
     .directive('ekInstanceList', () => new InstanceListDirective())
     .directive('ekInstanceStateSelector', () => new InstanceStateSelectorDirective())
     .directive('ekInstances', () => new InstancesDirective())
-    .directive('ekLabelEditor', () => new LabelEditorDirective())
     .directive('ekNewInstance', () => new NewInstanceDirective());
 
 export default moduleName;

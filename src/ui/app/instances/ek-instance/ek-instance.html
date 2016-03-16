@@ -6,7 +6,9 @@
             <ek-instance-state instance="ctrl.instance"></ek-instance-state>
         </div>
 
-        <div class="ek-tabs" layout="row" layout-align="center end">
+        <div class="ek-tabs"
+             ng-if="ctrl.instance.kind === 'Pod'"
+             layout="row" layout-align="center end">
             <!--<div class="ek-tab ek-tab&#45;&#45;selected">overview</div>-->
             <!--<div class="ek-tab">events</div>-->
             <!--<div class="ek-tab">containers</div>-->
@@ -16,6 +18,7 @@
     <ek-sidenav-layout class="ek-instance__body" transclude-to="body" flex>
 
         <div class="ek-instance__body__sidenav"
+             ng-class="{'ek-instance__body__sidenav--pod': ctrl.instance.kind === 'Pod'}"
              transclude-to="sidenav" flex
              layout="column" layout-align="start center">
 

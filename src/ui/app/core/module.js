@@ -49,10 +49,11 @@ import humanizeDateFilter from './filters/humanize-date.filter';
 
 import FocusDirective from './directives/focus';
 
-import InitializationService from './services/initialization.service';
-import MultiTranscludeService from './services/multi-transclude.service';
 import AuthService from './security/auth.service';
 import CheckNamespaceService from './services/check-namespace.service';
+import InitializationService from './services/initialization.service';
+import MultiTranscludeService from './services/multi-transclude.service';
+import { NotificationsService } from './services/notifications.service.js';
 import SessionService from './services/session.service';
 
 const moduleName = 'app.core';
@@ -75,12 +76,13 @@ angular
 
     .filter('ekHumanizeDate', () => humanizeDateFilter)
 
-    .service('session', SessionService)
     .service('auth', AuthService)
     .service('checkNamespace', CheckNamespaceService)
     .service('dispatcher', DispatcherService)
     .service('initialization', InitializationService)
     .service('multiTransclude', MultiTranscludeService)
+    .service('notifications', NotificationsService)
+    .service('session', SessionService)
 
     .service('chartsActionCreator', ChartsActionCreatorService)
     .service('chartsStore', ChartsStoreService)
