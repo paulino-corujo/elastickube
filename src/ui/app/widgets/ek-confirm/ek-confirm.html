@@ -1,17 +1,23 @@
 <md-dialog class="ek-confirm__dialog">
+
     <md-dialog-content ng-if="!ctrl.options.template" class="ek-confirm__dialog__content">
-
-        <h2 class="ek-confirm__dialog__content__title">{{ ctrl.options.title }}</h2>
-
-        <div class="ek-confirm__dialog__content__body">
-            {{ ctrl.options.content }}
-        </div>
+        <h2 class="ek-confirm__dialog__content__title">{{:: ctrl.options.title }}</h2>
+        <div class="ek-confirm__dialog__content__body">{{:: ctrl.options.content }}</div>
     </md-dialog-content>
 
     <md-dialog-actions class="ek-confirm__dialog__actions">
-        <md-button ng-if="ctrl.isCancelButtonAvailable()" class="ek-confirm__actions__cancel ek-button" ng-click="ctrl.cancel()">{{ ctrl.options.cancel }}</md-button>
-        <md-button ng-disabled="!ctrl.canAccept" ng-if="ctrl.isOKButtonAvailable()" ng-click="ctrl.ok()"
-                   class="ek-button ek-confirm__dialog__actions__ok md-raised md-primary ek-button">{{ ctrl.options.ok }}
+        <md-button ng-if="ctrl.isCancelButtonAvailable()"
+                   class="ek-confirm__actions__cancel ek-button"
+                   aria-label="cancel"
+                   ng-click="ctrl.cancel()">
+            {{:: ctrl.options.cancel }}
+        </md-button>
+        <md-button ng-disabled="!ctrl.canAccept"
+                   ng-if="ctrl.isOKButtonAvailable()"
+                   ng-click="ctrl.ok()"
+                   aria-label="ok"
+                   class="ek-button ek-confirm__dialog__actions__ok md-raised md-primary ek-button">
+            {{:: ctrl.options.ok }}
         </md-button>
     </md-dialog-actions>
 </md-dialog>

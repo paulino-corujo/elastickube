@@ -27,15 +27,10 @@ class InstanceActionsController {
     delete() {
         this.drop.close();
 
-        const instanceNames = _.chain(this.instances)
-            .map((x) => x.metadata.name)
-            .value()
-            .join(', ');
-
         return this._confirmDialog
-            .confirm(this._$scope, {
+            .confirm({
                 title: 'Confirm Action',
-                content: `Do you want to DELETE ${instanceNames} instance${_.size(this.instances) > 1 ? 's' : ''}?`,
+                content: 'Do you want to DELETE selected instances?',
                 ok: 'OK',
                 cancel: 'CANCEL'
             })

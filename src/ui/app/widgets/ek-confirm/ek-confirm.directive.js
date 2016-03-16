@@ -23,6 +23,7 @@ class ConfirmDirective extends Directive {
 
     constructor($compile) {
         super({ Controller, template });
+
         this._$compile = $compile;
     }
 
