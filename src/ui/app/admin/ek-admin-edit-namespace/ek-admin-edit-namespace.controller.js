@@ -20,6 +20,7 @@ class AdminEditNamespaceController {
 
         this._namespacesActionCreator = namespacesActionCreator;
 
+        this.labels =  _.get(this.namespace, 'metadata.labels') || {};
         this.namespaceName = _.get(this.namespace, 'metadata.name');
         this.users = this.namespace ? _.map(this.namespace.members, (username) => usersStore.get(username))
             : [principalStore.getPrincipal()];
@@ -29,15 +30,29 @@ class AdminEditNamespaceController {
         });
     }
 
+    countLabels() {
+        return _.size(this.labels);
+    }
+
     removeUser(user) {
         this.users = _.without(this.users, user);
     }
 
+    setLabels() {
+        return (labels) => this.labels = labels;
+    }
+
     accept() {
+        const namespaceInfo = {
+            namespaceName: this.namespaceName,
+            labels: this.labels,
+            users: this.users
+        };
+
         if (this.namespace) {
-            return this._namespacesActionCreator.updateNamespace(this.namespace, this.namespaceName, this.users);
+            return this._namespacesActionCreator.updateNamespace(this.namespace, this.users);
         }
-        return this._namespacesActionCreator.createNamespace(this.namespaceName, this.users);
+        return this._namespacesActionCreator.createNamespace(namespaceInfo);
     }
 }
 
