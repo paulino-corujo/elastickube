@@ -24,6 +24,7 @@ class InstanceActionsController {
 
     delete() {
         this.drop.close();
+
         return this._confirmDialog
             .confirm({
                 title: 'Confirm Action',
@@ -31,9 +32,7 @@ class InstanceActionsController {
                 ok: 'OK',
                 cancel: 'CANCEL'
             })
-            .then(() => {
-                 return this._instancesActionCreator.delete(this.instance);
-            });
+            .then(() => this._instancesActionCreator.delete(this.instance));
     }
 }
 

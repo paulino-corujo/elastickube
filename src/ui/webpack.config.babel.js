@@ -89,6 +89,9 @@ const webpackConfig = {
     }),
 
     plugins: [
+        new webpack.DefinePlugin({
+            PRODUCTION: isProduction
+        }),
         new webpack.OldWatchingPlugin(),
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /uk/),
         new HtmlWebpackPlugin({ template: './index.html', favicon: './favicon.png' }),

@@ -14,26 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-actions.less';
+import './ek-notifications.less';
 import Directive from 'directive';
-import constants from '../constants';
-import Controller from './ek-instance-actions.controller';
-import template from './ek-instance-actions.html';
+import Controller from './ek-notifications.controller';
+import template from './ek-notifications.html';
 
-class InstanceActionsDirective extends Directive {
+class NotificationsDirective extends Directive {
     constructor() {
         super({ Controller, template });
-
-        this.bindToController = {
-            instance: '='
-        };
     }
 
     compile(tElement) {
-        tElement.addClass('ek-instance-actions');
-
-        return ($scope) => _.extend($scope, constants);
+        tElement.addClass('ek-notifications layout-column layout-align-start-center');
     }
 }
 
-export default InstanceActionsDirective;
+export default NotificationsDirective;

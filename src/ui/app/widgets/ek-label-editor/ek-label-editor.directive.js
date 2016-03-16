@@ -25,6 +25,8 @@ class LabelEditorDirective extends Directive {
         super({ Controller, template });
 
         this.bindToController = {
+            editable: '=?',
+            labels: '=?',
             setLabelsCallback: '&'
         };
     }
