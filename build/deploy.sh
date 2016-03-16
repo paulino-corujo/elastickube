@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TIMEOUT=${TIMEOUT:-240}
+
 cat << \
 '______________________________HEADER______________________________'
   _____ _           _   _      _  __     _
@@ -194,13 +196,13 @@ deploy_rc()
     fi
 
     local COUNTER=0
-    until [ ${COUNTER} -ge 60 ] || exec_wait "kubectl --namespace=kube-system describe rc ${1} | grep '0 Waiting / 0 Succeeded / 0 Failed'"
+    until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe rc ${1} | grep '0 Waiting / 0 Succeeded / 0 Failed'"
     do
         exec_wait sh -c "sleep 2"
         COUNTER=$[${COUNTER} + 1]
     done
 
-    if [ ${COUNTER} -lt 60 ]
+    if [[ ${COUNTER} -lt ${TIMEOUT} ]]
     then
         echo [ ✓ ]
     else
@@ -243,13 +245,13 @@ deploy_svc elastickube-server "${ELASTICKUBE_SERVER_SVC}"
 
 printf "%-${PROGRESS_WIDTH}s" "Waiting for LB to be ready"
 COUNTER=0
-until [ ${COUNTER} -ge 60 ] || exec_wait "kubectl --namespace=kube-system describe svc elastickube-server | grep 'LoadBalancer Ingress:'"
+until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe svc elastickube-server | grep 'LoadBalancer Ingress:'"
 do
     exec_wait sh -c "sleep 2"
     COUNTER=$[${COUNTER} + 1]
 done
 
-if [ ${COUNTER} -lt 60 ]
+if [[ ${COUNTER} -lt ${TIMEOUT} ]]
 then
     echo [ ✓ ]
 else
