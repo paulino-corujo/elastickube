@@ -18,8 +18,8 @@ import AbstractStore from './abstract-store';
 import constants from './constants';
 
 const NAMESPACE_UPDATED_EVENT = 'namespace.change';
-const EXPANDED_INSTANCES_CHANGED_EVENT = 'expanded-instances.changed';
-const EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT = 'expanded-admin-instances.changed';
+const INSTANCES_STATUS_CHANGED_EVENT = 'instances-status.changed';
+const ADMIN_INSTANCES_STATUS_CHANGED_EVENT = 'admin-instances-status.changed';
 
 class SessionStoreService extends AbstractStore {
     constructor(session, actions, dispatcher, namespacesStore) {
@@ -38,12 +38,12 @@ class SessionStoreService extends AbstractStore {
                     this.emit(NAMESPACE_UPDATED_EVENT);
                     break;
 
-                case this._actions.SESSION_EXPANDED_INSTANCES_CHANGED:
-                    this.emit(EXPANDED_INSTANCES_CHANGED_EVENT);
+                case this._actions.SESSION_INSTANCES_STATUS_CHANGED:
+                    this.emit(INSTANCES_STATUS_CHANGED_EVENT);
                     break;
 
-                case this._actions.SESSION_EXPANDED_ADMIN_INSTANCES_CHANGED:
-                    this.emit(EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT);
+                case this._actions.SESSION_ADMIN_INSTANCES_STATUS_CHANGED:
+                    this.emit(ADMIN_INSTANCES_STATUS_CHANGED_EVENT);
                     break;
 
                 default:
@@ -61,15 +61,15 @@ class SessionStoreService extends AbstractStore {
         return this._session.getItem(constants.SESSION_TOKEN);
     }
 
-    getExpandedInstances() {
+    getInstancesStatus() {
         const namespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
-        const expandedInstances = this._session.getItem(constants.EXPANDED_INSTANCES) || {};
+        const instancesStatus = this._session.getItem(constants.INSTANCES_STATUS) || {};
 
-        return expandedInstances[namespaceUID];
+        return instancesStatus[namespaceUID];
     }
 
-    getExpandedAdminInstances() {
-        return this._session.getItem(constants.EXPANDED_ADMIN_INSTANCES);
+    getAdminInstancesStatus() {
+        return this._session.getItem(constants.ADMIN_INSTANCES_STATUS);
     }
 
     addNamespaceChangeListener(callback) {
@@ -80,20 +80,20 @@ class SessionStoreService extends AbstractStore {
         this.removeListener(NAMESPACE_UPDATED_EVENT, callback);
     }
 
-    addExpandedInstancesChangeListener(callback) {
-        this.on(EXPANDED_INSTANCES_CHANGED_EVENT, callback);
+    addInstancesStatusChangeListener(callback) {
+        this.on(INSTANCES_STATUS_CHANGED_EVENT, callback);
     }
 
-    removeExpandedInstancesChangeListener(callback) {
-        this.removeListener(EXPANDED_INSTANCES_CHANGED_EVENT, callback);
+    removeInstancesStatusChangeListener(callback) {
+        this.removeListener(INSTANCES_STATUS_CHANGED_EVENT, callback);
     }
 
-    addExpandedAdminInstancesChangeListener(callback) {
-        this.on(EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT, callback);
+    addAdminInstancesStatusChangeListener(callback) {
+        this.on(ADMIN_INSTANCES_STATUS_CHANGED_EVENT, callback);
     }
 
-    removeExpandedAdminInstancesChangeListener(callback) {
-        this.removeListener(EXPANDED_ADMIN_INSTANCES_CHANGED_EVENT, callback);
+    removeAdminInstancesStatusChangeListener(callback) {
+        this.removeListener(ADMIN_INSTANCES_STATUS_CHANGED_EVENT, callback);
     }
 }
 

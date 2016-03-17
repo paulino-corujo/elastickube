@@ -37,6 +37,7 @@
     "tether-drop": "^1.4.2"
   },
   "devDependencies": {
+    "angular-vs-repeat": "^1.1.7",
     "autoprefixer": "^6.3.2",
     "babel-core": "^6.4.5",
     "babel-eslint": "^4.1.8",

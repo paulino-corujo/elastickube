@@ -1,7 +1,2 @@
-<div class="ek-instance-list__table ek-table" ui-grid-selection ui-grid-tree-view
-     ng-if="ctrl.containsGroups"
-     ui-grid="ctrl.gridOptions"></div>
-
-<div class="ek-instance-list__table ek-table" ui-grid-selection
-     ng-if="!ctrl.containsGroups"
-     ui-grid="ctrl.gridOptions"></div>
+<ek-table options="ctrl.tableOptions"
+          status="ctrl.instancesStatus"></ek-table>
