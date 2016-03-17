@@ -14,19 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-instance-overview-details.less';
+import './ek-instance-labels-block.less';
 import Directive from 'directive';
-import Controller from './ek-instance-overview-details.controller';
-import template from './ek-instance-overview-details.html';
+import Controller from './ek-instance-labels-block.controller';
+import template from './ek-instance-labels-block.html';
 
-class InstanceOverviewDetailsDirective extends Directive {
+class InstanceLabelsBlockDirective extends Directive {
     constructor() {
         super({ Controller, template });
     }
 
     compile(tElement) {
-        tElement.addClass('ek-instance-overview-details ek-white-box');
+        tElement.addClass('ek-instance-labels-block ek-white-box');
     }
 }
 
-export default InstanceOverviewDetailsDirective;
+export default InstanceLabelsBlockDirective;

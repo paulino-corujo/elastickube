@@ -1,11 +1,3 @@
-<div layout="row">
-    <div class="ek-instance-overview__first-column" layout="column" flex>
-        <ek-instance-overview-selectors ng-if="ctrl.instance.kind !== 'Pod'"></ek-instance-overview-selectors>
-        <ek-instance-overview-containers ng-if="ctrl.instance.kind === 'Pod'"></ek-instance-overview-containers>
-        <ek-instance-overview-events></ek-instance-overview-events>
-    </div>
-    <div class="ek-instance-overview__second-column" layout="column">
-        <ek-instance-overview-details></ek-instance-overview-details>
-        <ek-instance-overview-labels></ek-instance-overview-labels>
-    </div>
-</div>
+<ek-instance-overview-selectors ng-if="ctrl.instance.kind !== 'Pod'"></ek-instance-overview-selectors>
+<ek-instance-overview-containers ng-if="ctrl.instance.kind === 'Pod'"></ek-instance-overview-containers>
+<ek-instance-events-block></ek-instance-events-block>

@@ -14,18 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-class InstanceOverviewLabelsController {
-    constructor($scope, instanceStore) {
-        'ngInject';
+class ContainerStateController {
+    constructor() {
+    }
 
-        const onChange = () => this.instance = instanceStore.getInstance();
-
-        this.instance = instanceStore.getInstance();
-
-        instanceStore.addChangeListener(onChange);
-
-        $scope.$on('$destroy', () => instanceStore.removeChangeListener(onChange));
+    getContainerState() {
+        return _.chain(this.container)
+            .get('state')
+            .keys()
+            .first()
+            .value();
     }
 }
 
-export default InstanceOverviewLabelsController;
+export default ContainerStateController;

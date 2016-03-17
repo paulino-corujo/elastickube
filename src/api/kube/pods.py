@@ -32,55 +32,61 @@ class Pods(NamespacedResource):
         if self.api.heapster_base_url and name:
             node_cpu_limit = None
             node_mem_limit = None
-            for container in result["spec"]["containers"]:
-                if "limits" not in container["resources"]:
-                    if not node_cpu_limit:
-                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(result["status"]["hostIP"])
+            if "containerStatuses" in result["status"]:
+                for container_status in result["status"]["containerStatuses"]:
+                    for container in result["spec"]["containers"]:
+                        if container_status["name"] == container["name"]:
+                            container_spec = container
+                            break
 
-                    container_cpu_limit = node_cpu_limit
-                    container_mem_limit = node_mem_limit
-                else:
-                    if (("cpu" not in container["resources"]["limits"] or
-                         "memory" not in container["resources"]["limits"]) and not node_cpu_limit):
-                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(result["status"]["hostIP"])
+                    if "limits" not in container_spec["resources"]:
+                        if not node_cpu_limit:
+                            node_cpu_limit, node_mem_limit = yield self._get_node_metrics(result["status"]["hostIP"])
 
-                    if "cpu" in container["resources"]["limits"]:
-                        container_cpu_limit = int(container["resources"]["limits"]["cpu"].replace("m", ""))
-                    else:
                         container_cpu_limit = node_cpu_limit
-
-                    if "memory" in container["resources"]["limits"]:
-                        container_mem_limit = (int(container["resources"]["limits"]["memory"].replace("Mi", "")) *
-                                               pow(10, 6))
-                    else:
                         container_mem_limit = node_mem_limit
+                    else:
+                        if (("cpu" not in container_spec["resources"]["limits"] or
+                             "memory" not in container_spec["resources"]["limits"]) and not node_cpu_limit):
+                            node_cpu_limit, node_mem_limit = yield self._get_node_metrics(result["status"]["hostIP"])
 
-                url_cpu_usage = "%s/namespaces/%s/pods/%s/containers/%s/metrics/cpu-usage" % (
-                    self.api.heapster_base_url, namespace, name, container["name"])
+                        if "cpu" in container_spec["resources"]["limits"]:
+                            container_cpu_limit = int(container_spec["resources"]["limits"]["cpu"].replace("m", ""))
+                        else:
+                            container_cpu_limit = node_cpu_limit
 
-                try:
-                    cpu_result = yield self.api.http_client.request(url_cpu_usage)
-                except HTTPError as http_error:
-                    logging.exception(http_error)
-                    continue
+                        if "memory" in container_spec["resources"]["limits"]:
+                            container_mem_limit = (int(container_spec["resources"]["limits"]["memory"].replace("Mi", "")) *
+                                                   pow(10, 6))
+                        else:
+                            container_mem_limit = node_mem_limit
 
-                cpu_metrics = json.loads(cpu_result.body).get("metrics")
-                container_cpu_usage = cpu_metrics[0]["value"]
+                    url_cpu_usage = "%s/namespaces/%s/pods/%s/containers/%s/metrics/cpu-usage" % (
+                        self.api.heapster_base_url, namespace, name, container_spec["name"])
 
-                url_mem_usage = "%s/namespaces/%s/pods/%s/containers/%s/metrics/memory-usage" % (
-                    self.api.heapster_base_url, namespace, name, container["name"])
+                    try:
+                        cpu_result = yield self.api.http_client.request(url_cpu_usage)
+                    except HTTPError as http_error:
+                        logging.exception(http_error)
+                        continue
 
-                try:
-                    mem_result = yield self.api.http_client.request(url_mem_usage)
-                except HTTPError as http_error:
-                    logging.exception(http_error)
-                    continue
+                    cpu_metrics = json.loads(cpu_result.body).get("metrics")
+                    container_cpu_usage = cpu_metrics[0]["value"]
 
-                mem_metrics = json.loads(mem_result.body).get("metrics")
-                container_mem_usage = mem_metrics[0]["value"]
+                    url_mem_usage = "%s/namespaces/%s/pods/%s/containers/%s/metrics/memory-usage" % (
+                        self.api.heapster_base_url, namespace, name, container_spec["name"])
 
-                container["metrics"] = dict(cpuUsage=int(container_cpu_usage / float(container_cpu_limit) * 100),
-                                            memUsage=int(container_mem_usage / float(container_mem_limit) * 100))
+                    try:
+                        mem_result = yield self.api.http_client.request(url_mem_usage)
+                    except HTTPError as http_error:
+                        logging.exception(http_error)
+                        continue
+
+                    mem_metrics = json.loads(mem_result.body).get("metrics")
+                    container_mem_usage = mem_metrics[0]["value"]
+
+                    container_status["metrics"] = dict(cpuUsage=int(container_cpu_usage / float(container_cpu_limit) * 100),
+                                                       memUsage=int(container_mem_usage / float(container_mem_limit) * 100))
 
         raise Return(result)
 

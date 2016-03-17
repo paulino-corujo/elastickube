@@ -15,15 +15,18 @@ limitations under the License.
 */
 
 class InstanceController {
-    constructor($scope, instancesNavigationActionCreator, instanceStore) {
+    constructor($scope, $state, $stateParams, instancesNavigationActionCreator, instanceStore) {
         'ngInject';
 
         const onChange = () => this._updateInstance();
 
+        this._$state = $state;
+        this._$stateParams = $stateParams;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._instanceStore = instanceStore;
 
         this._updateInstance();
+        this.tab = _.last($state.current.name.split('.'));
 
         instanceStore.addChangeListener(onChange);
 
@@ -35,6 +38,26 @@ class InstanceController {
 
         if (_.isUndefined(this.instance)) {
             return this._instancesNavigationActionCreator.instances();
+        }
+    }
+
+    selectTab(tabName = 'overview') {
+        const tabs = this.instance.kind === 'Pod' ? ['overview', 'events', 'containers'] : ['overview'];
+
+        if (_.includes(tabs, tabName)) {
+            this.tab = tabName;
+
+            const namespace = this._$stateParams.namespace;
+            const instanceId = this._$stateParams.instanceId;
+
+            switch (tabName) {
+                case 'events':
+                    return this._instancesNavigationActionCreator.instanceEvents({ namespace, instanceId });
+                case 'containers':
+                    return this._instancesNavigationActionCreator.instanceContainers({ namespace, instanceId });
+                default:
+                    return this._instancesNavigationActionCreator.instance({ namespace, instanceId });
+            }
         }
     }
 }

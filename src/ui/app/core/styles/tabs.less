@@ -1,9 +1,7 @@
 @import "../../colors";
 
 .ek-tabs {
-
     .ek-tab {
-
         & {
             text-transform: uppercase;
             width: 160px;
@@ -15,13 +13,14 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            padding-bottom: 3px;
         }
 
         &--selected {
             cursor: default;
             color: @cyan500;
+            padding-bottom: 0;
             border-bottom: 3px solid @cyan500;
         }
     }
 }
-
