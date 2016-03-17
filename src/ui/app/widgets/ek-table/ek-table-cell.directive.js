@@ -27,6 +27,8 @@ class TableCellDirective {
 
         return {
             pre: ($scope, $element) => {
+                $scope.appScope = $scope.$parent.ctrl._$scope.$parent;
+
                 if (angular.isDefined($scope.column.compiledTemplateFn)) {
                     $scope.column.compiledTemplateFn($scope, (clonedElement) => $element.append(clonedElement));
                 } else if (_.has($scope.column, 'field')) {

@@ -188,14 +188,14 @@ class TableController {
 
                     return columnDef.sortOrder === 'asc' ? result : result * -1;
                 });
-            } else {
+            } else if (angular.isDefined(sorterColumn.field)) {
                 return _.orderBy(collection, [columnDef.field], [columnDef.sortOrder]);
             }
 
             return collection;
         }
 
-        if (sorterColumn && sorterColumn.enableSorting && angular.isDefined(sorterColumn.field)) {
+        if (sorterColumn && sorterColumn.enableSorting) {
             items = sortByColumn(items, sorterColumn);
 
             if (angular.isDefined(this.options.groupField)) {
