@@ -36,7 +36,7 @@ class InstanceActionsDirective extends Directive {
             _.extend($scope, constants);
 
             $controller.drop = $element.find('ek-drop').controller('ekDrop');
-        }
+        };
     }
 }
 

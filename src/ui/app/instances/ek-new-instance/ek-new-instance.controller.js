@@ -48,7 +48,7 @@ class NewInstanceController {
     deploy() {
         return this._instancesActionCreator
             .deploy(this._sessionStore.getActiveNamespace(), this.selectedChart, this.deploymentInfo)
-            .catch((error) => this._$log.error(error.statusText))
+            .catch((error) => this._$log.error(error.body))
             .finally(() => this.goToInstances());
     }
 }
