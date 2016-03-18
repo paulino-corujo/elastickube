@@ -53,7 +53,9 @@ class DropDirective extends Directive {
                     }
                 });
 
-                $scope.$parent.ctrl.drop = $scope.ctrl.drop;
+                $scope.$on('$destroy', () => {
+                    $scope.ctrl.drop.destroy();
+                });
             }
         };
     }
