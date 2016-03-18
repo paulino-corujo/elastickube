@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import 'angular-material/angular-material';
+import 'angular-vs-repeat';
 
 import coreModule from 'core/module';
 
@@ -43,6 +44,8 @@ import NotificationsDirective from './ek-notifications/ek-notifications.directiv
 import OwnersSelectorDirective from './ek-owners-selector/ek-owners-selector.directive';
 import SearchFilterDirective from './ek-search-filter/ek-search-filter.directive';
 import SelectUsersDirective from './ek-select-users/ek-select-users.directive';
+import TableDirective from './ek-table/ek-table.directive';
+import TableCellDirective from './ek-table/ek-table-cell.directive';
 import UserInfoDirective from './ek-user-info/ek-user-info.directive';
 
 const moduleName = 'app.widgets';
@@ -50,7 +53,8 @@ const moduleName = 'app.widgets';
 angular
     .module(moduleName, [
         coreModule,
-        'ngMaterial'
+        'ngMaterial',
+        'vs-repeat'
     ])
     .service('confirmDialog', ConfirmDialogService)
 
@@ -85,6 +89,12 @@ angular
     .directive('ekOwnersSelector', () => new OwnersSelectorDirective())
     .directive('ekSearchFilter', () => new SearchFilterDirective())
     .directive('ekSelectUsers', () => new SelectUsersDirective())
+    .directive('ekTable', ($compile) => {
+        'ngInject';
+
+        return new TableDirective($compile);
+    })
+    .directive('ekTableCell', () => new TableCellDirective())
     .directive('ekUserInfo', () => new UserInfoDirective());
 
 export default moduleName;

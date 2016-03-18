@@ -35,7 +35,7 @@ const webpackConfig = {
             'angular-cookies',
             'angular-password',
             'angular-ui-router',
-            'angular-ui-grid/ui-grid',
+            'angular-vs-repeat',
             'd3',
             'flux',
             'lodash',
@@ -43,7 +43,6 @@ const webpackConfig = {
             'normalize.css/normalize.css',
             'roboto-fontface/css/roboto-fontface.css',
             'tether-drop',
-            'angular-ui-grid/ui-grid.css',
             'angular-material/angular-material.css'
         ]
     },

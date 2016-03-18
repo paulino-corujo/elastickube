@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import rowTemplate from './ek-admin-namespaces-row.template.html';
-
 class AdminNamespacesController {
     constructor($scope, confirmDialog, instancesStore, namespacesStore) {
         'ngInject';
@@ -24,7 +22,6 @@ class AdminNamespacesController {
 
         namespacesStore.addChangeListener(onChange);
 
-        this._$scope = $scope;
         this._confirmDialog = confirmDialog;
         this._instancesStore = instancesStore;
 
@@ -32,28 +29,21 @@ class AdminNamespacesController {
         this.namespaces = namespacesStore.getAll();
         this.filteredNamespaces = [];
 
-        this.gridOptions = {
-            rowTemplate,
+        this.tableOptions = {
             data: 'ctrl.filteredNamespaces',
-            enableFiltering: false,
-            enableRowSelection: true,
-            enableSelectAll: true,
-            selectionRowHeaderWidth: 50,
-            rowHeight: 50,
+            getIdentity: (item) => item.metadata.uid,
             columnDefs: [
                 {
                     name: 'name',
-                    field: 'metadata.name',
-                    enableColumnMenu: false
+                    field: 'metadata.name'
                 },
                 {
                     name: 'labels',
                     field: 'metadata.labels',
-                    enableColumnMenu: false,
-                    cellTemplate: `<ek-labels labels="row.entity.metadata.labels"></ek-labels>`,
+                    cellTemplate: `<ek-labels labels="item.metadata.labels"></ek-labels>`,
                     sortingAlgorithm: (a, b) => {
-                        const sizeA = _.size(a);
-                        const sizeB = _.size(b);
+                        const sizeA = _.size(a.metadata.labels);
+                        const sizeB = _.size(b.metadata.labels);
 
                         if (sizeA > sizeB) {
                             return 1;
@@ -66,16 +56,10 @@ class AdminNamespacesController {
                 },
                 {
                     name: 'members',
-                    cellTemplate: `<div>{{ row.entity.members.length }}</div>`,
-                    enableColumnMenu: false
-                },
-                {
-                    name: 'instances',
-                    enableColumnMenu: false,
-                    cellTemplate: `<div>{{ grid.appScope.ctrl.getInstances(row.entity) }}</div>`,
-                    sortingAlgorithm: (a, b, rowA, rowB) => {
-                        const sizeA = _.size(this._instancesStore.getAll(rowA.entity.metadata.name));
-                        const sizeB = _.size(this._instancesStore.getAll(rowB.entity.metadata.name));
+                    cellTemplate: `<div>{{ item.members.length }}</div>`,
+                    sortingAlgorithm: (a, b) => {
+                        const sizeA = _.size(a.members);
+                        const sizeB = _.size(b.members);
 
                         if (sizeA > sizeB) {
                             return 1;
@@ -87,24 +71,30 @@ class AdminNamespacesController {
                     }
                 },
                 {
-                    name: 'actions',
-                    displayName: '',
+                    name: 'instances',
+                    cellTemplate: `<div>{{ appScope.ctrl.getInstances(item) }}</div>`,
+                    sortingAlgorithm: (a, b) => {
+                        const sizeA = _.size(this._instancesStore.getAll(a.metadata.name));
+                        const sizeB = _.size(this._instancesStore.getAll(b.metadata.name));
+
+                        if (sizeA > sizeB) {
+                            return 1;
+                        } else if (sizeA < sizeB) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }
+                },
+                {
+                    name: '',
+                    width: '70px',
                     enableSorting: false,
-                    enableColumnMenu: false,
-                    cellTemplate: `<div class="ek-admin-namespaces__body__table__actions" layout="row" layout-align="end center">
-                            <ek-namespace-actions namespace="row.entity"></ek-namespace-actions>
+                    cellTemplate: `<div class="ek-admin-namespaces__body__table__actions" layout="row" layout-align="end center" flex>
+                            <ek-namespace-actions namespace="item"></ek-namespace-actions>
                         </div>`
                 }
-            ],
-            onRegisterApi: (gridApi) => {
-                this.gridApi = gridApi;
-
-                gridApi.selection.on.rowSelectionChanged($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-
-                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-            }
+            ]
         };
 
         $scope.$on('$destroy', () => {

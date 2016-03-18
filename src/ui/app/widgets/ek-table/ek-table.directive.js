@@ -14,11 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const sessionKeys = {
-    ACTIVE_NAMESPACE: 'ACTIVE_NAMESPACE',
-    INSTANCES_STATUS: 'INSTANCES_STATUS',
-    ADMIN_INSTANCES_STATUS: 'ADMIN_INSTANCES_STATUS',
-    SESSION_TOKEN: 'SESSION_TOKEN'
-};
+import './ek-table.less';
+import Directive from 'directive';
+import Controller from './ek-table.controller';
+import template from './ek-table.html';
 
-export default sessionKeys;
+class TableDirective extends Directive {
+    constructor() {
+        'ngInject';
+
+        super({ Controller, template });
+
+        this.bindToController = {
+            inputOptions: '=options',
+            status: '=status'
+        };
+    }
+
+    compile(tElement) {
+        tElement.addClass('ek-table layout-column');
+    }
+}
+
+export default TableDirective;

@@ -1,0 +1,131 @@
+@import "../../colors";
+
+.ek-table {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    &__selection {
+        position: relative;
+
+        &:before {
+            content: '';
+            display: block;
+            cursor: pointer;
+            width: 12px;
+            height: 12px;
+            background-color: @white;
+            border: 1px solid @grey400;
+            border-radius: 2px;
+        }
+
+        &--selected:after {
+            content: '';
+            cursor: pointer;
+            position: absolute;
+            left: -2px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background-image: url('../../../node_modules/material-design-icons/action/svg/production/ic_done_24px.svg');
+            background-size: 20px 20px;
+            background-position: 2px -5px;
+            background-repeat: no-repeat;
+        }
+    }
+
+    &__grouping {
+        width: 36px;
+
+        &--collapsed:before,
+        &--expanded:before {
+            content: '';
+            cursor: pointer;
+            background-image: none;
+            background-size: 16px 16px;
+            background-position: 0 0;
+            background-repeat: no-repeat;
+            width: 16px;
+            height: 16px;
+        }
+
+        &--expanded:before {
+            background-image: url('../../../images/icon-collapse.svg');
+        }
+
+        &--collapsed:before {
+            background-image: url('../../../images/icon-expand.svg');
+        }
+    }
+
+    &__header {
+        min-height: 30px;
+
+        &__column {
+            & {
+                text-transform: capitalize;
+                height: 30px;
+                line-height: 30px;
+                font-weight: 500;
+                color: @grey500;
+                padding: 0 10px;
+                border-bottom: 1px solid @grey300;
+            }
+
+            &--sortable {
+                & {
+                    cursor: pointer;
+                }
+
+                &:after {
+                    background-image: none;
+                    background-size: 18px 18px;
+                    background-position: 0 0;
+                    background-repeat: no-repeat;
+                    content: '';
+                    width: 18px;
+                    height: 18px;
+                    margin-left: 5px;
+                    opacity: 0;
+                    transition: all 150ms linear;
+                }
+
+                &--asc:after,
+                &--desc:after {
+                    opacity: 0.4;
+                    background-image: url('../../../node_modules/material-design-icons/navigation/svg/production/ic_arrow_upward_24px.svg');
+                }
+
+                &--desc:after {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+    }
+
+    &__body {
+        overflow: scroll;
+
+        &__row {
+            & {
+                height: 50px;
+            }
+
+            &--selected {
+                background-color: @blue50;
+            }
+
+            &:not(:last-child) {
+                border-bottom: 1px solid @grey300;
+            }
+
+            &__column {
+                padding: 0 10px;
+
+                .ek-table-cell {
+                    display: block;
+                }
+            }
+        }
+    }
+}

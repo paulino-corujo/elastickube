@@ -20,7 +20,6 @@ import 'angular-aria';
 import 'angular-animate';
 import 'angular-cookies';
 import 'angular-messages';
-import 'angular-ui-grid/ui-grid';
 import 'angular-material/angular-material';
 
 import apiModule from 'blocks/api/module';
@@ -64,9 +63,6 @@ angular
         'ngAnimate',
         'ngCookies',
         'ngMessages',
-        'ui.grid',
-        'ui.grid.selection',
-        'ui.grid.treeView',
         apiModule,
         routerModule
     ])
