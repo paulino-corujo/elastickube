@@ -17,7 +17,7 @@ limitations under the License.
 import logging
 
 import pymongo
-from tornado.gen import coroutine, Return, sleep
+from tornado.gen import coroutine, Return
 
 from data.query import Query, ObjectNotFoundError
 

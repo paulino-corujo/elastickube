@@ -34,22 +34,16 @@ class Resource(object):
         self.selector = {}
 
     @coroutine
-    def get(self, name=None):
+    def get(self, **kwargs):
         url_path = self.base_url_path
 
         params = dict()
-        if name:
+        if "name" in kwargs:
             url_path += "/{name}"
-            params["name"] = name
+            params["name"] = kwargs.pop("name")
 
-        if self.selector:
-            for selector, selector_values in self.selector.iteritems():
-                params[selector] = ""
-                for index, (key, value) in enumerate(selector_values.iteritems()):
-                    if index == 0:
-                        params[selector] = "%s=%s" % (key, value)
-                    else:
-                        params[selector] += ",%s=%s" % (key, value)
+        for key in kwargs.iterkeys():
+            params[key] = kwargs[key]
 
         result = yield self.api.get(url_path, **params)
         raise Return(result)
@@ -75,31 +69,18 @@ class Resource(object):
         raise Return(result)
 
     @coroutine
-    def watch(self, name=None, resource_version=None, on_data=None):
+    def watch(self, on_data=None, **kwargs):
         url_path = self.api_path + "/watch" + self.resource_path
-        params = dict(resourceVersion=resource_version)
+        params = dict()
 
-        if name:
+        if "name" in kwargs:
             url_path += "/{name}"
-            params["name"] = name
+            params["name"] = kwargs.pop("name")
 
-        if self.selector:
-            for selector, selector_values in self.selector.iteritems():
-                params[selector] = ""
-                for index, (key, value) in enumerate(selector_values.iteritems()):
-                    if index == 0:
-                        params[selector] = "%s=%s" % (key, value)
-                    else:
-                        params[selector] += ",%s=%s" % (key, value)
+        for key in kwargs.iterkeys():
+            params[key] = kwargs[key]
 
         yield self.api.watch(url_path, on_data, **params)
-
-    def filter(self, selector=None):
-        if selector is not None:
-            for k, value in selector.iteritems():
-                self.selector[k] = value
-
-        return self
 
 
 class NamespacedResource(object):
@@ -116,27 +97,21 @@ class NamespacedResource(object):
         self.selector = {}
 
     @coroutine
-    def get(self, name=None, namespace=None):
+    def get(self, **kwargs):
         url_path = self.api_path
 
         params = dict()
-        if namespace:
+        if "namespace" in kwargs:
             url_path += "/namespaces/{namespace}"
-            params["namespace"] = namespace
+            params["namespace"] = kwargs.pop("namespace")
 
         url_path += self.resource_path
-        if name:
+        if "name" in kwargs:
             url_path += "/{name}"
-            params["name"] = name
+            params["name"] = kwargs.pop("name")
 
-        if self.selector:
-            for selector, selector_values in self.selector.iteritems():
-                params[selector] = ""
-                for index, (key, value) in enumerate(selector_values.iteritems()):
-                    if index == 0:
-                        params[selector] = "%s=%s" % (key, value)
-                    else:
-                        params[selector] += ",%s=%s" % (key, value)
+        for key in kwargs.iterkeys():
+            params[key] = kwargs[key]
 
         result = yield self.api.get(url_path, **params)
         raise Return(result)
@@ -173,34 +148,21 @@ class NamespacedResource(object):
         result = yield self.api.patch(url_path, **params)
         raise Return(result)
 
-    def watch(self, name=None, namespace=None, resource_version=None, on_data=None):
+    def watch(self, on_data=None, **kwargs):
         url_path = self.api_path + "/watch"
-        params = dict(resourceVersion=resource_version)
+        params = dict()
 
-        if namespace:
+        if "namespace" in kwargs:
             url_path += "/namespaces/{namespace}"
-            params["namespace"] = namespace
+            params["namespace"] = kwargs.pop("namespace")
 
         url_path += self.resource_path
 
-        if name:
+        if "name" in kwargs:
             url_path += "/{name}"
-            params["name"] = name
+            params["name"] = kwargs.pop("name")
 
-        if self.selector:
-            for selector, selector_values in self.selector.iteritems():
-                params[selector] = ""
-                for index, (key, value) in enumerate(selector_values.iteritems()):
-                    if index == 0:
-                        params[selector] = "%s=%s" % (key, value)
-                    else:
-                        params[selector] += ",%s=%s" % (key, value)
+        for key in kwargs.iterkeys():
+            params[key] = kwargs[key]
 
         return self.api.watch(url_path, on_data, **params)
-
-    def filter(self, selector=None):
-        if selector is not None:
-            for k, value in selector.iteritems():
-                self.selector[k] = value
-
-        return self

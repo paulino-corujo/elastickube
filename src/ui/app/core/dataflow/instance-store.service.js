@@ -27,7 +27,9 @@ class EventsStoreService extends AbstractStore {
         this._$q = $q;
         this._actions = actions;
         this._instanceEvents = [];
+        this._instanceMetrics = [];
         this._instanceEndpoints = [];
+        this._instanceLogs = [];
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
@@ -68,6 +70,14 @@ class EventsStoreService extends AbstractStore {
                 this._instanceEndpoints = this._instanceEndpoints.concat(item);
                 break;
 
+            case 'Log':
+                this._instanceLogs = this._instanceLogs.concat(item);
+                break;
+
+            case 'Metric':
+                this._instanceMetrics = this._instanceMetrics.concat(item);
+                break;
+
             default:
                 this._instance = item;
         }
@@ -103,10 +113,20 @@ class EventsStoreService extends AbstractStore {
         return this._instanceEndpoints;
     }
 
+    getLogs() {
+        return this._instanceLogs;
+    }
+
+    getMetrics() {
+        return this._instanceMetrics;
+    }
+
     destroy() {
         delete this._instance;
         this._instanceEvents = [];
         this._instanceEndpoints = [];
+        this._instanceLogs = [];
+        this._instanceMetrics = [];
     }
 
     addChangeListener(callback) {
