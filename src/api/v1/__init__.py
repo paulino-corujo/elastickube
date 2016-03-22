@@ -38,9 +38,12 @@ ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
 
 
 def configure(settings):
-    if os.path.exists('/var/run/secrets/kubernetes.io/serviceaccount/token'):
-        with open('/var/run/secrets/kubernetes.io/serviceaccount/token') as token:
-            settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'), token=token.read())
+    if "KUBE_API_TOKEN_PATH" in os.environ and os.path.exists(os.environ["KUBE_API_TOKEN_PATH"]):
+        with open(os.environ["KUBE_API_TOKEN_PATH"]) as token:
+            settings["kube"] = client.KubeClient(os.getenv("KUBERNETES_SERVICE_HOST"), token=token.read())
+
+    if "kube" not in settings:
+        settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'))
 
     mongo_url = "mongodb://{0}:{1}/".format(
         os.getenv('ELASTICKUBE_MONGO_SERVICE_HOST', 'localhost'),
