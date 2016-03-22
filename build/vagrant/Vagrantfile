@@ -1,42 +1,25 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-EBX_ADDRESS = "elasticbox.com"
-
-TOKEN_FILE = File.join(Dir.home, ".ebx_token_prod")
-if File.exist?(TOKEN_FILE)
-  TOKEN = File.read(TOKEN_FILE)
-else
-  print "Enter your ElasticBox Token: "
-  TOKEN = STDIN.gets
-  File.write(TOKEN_FILE, TOKEN)
-end
-
-ARGUMENTS = "-b 'ElasticKube Dev' -n #{ENV['USER']} -H '#{EBX_ADDRESS}' -t #{TOKEN}"
-
-PRODUCT_PATH = File.join(Dir.home, "Repositories", "elastickube")
-SSH_PUB_KEY = File.read(File.join(Dir.home, ".ssh", "id_rsa.pub"))
-RSYNCD_CONF = File.read(File.join("#{PRODUCT_PATH}", "build", "vagrant", "rsyncd.conf"))
+ELASTICKUBE_PATH = "/opt/elastickube"
+REPOSITORY_PATH = File.join(Dir.home, "Repositories", "elastickube")
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "elasticbox/ubuntu-14.04"
+  config.vm.synced_folder "#{REPOSITORY_PATH}", "#{ELASTICKUBE_PATH}",
+    :disabled       => false,
+    :type           => "rsync",
+    :rsync__auto    => true,
+    :rsync__exclude => ["src/build/ui", "node_modules"]
 
-  # Disable default Vagrant synced folder
-  config.vm.synced_folder '.', '/vagrant', disabled: true
-
-  config.vm.network :private_network, ip: "10.5.10.6"
+  config.vm.network :private_network, ip: "10.107.56.115"
   config.vm.network "public_network", bridge: 'en0: Wi-Fi (AirPort)'
 
   config.ssh.username = "elasticbox"
   config.ssh.password = "elasticbox"
-
-  config.vm.provider :vmware_fusion do |v|
-    v.vmx["memsize"] = "4096"
-    v.vmx["numvcpus"] = "8"
-  end
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
@@ -45,18 +28,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', '10000']
   end
 
-  # Add the public key to the authorized hosts
-  config.vm.provision :shell, inline: "echo '#{SSH_PUB_KEY}' >> /home/elasticbox/.ssh/authorized_keys"
-
-  # Configure Rsync daemon
-  config.vm.provision :shell, inline: "echo '#{RSYNCD_CONF}' | sudo tee /etc/rsyncd.conf > /dev/null"
-
   # Execute custom setup
   config.vm.provision :shell, path: "setup.sh"
-
-  # Do the first code sync the product
-  config.vm.provision :host_shell, inline: "cd #{PRODUCT_PATH} && rsync -aHviSh --delete --filter=':- .gitignore' . 10.5.10.6::elastickube/"
-
-  # Install the ElasticBox agent
-  config.vm.provision :shell, inline: "curl -skL #{EBX_ADDRESS} | bash -s -- #{ARGUMENTS}"
 end
+
+puts "
+        _____ _           _   _      _  __     _
+       | ____| | __ _ ___| |_(_) ___| |/ /   _| |__   ___
+       |  _| | |/ _` / __| __| |/ __| ' / | | | '_ \\ / _ \\
+       | |___| | (_| \\__ \\ |_| | (__| . \\ |_| | |_) |  __/
+       |_____|_|\\__,_|___/\\__|_|\\___|_|\\_\\__,_|_.__/ \\___| by ElasticBox
+
+ To automatically sync changes with the VM use 'vagrant rsync-auto'
+
+"

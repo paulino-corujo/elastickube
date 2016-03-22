@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+export PATH=$PATH:/usr/local/go/bin
+
+# Update configuration on etc
+CONFIGURATION="$(curl -ksL {{ FLANNEL_CONFIG }} | elasticbox config)"
+ETCDCTL=/opt/etcd/v{{ ETCD_VERSION }}/etcdctl
+
+{% if etcd %} 
+${ETCDCTL} --peers http://{{ etcd.address.public or etcd.address.private }}:{{ etcd.CLIENT_COMUNICATION }} --no-sync set /coreos.com/network/config "${CONFIGURATION}"
+{% else %}
+${ETCDCTL} --peers http://localhost:2379 --no-sync set /coreos.com/network/config "${CONFIGURATION}"
+{% endif %}
+
+# Ensure flannel is up
+service flannel restart
+
+# Wait for flannel config file which indicates flannel is up
+echo "Waiting for flannel to start"
+while [ ! -f /run/flannel/subnet.env ] ;
+do
+    sleep 5
+done

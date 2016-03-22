@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 KUBECTL="/opt/kubernetes/$(ls /opt/kubernetes | head -n 1)/bin/kubectl"
@@ -37,9 +37,9 @@ done
 echo " done!"
 
 # Rebuild images
-docker build --file=${REPO_ROOT}/src/Dockerfile-api    --tag=elasticbox/elastickube-api ${REPO_ROOT}/src
-docker build --file=${REPO_ROOT}/src/Dockerfile-charts --tag=elasticbox/elastickube-charts ${REPO_ROOT}/src
-docker build --file=${REPO_ROOT}/src/Dockerfile-nginx  --tag=elasticbox/elastickube-nginx ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-api    --tag=elasticbox/elastickube-api:latest    ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-charts --tag=elasticbox/elastickube-charts:latest ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-nginx  --tag=elasticbox/elastickube-nginx:latest  ${REPO_ROOT}/src
 
 # Create replication controller
 ${KUBECTL} create -f elastickube/elastickube-server-rc.yaml

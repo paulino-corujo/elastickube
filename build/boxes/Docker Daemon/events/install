@@ -1,0 +1,81 @@
+#!/bin/bash
+
+MACHINE_TYPE="$(uname -m)"
+
+if [[ "${MACHINE_TYPE}" != "x86_64" ]]; then
+    echo -e "$(date) - Docker is not supported in $MACHINE_TYPE architectures."
+    exit 1
+fi
+
+if [[ -x /usr/bin/yum ]]; then
+
+    # Yum based distros
+    if [[ -n "$(grep -q -i "release 6" /etc/redhat-release)" ]]; then
+        EPEL_VERSION="6-8"
+    elif [[ -n "$(grep -q -i "release 5" /etc/redhat-release)" ]]; then
+        EPEL_VERSION="5-4"
+    else
+        EPEL_VERSION="4-10"
+    fi
+
+    rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-${EPEL_VERSION}.noarch.rpm
+
+    # Verify EPEL Installation
+    yum repolist
+    if [[ "$?" -ne "0" ]]; then
+        echo -e "$(date) - EPEL is not available."
+        exit 1
+    fi
+
+    # Docker.io Installation
+    yum -y install epel-release
+    yum -y install docker-io
+    yum -y update docker-io
+
+    chkconfig docker on
+    service docker start
+
+elif [[ -f /etc/lsb-release ]]; then
+    UBUNTU_KEY='36A1D7869245C8950F966E92D8576A8BA88D21E9'
+    UBUNTU_VERSION="$(lsb_release -d | awk -F "\t" '{ print $2 }')"
+
+    EC2_ARCHIVE_PPA="http://.*\.ec2\.archive\.ubuntu\.com"
+    if [[ -n "$(egrep "${EC2_ARCHIVE_PPA}" /etc/apt/sources.list)" ]]; then
+        echo -e "$(date) - Relying on the official Ubuntu PPAs."
+
+        if [[ -n "$(lsb_release -cs | egrep "(saucy)")" ]]; then
+            sed -ir "s|${EC2_ARCHIVE_PPA}|http\:\/\/us.archive\.ubuntu\.com|" /etc/apt/sources.list
+        elif [[ -n "$(lsb_release -cs | egrep "(raring|quantal)")" ]]; then
+            sed -i "s|${EC2_ARCHIVE_PPA}|http\:\/\/old-releases\.ubuntu\.com|" /etc/apt/sources.list
+            sed -ir "s|http\:\/\/security\.ubuntu\.com|http\:\/\/old-releases\.ubuntu\.com|" /etc/apt/sources.list
+        fi
+    fi
+    
+    echo deb https://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${UBUNTU_KEY}
+
+    apt-get -y update
+
+    if [[ -n "$(lsb_release -cs | egrep "(vivid|utopic|trusty)")" ]]; then
+        apt-get -y install docker.io
+        source /etc/bash_completion.d/docker.io
+
+    elif [[ -n "$(lsb_release -cs | egrep "(saucy|raring|quantal)")" ]]; then
+        apt-get -y install linux-image-extra-$(uname -r)
+
+    else
+        echo -e "$(date) - Docker is not supporting ${UBUNTU_VERSION}."
+        exit 1
+    fi
+
+    if [[ -e /usr/lib/apt/methods/https ]]
+    then
+        apt-get -y install apt-transport-https
+    fi
+
+    apt-get -y install lxc-docker
+    
+    if [ "$?" -eq "100" ]; then
+        exit 1
+    fi
+fi

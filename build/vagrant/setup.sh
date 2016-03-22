@@ -1,15 +1,20 @@
 #!/bin/bash -e
 
-mkdir -p /opt/elastickube
+# Install ElasticBox bootstrap
+apt-get -y update
+apt-get -y install python-pip curl
+
+pip install --no-compile elasticbox-docker
+
+# Create code folder
 chown -R elasticbox:elasticbox /opt/elastickube
 
-mkdir -p /home/elasticbox/.ssh
-pushd /home/elasticbox
-    chown -R elasticbox:elasticbox .ssh
-    chmod -R 700 .ssh
-    chmod 600 .ssh/*
-popd
+sudo bash -- << \
+_____________EXECUTE_BOXES_____________
 
-# Start Rsync daemon and enable it at boot
-sudo sed -i 's/^RSYNC_ENABLE=false/RSYNC_ENABLE=true/' /etc/default/rsync
-sudo /etc/init.d/rsync start
+export DEBIAN_FRONTEND=noninteractive
+export ELASTICBOX_PATH=/opt/elastickube/build
+export ELASTICBOX_INSTANCE_PATH=${ELASTICBOX_PATH}
+
+elasticbox run --install --exit
+_____________EXECUTE_BOXES_____________

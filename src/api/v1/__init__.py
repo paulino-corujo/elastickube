@@ -39,8 +39,10 @@ ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
 
 def configure(settings):
     if "KUBE_API_TOKEN_PATH" in os.environ and os.path.exists(os.environ["KUBE_API_TOKEN_PATH"]):
+        logging.info("Reading token from '%s'.", os.environ["KUBE_API_TOKEN_PATH"])
+
         with open(os.environ["KUBE_API_TOKEN_PATH"]) as token:
-            settings["kube"] = client.KubeClient(os.getenv("KUBERNETES_SERVICE_HOST"), token=token.read())
+            settings["kube"] = client.KubeClient(os.environ["KUBERNETES_SERVICE_HOST"], token=token.read())
 
     if "kube" not in settings:
         settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'))

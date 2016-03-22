@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+{% if etcd.address %}
+    elasticbox set ETCD_DISCOVERY_ENDPOINT "{{ etcd.ETCD_DISCOVERY_ENDPOINT }}"
+{% elif ETCD_DISCOVERY_ENDPOINT is not defined or not ETCD_DISCOVERY_ENDPOINT %}
+    elasticbox set ETCD_DISCOVERY_ENDPOINT "$(curl -s https://discovery.etcd.io/new?size={{ CLUSTER_SIZE }})"
+{% endif %}
+
+mkdir -p /etc/etcd
+curl -ksL {{ ETCD_CONFIG }} | elasticbox config -o /etc/etcd/etcd.conf
+curl -ksL {{ ETCD_INIT }} | elasticbox config -o /etc/init.d/etcd && chmod +x /etc/init.d/etcd
+
+# Start etcd
+service etcd restart
+
+echo -n "Waiting for ETCD to be ready"
+until /opt/etcd/v{{ ETCD_VERSION }}/etcdctl --peers http://localhost:2379 cluster-health > /dev/null 2>&1
+do
+    echo -n "."
+    sleep 2;
+done
