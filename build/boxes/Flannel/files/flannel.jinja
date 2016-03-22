@@ -1,0 +1,80 @@
+#!/bin/sh
+#
+# flanneld -- startup script for flanneld
+#
+# chkconfig: - 85 15
+# processname: flanneld
+# pidfile: /var/run/flanneld.pid
+# description: flanneld is a highly-available key-value store for shared configuration and service discovery
+#
+### BEGIN INIT INFO
+# Provides: flanneld
+# Required-Start: $local_fs $remote_fs $network
+# Required-Stop: $local_fs $remote_fs $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop flanneld
+### END INIT INFO
+#
+#
+
+BIN_DIR="/opt/flannel/v{{ FLANNEL_VERSION }}"
+NAME="flanneld"
+PID_FILE="/var/run/${NAME}.pid"
+PATH="/bin:/usr/bin:/sbin:/usr/sbin:${BIN_DIR}"
+DAEMON="${BIN_DIR}/${NAME}"
+
+start() {
+    echo -n "Starting ${NAME} Daemon: "
+    if [ -f "${PID_FILE}" ]; then
+        echo ${NAME} already running: $(cat ${PID_FILE})
+        exit 1;
+    else
+{% if etcd %} 
+        ${DAEMON} --etcd-endpoints=http://{{ etcd.address.public or etcd.address.private}}:{{ etcd.CLIENT_COMUNICATION}} > /var/log/${NAME}.log 2>&1 & echo $! > "${PID_FILE}"
+{% else %}
+        ${DAEMON} --etcd-endpoints=http://localhost:2379 > /var/log/${NAME}.log 2>&1 & echo $! > "${PID_FILE}"
+{% endif %}
+        echo $(cat ${PID_FILE})
+    fi
+
+}
+
+stop() {
+    if [ -f "${PID_FILE}" ]; then
+        echo "Shutting down ${NAME} Daemon"
+        kill $(cat ${PID_FILE})
+        rm "${PID_FILE}"
+    else
+        echo "${NAME} is not running" 1>&2
+    fi 
+}
+
+status() {
+    if [ -f "${PID_FILE}" ]; then
+        echo "${NAME} is running"
+    else
+        echo "${NAME} is stopped"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage:  {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+exit $?

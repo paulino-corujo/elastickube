@@ -1,0 +1,25 @@
+#!/bin/bash -e
+curl -ksL {{ KUBE_APISERVER_INIT }} | elasticbox config -o /etc/init.d/kube_apiserver
+curl -ksL {{ KUBE_CONTROLLER_MANAGER_INIT }} | elasticbox config -o /etc/init.d/kube_controller_manager
+curl -ksL {{ KUBE_SCHEDULLER_INIT }} | elasticbox config -o /etc/init.d/kube_scheduler
+curl -ksL {{ KUBE_PROXY_INIT }} | elasticbox config -o /etc/init.d/kube_proxy
+curl -ksL {{ KUBE_KUBELET_INIT }} | elasticbox config -o /etc/init.d/kube_kubelet
+
+chmod +x /etc/init.d/kube_apiserver
+chmod +x /etc/init.d/kube_controller_manager
+chmod +x /etc/init.d/kube_scheduler
+chmod +x /etc/init.d/kube_proxy
+chmod +x /etc/init.d/kube_kubelet
+
+mkdir -p /var/lib/kubelet
+curl -ksL {{ KUBE_CONFIG }} | elasticbox config -o /var/lib/kubelet/kubeconfig
+
+mkdir -p /etc/kubernetes
+
+if [[ ! -f "/etc/kubernetes/serviceaccount.key" ]]
+then
+    openssl genrsa -out /etc/kubernetes/serviceaccount.key 2048  2>&1 >/dev/null
+fi
+
+curl -ksL {{ TLS_CERT_FILE }} -o /etc/kubernetes/ssl.cert
+curl -ksL {{ TLS_PRIVATE_KEY }} -o /etc/kubernetes/ssl.key

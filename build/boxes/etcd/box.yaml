@@ -1,0 +1,50 @@
+description: A highly-available key-value store for shared configuration and service
+  discovery
+icon: d7dec7b1-ac4e-4297-9a47-bec900d6fdff
+id: d7dec7b1-ac4e-4297-9a47-bec900d6fdff
+name: etcd
+requirements:
+- linux
+variables:
+- name: CLIENT_COMUNICATION
+  required: false
+  type: Port
+  value: '2379'
+  visibility: public
+- name: SERVER_TO_SERVER_COMUNICATION
+  required: false
+  type: Port
+  value: '2380'
+  visibility: public
+- name: CLUSTER_SIZE
+  required: true
+  type: Number
+  value: '1'
+  visibility: public
+- name: ETCD_VERSION
+  options: 2.2.4
+  required: false
+  type: Options
+  value: 2.2.4
+  visibility: public
+- name: ETCD_DISCOVERY_ENDPOINT
+  required: false
+  type: Text
+  value: ''
+  visibility: public
+- name: ETCD_INIT
+  required: false
+  type: File
+  value: files/etcd
+  visibility: public
+- name: ETCD_CONFIG
+  required: false
+  type: File
+  value: files/etcd.jinja
+  visibility: public
+- name: etcd
+  required: false
+  type: Binding
+  value: d7dec7b1-ac4e-4297-9a47-bec900d6fdff
+  visibility: private
+

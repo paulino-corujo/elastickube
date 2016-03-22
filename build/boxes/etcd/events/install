@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+# Download etcd in order to download etcdctl
+ETCD_DIR="/opt/etcd/v{{ ETCD_VERSION }}"
+ETCD_URL=https://github.com/coreos/etcd/releases/download/v{{ ETCD_VERSION }}/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz
+
+if [[ ! -d "${ETCD_DIR}" ]]
+then
+    mkdir -p ${ETCD_DIR}
+    curl -ksL ${ETCD_URL} | tar -xz -C ${ETCD_DIR} --strip-components=1
+fi

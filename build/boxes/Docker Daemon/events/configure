@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+if [[ -x /usr/bin/yum ]]; then
+
+cat > /etc/sysconfig/docker << EOF
+# Additional startup options for the Docker daemon, for example:
+OPTIONS="{{ DOCKER_OPTION }}"
+other_args="{{ DOCKER_OPTION }}"
+EOF
+
+else
+
+    cat > /etc/default/docker << EOF
+# Additional startup options for the Docker daemon, for example:
+# DOCKER_OPTS="--ip-forward=true --iptables=true"
+DOCKER_OPTS="{{ DOCKER_OPTION }}"
+EOF
+
+fi

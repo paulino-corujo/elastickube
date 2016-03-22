@@ -1,0 +1,13 @@
+description: The open-source application container engine
+icon: a2b48401-5374-43bf-983b-0324404038d4
+id: a2b48401-5374-43bf-983b-0324404038d4
+name: Docker Daemon
+requirements:
+- linux
+variables:
+- name: DOCKER_OPTIONS
+  required: false
+  type: Text
+  value: ''
+  visibility: public
+

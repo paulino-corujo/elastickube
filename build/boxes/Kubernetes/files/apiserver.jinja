@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# kube-apiserver -- startup script for kube-apiserver
+#
+# chkconfig: - 85 15
+# processname: kube-apiserver
+# pidfile: /var/run/kube-apiserver.pid
+# description: kube-apiserver is a highly-available key-value store for shared configuration and service discovery
+#
+### BEGIN INIT INFO
+# Provides: kube-apiserver
+# Required-Start: $local_fs $remote_fs $network
+# Required-Stop: $local_fs $remote_fs $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop kube-apiserver
+### END INIT INFO
+#
+#
+
+BIN_DIR="/opt/kubernetes/v{{ KUBERNETES_VERSION }}/bin"
+NAME="kube-apiserver"
+PID_FILE="/var/run/${NAME}.pid"
+PATH="/bin:/usr/bin:/sbin:/usr/sbin:${BIN_DIR}"
+DAEMON="${BIN_DIR}/${NAME}"
+
+start() {
+    echo -n "Starting ${NAME} Daemon: "
+    if [ -f "${PID_FILE}" ]; then
+        echo ${NAME} already running: $(cat ${PID_FILE})
+        exit 1;
+    else
+        $DAEMON \
+        --admission-control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
+	    --service_account_key_file=/etc/kubernetes/serviceaccount.key \
+        --service_account_lookup=false \
+        --runtime_config=api/v1 \
+        --allow_privileged=true \
+        --insecure_bind_address=0.0.0.0 \
+        --insecure_port={{ KUBE_INSECURE_API_PORT }} \
+        --kubelet_https=true \
+        --secure_port={{ KUBE_SECURE_API_PORT }} \
+        --service-cluster-ip-range={{ SERVICE_CLUSTER_NETWORK }} \
+        --tls-cert-file=/etc/kubernetes/ssl.cert \
+        --tls-private-key-file=/etc/kubernetes/ssl.key \
+{% if etcd %}
+        --etcd_servers=http://{{ etcd.address.public or etcd.address.private}}:{{ etcd.CLIENT_COMUNICATION}} \
+{% else %}
+        --etcd_servers=http://localhost:2379 \
+{% endif %}
+        --logtostderr=true > /var/log/${NAME}.log 2>&1 & echo $! > "${PID_FILE}"
+
+        # Write pidfile
+        echo $(cat ${PID_FILE})
+    fi
+
+}
+
+stop() {
+    if [ -f "${PID_FILE}" ]; then
+        echo "Shutting down ${NAME} Daemon: $(cat ${PID_FILE})"
+        pkill --pidfile ${PID_FILE}
+        rm "${PID_FILE}"
+    else
+        echo "${NAME} is not running" 1>&2
+    fi 
+}
+
+status() {
+    if [ -f "${PID_FILE}" ]; then
+        echo "${NAME} is running"
+    else
+        echo "${NAME} is stopped"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage:  {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+exit $?

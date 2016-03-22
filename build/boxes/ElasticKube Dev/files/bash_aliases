@@ -1,0 +1,49 @@
+# Export variables
+export ELASTICKUBE_OAUTH_KEY="{{ ELASTICKUBE_OAUTH_KEY}}"
+export ELASTICKUBE_OAUTH_SECRET="{{ ELASTICKUBE_OAUTH_SECRET }}"
+export ELASTICKUBE_REDIRECT_URI="{{ ELASTICKUBE_REDIRECT_URI }}"
+
+# Setup kubectl
+alias kubectl="/opt/kubernetes/v{{ kubernetes.KUBERNETES_VERSION }}/bin/kubectl $@"
+alias ks="/opt/kubernetes/v{{ kubernetes.KUBERNETES_VERSION }}/bin/kubectl --namespace=kube-system $@"
+
+function apilogs {
+  local RED=`echo -e '\033[31m'`
+  local GREEN=`echo -e '\033[32m'`
+  local YELLOW=`echo -e '\033[33m'`
+  local NORMAL=`echo -e '\033[0m'`
+
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks logs -f $POD_NAME -c elastickube-api | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
+}
+
+function chartslogs {
+  local RED=`echo -e '\033[31m'`
+  local GREEN=`echo -e '\033[32m'`
+  local YELLOW=`echo -e '\033[33m'`
+  local NORMAL=`echo -e '\033[0m'`
+
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks logs -f $POD_NAME -c elastickube-charts | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
+}
+
+function sshapi {
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks exec -it $POD_NAME -c elastickube-api /bin/bash
+}
+
+function sshcharts {
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks exec -it $POD_NAME -c elastickube-charts /bin/bash
+}
+
+alias addoauth="python /opt/elastickube/build/tools/kubeman.py auth add-oauth"
+alias removeoauth="python /opt/elastickube/build/tools/kubeman.py auth remove-oauth"
+alias deletedb="python /opt/elastickube/build/tools/kubeman.py database delete-db"
+alias tests="python /opt/elastickube/src/tests/runtests.py /opt/elastickube/src/tests --processes 10 --process-timeout=90"
+
+function addusers {
+  python /opt/elastickube/build/tools/kubeman.py users add-user -e "{{ instance.name }}@elasticbox.com" -f "{{ instance.name }}" -l "Admin"
+  python /opt/elastickube/build/tools/kubeman.py users add-user -e "operations@elasticbox.com" -f "Admin" -l "ElasticBox"
+  python /opt/elastickube/build/tools/kubeman.py users add-user -e "engineer@elasticbox.com" -f "Engineer" -l "ElasticBox" -r "user"
+}

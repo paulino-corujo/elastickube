@@ -1,0 +1,55 @@
+icon: 6da24ad0-7af2-48fc-9016-954d196c1da1
+id: 6da24ad0-7af2-48fc-9016-954d196c1da1
+name: ElasticKube Dev
+requirements: []
+variables:
+- name: ROLE
+  options: Master,Node,Standalone
+  required: true
+  scope: kubernetes
+  type: Options
+  value: Standalone
+  visibility: public
+- name: ELASTICKUBE_OAUTH_KEY
+  required: false
+  type: Text
+  value: 726336950247-p6172q2aojfuntnp8e0rocg45c19ss4b.apps.googleusercontent.com
+  visibility: public
+- name: ELASTICKUBE_REDIRECT_URI
+  required: false
+  type: Text
+  value: http://elastickube.internal.elasticbox.com/api/v1/auth/google
+  visibility: public
+- name: ELASTICKUBE_OAUTH_SECRET
+  required: false
+  type: Password
+  value: dmr77iW9Z6e9ZSJvFmuv541g
+  visibility: public
+- name: http
+  required: false
+  type: Port
+  value: '80'
+  visibility: public
+- name: BASH_ALIASES
+  required: false
+  type: File
+  value: files/bash_aliases
+  visibility: internal
+- name: GRUNT_UPSTART
+  required: false
+  type: File
+  value: files/kubegrunt.conf
+  visibility: internal
+- automatic_updates: major
+  name: etcd
+  required: false
+  type: Box
+  value: d7dec7b1-ac4e-4297-9a47-bec900d6fdff
+  visibility: internal
+- automatic_updates: major
+  name: kubernetes
+  required: false
+  type: Box
+  value: b9915b61-6bad-49bc-ad1f-fa14f40916c5
+  visibility: internal
+
