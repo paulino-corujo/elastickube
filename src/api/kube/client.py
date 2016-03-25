@@ -35,18 +35,10 @@ class HTTPClient(object):
         self.endpoint = endpoint
         self.token = token
 
-        if self.token:
-            if not endpoint.startswith("https"):
-                if endpoint.startswith("http://"):
-                    self._base_url = "https://%s" % self.endpoint.replace("http://", "")
-                else:
-                    self._base_url = "https://%s" % self.endpoint
+        if endpoint.startswith("http"):
+            self._base_url = self.endpoint
         else:
-            if not endpoint.startswith("http"):
-                if endpoint.startswith("https://"):
-                    self._base_url = "http://%s" % self.endpoint.replace("https://", "")
-                else:
-                    self._base_url = "https://%s" % self.endpoint
+            self._base_url = "https://%s" % self.endpoint
 
         AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient", defaults=dict(validate_cert=False))
 

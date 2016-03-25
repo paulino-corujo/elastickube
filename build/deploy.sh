@@ -1,6 +1,42 @@
 #!/bin/bash
 
+USAGE="Usage :  deploy.sh [options]
+
+Example:
+    deploy.sh -t 600
+
+Options:
+    -t Timeout in seconds per operation
+    -u Master Kubernetes URL
+    -h Display this message
+"
+
+function help() {
+    echo "${USAGE}"
+
+    if [[ ${1} ]]
+    then
+        echo ${1}
+    fi
+}
+
+# Handle options
+while getopts ":t:u:hr" ARGUMENT
+do
+  case ${ARGUMENT} in
+
+    t )  export TIMEOUT=$OPTARG;;
+    r )  export REINSTALL=true;;
+    u )  export MASTER_URL=$OPTARG;;
+    h )  help; exit 0;;
+    : )  help "Missing option argument for -$OPTARG."; exit 1;;
+    \?)  help "Option does not exist : $OPTARG."; exit 1;;
+
+  esac
+done
+
 TIMEOUT=${TIMEOUT:-600}
+KUBERNETES_MASTER_URL=${KUBERNETES_MASTER_URL:https://kubernetes}
 
 cat << \
 '______________________________HEADER______________________________'
@@ -98,6 +134,9 @@ spec:
         volumeMounts:
         - name: elastickube-run
           mountPath: /var/run
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: ${KUBERNETES_MASTER_URL}
       - name: elastickube-charts
         image: elasticbox/elastickube-charts:latest
         resources:
@@ -165,9 +204,8 @@ exec_wait()
     while [ "$(ps a | awk '{print $1}' | grep ${PID})" ]
     do
         TEMP_SPINNER=${SPINNER_STR#?}
-
-        printf "\b\b\b\b\b\b[ %c ] " "${SPINNER_STR}"
         SPINNER_STR=${TEMP_SPINNER}${SPINNER_STR%"$TEMP_SPINNER"}
+        printf "\b\b\b\b\b\b[ %c ] " "${SPINNER_STR}"
 
         sleep ${SPINNER_DELAY}
     done
@@ -191,6 +229,7 @@ check_tool()
 deploy_rc()
 {
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1}"
+
     if ! exec_wait kubectl --namespace=kube-system get rc ${1}
     then
         exec_wait "echo '${2}' | kubectl create --validate=false -f -"
@@ -200,7 +239,7 @@ deploy_rc()
     until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe rc ${1} | grep '0 Waiting / 0 Succeeded / 0 Failed'"
     do
         exec_wait sh -c "sleep 2"
-        COUNTER=$[${COUNTER} + 1]
+        COUNTER=$[${COUNTER} + 2]
     done
 
     if [[ ${COUNTER} -lt ${TIMEOUT} ]]
@@ -248,8 +287,8 @@ printf "%-${PROGRESS_WIDTH}s" "Waiting for LB to be ready"
 COUNTER=0
 until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:'"
 do
-    exec_wait "sh -c 'sleep 2'"
-    COUNTER=$[${COUNTER} + 1]
+    exec_wait bash -c "sleep 2"
+    COUNTER=$[${COUNTER} + 2]
 done
 
 if [[ ${COUNTER} -lt ${TIMEOUT} ]]
@@ -267,3 +306,4 @@ $(tput bold)
 Please complete the installation here: http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:' | awk '{print $2}')
 $(tput sgr0)
 ______________________________RESULT______________________________
+
