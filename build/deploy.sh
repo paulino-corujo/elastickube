@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TIMEOUT=${TIMEOUT:-240}
+TIMEOUT=${TIMEOUT:-600}
 
 cat << \
 '______________________________HEADER______________________________'
@@ -158,19 +158,20 @@ exec_wait()
 
     local PID=$!
     local SPINNER_DELAY=0.25
+    local TEMP_SPINNER=${SPINNER_STR#?}
+    SPINNER_STR=${TEMP_SPINNER}${SPINNER_STR%"$TEMP_SPINNER"}
 
+    printf "[ %c ] " "${SPINNER_STR}"
     while [ "$(ps a | awk '{print $1}' | grep ${PID})" ]
     do
-        local TEMP_SPINNER=${SPINNER_STR#?}
+        TEMP_SPINNER=${SPINNER_STR#?}
 
-        printf "[ %c ] " "${SPINNER_STR}"
+        printf "\b\b\b\b\b\b[ %c ] " "${SPINNER_STR}"
         SPINNER_STR=${TEMP_SPINNER}${SPINNER_STR%"$TEMP_SPINNER"}
 
         sleep ${SPINNER_DELAY}
-        printf "\b\b\b\b\b\b"
     done
-
-    printf "    \b\b\b\b"
+    printf "\b\b\b\b\b\b    \b\b\b\b"
 
     wait ${PID}
     return $?
@@ -192,7 +193,7 @@ deploy_rc()
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1}"
     if ! exec_wait kubectl --namespace=kube-system get rc ${1}
     then
-        exec_wait "echo '${2}' | kubectl create -f -"
+        exec_wait "echo '${2}' | kubectl create --validate=false -f -"
     fi
 
     local COUNTER=0
@@ -215,7 +216,7 @@ deploy_svc()
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1} svc"
     if ! exec_wait kubectl --namespace=kube-system get svc ${1}
     then
-        if exec_wait "echo '${2}' | kubectl create -f -"
+        if exec_wait "echo '${2}' | kubectl create --validate=false -f -"
         then
             echo [ ✓ ]
         else
@@ -245,9 +246,9 @@ deploy_svc elastickube-server "${ELASTICKUBE_SERVER_SVC}"
 
 printf "%-${PROGRESS_WIDTH}s" "Waiting for LB to be ready"
 COUNTER=0
-until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe svc elastickube-server | grep 'LoadBalancer Ingress:'"
+until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:'"
 do
-    exec_wait sh -c "sleep 2"
+    exec_wait "sh -c 'sleep 2'"
     COUNTER=$[${COUNTER} + 1]
 done
 
@@ -263,6 +264,6 @@ ______________________________RESULT______________________________
 
 ElasticKube has been deployed!
 $(tput bold)
-Please complete the installation here: http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep "LoadBalancer Ingress:" | awk '{print $3}')
+Please complete the installation here: http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:' | awk '{print $2}')
 $(tput sgr0)
 ______________________________RESULT______________________________
