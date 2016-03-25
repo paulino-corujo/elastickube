@@ -3,24 +3,24 @@
 .ek-label {
     font-size: 11px;
     line-height: 22px;
+    border: 1px solid @grey300;
+    border-radius: 2px;
 
     &__name,
     &__value {
         padding: 0 4px;
-        border: 1px solid @grey300;
     }
 
     &__name {
-        border-bottom-left-radius: 2px;
-        border-top-left-radius: 2px;
         color: @grey500;
         background-color: @grey100;
     }
 
     &__value {
-        border-bottom-right-radius: 2px;
-        border-top-right-radius: 2px;
-        border-left-width: 0;
+        border-left: 1px solid @grey300;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
         color: @black;
         background-color: @white;
     }

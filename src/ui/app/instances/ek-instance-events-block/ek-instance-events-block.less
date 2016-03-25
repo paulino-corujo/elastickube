@@ -1,0 +1,45 @@
+@import "../../colors";
+
+.ek-instance-events-block {
+    padding: 0;
+
+    h3 {
+        font-size: 22px;
+    }
+
+    &__container {
+        padding: 30px 30px 0 30px;
+    }
+
+    &__message {
+        margin-bottom: 30px;
+        color: @grey500;
+    }
+
+    &__paginator {
+        height: 60px;
+        border-top: 1px solid @grey300;
+    }
+
+    &__event {
+
+        & {
+            height: 60px;
+        }
+
+        &:not(:last-child) {
+            border-bottom: 1px solid @grey300;
+        }
+
+        &__icon {
+            color: @grey500;
+            height: 22px;
+            width: 22px;
+            margin: 0 10px 0 0;
+        }
+
+        &__date {
+            color: @grey500;
+        }
+    }
+}

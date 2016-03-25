@@ -1,0 +1,55 @@
+#!/bin/bash -e
+
+# Update docker options
+source /run/flannel/subnet.env
+elasticbox set docker.DOCKER_OPTIONS "--bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU}"
+
+# http://kubernetes.io/v1.1/docs/getting-started-guides/docker-multinode/master.html
+if [[ "$(ifconfig | grep docker0 | wc -c)" -ne "0" ]]; then
+    ip link set docker0 down
+    brctl delbr docker0
+    service docker restart
+fi
+
+{% if ROLE == "Master" or ROLE == "Standalone" %}
+
+service kube_apiserver restart
+service kube_controller_manager restart
+service kube_scheduler restart
+
+KUBECTL="/opt/kubernetes/v{{ KUBERNETES_VERSION }}/bin/kubectl"
+
+# Ensure kube_apiserver is up
+until ${KUBECTL} cluster-info 2>/dev/null
+do
+  sleep 1
+done
+
+# Ensure kube-system exists
+if [[ -z $(${KUBECTL} get ns | grep kube-system) ]]
+then
+    curl -ks {{ KUBE_SYSTEM_NS }} | ${KUBECTL} create -f -
+fi
+
+# Stop skydns replication controller if running
+if [[ -n $(${KUBECTL} get rc --namespace=kube-system | grep kube-dns-v9) ]]
+then
+    ${KUBECTL} delete rc kube-dns-v9 --namespace=kube-system
+fi
+
+# Stop skydns service if running
+if [[ -n $(${KUBECTL} get svc --namespace=kube-system | grep kube-dns) ]]
+then
+    ${KUBECTL} delete svc kube-dns --namespace=kube-system
+fi
+
+# Start skydns replication controller and service
+curl -ks {{ SKYDNS_RC }} | elasticbox config | ${KUBECTL} create -f -
+curl -ks {{ SKYDNS_SVC }} | elasticbox config | ${KUBECTL} create -f -
+
+{% endif %}
+
+{% if ROLE == "Node" or ROLE == "Standalone" %}
+service kube_proxy restart
+service kube_kubelet restart
+{% endif %}

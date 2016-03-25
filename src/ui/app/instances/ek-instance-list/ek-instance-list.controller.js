@@ -14,91 +14,46 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import rowTemplate from './ek-instance-list-row.template.html';
-
 class InstanceListController {
     constructor($scope, instancesStore, sessionActionCreator, sessionStore) {
         'ngInject';
 
-        const onCollapsedChange = () => {
-            if (!_.isUndefined(this.gridApi.treeBase)) {
-                this._synchronizing = true;
+        this.instancesStatus = sessionStore.getInstancesStatus();
+        this.selectedInstances = _.filter(this.instances, (x) =>
+            _.includes(_.get(this.instancesStatus, 'selection', []), x.metadata.uid));
 
-                _.without(this._expandedInstances, sessionStore.getExpandedInstances()).forEach((x) => {
-                    const instance = instancesStore.get(x);
-
-                    if (!_.isUndefined(instance)) {
-                        const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
-
-                        if (!_.isUndefined(row)) {
-                            this.gridApi.treeBase.collapseRow(row);
-                        }
-                    }
-                });
-
-                _.without(sessionStore.getExpandedInstances(), this._expandedInstances).forEach((x) => {
-                    const instance = instancesStore.get(x);
-
-                    if (!_.isUndefined(instance)) {
-                        const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', instance.metadata.uid));
-
-                        if (!_.isUndefined(row)) {
-                            this.gridApi.treeBase.expandRow(row);
-                        }
-                    }
-                });
-
-                this._expandedInstances = sessionStore.getExpandedInstances();
-                this._synchronizing = false;
-            }
-        };
-
-        this._synchronizing = false;
-        this._expandedInstances = sessionStore.getExpandedInstances();
-
-        this.groupedInstances = [];
-
-        this.gridOptions = {
-            rowTemplate,
+        this.tableOptions = {
             data: 'ctrl.groupedInstances',
-            enableFiltering: false,
-            enableRowSelection: true,
-            enableSelectAll: true,
-            showTreeExpandNoChildren: false,
-            selectionRowHeaderWidth: 50,
-            rowHeight: 50,
+            enableSelection: true,
+            groupField: '_childItems',
+            getIdentity: (item) => item.metadata.uid,
             columnDefs: [
                 {
                     name: 'name',
                     field: 'metadata.name',
-                    enableColumnMenu: false,
                     width: '25%',
-                    cellTemplate: `<div ng-class="{'ek-instance-list__child-row': row.entity.$$treeLevel === 1}">
-                        <ek-instance-name instance="row.entity"></ek-instance-name>
+                    cellTemplate: `<div ng-class="{'ek-instance-list__child-row': item._groupChild}">
+                        <ek-instance-name instance="item"></ek-instance-name>
                     </div>`
                 },
                 {
                     name: 'state',
                     field: 'status.phase',
-                    enableColumnMenu: false,
                     width: '15%',
-                    cellTemplate: `<ek-instance-state instance="row.entity"></ek-instance-state>`
+                    cellTemplate: `<ek-instance-state instance="item"></ek-instance-state>`
                 },
                 {
                     name: 'kind',
                     field: 'kind',
-                    enableColumnMenu: false,
-                    width: '18%',
-                    cellTemplate: `<p>{{ row.entity.kind }}</p>`
+                    width: '18%'
                 },
                 {
                     name: 'labels',
                     field: 'metadata.labels',
-                    enableColumnMenu: false,
-                    cellTemplate: `<ek-labels labels="row.entity.metadata.labels"></ek-labels>`,
+                    cellTemplate: `<ek-labels labels="item.metadata.labels"></ek-labels>`,
                     sortingAlgorithm: (a, b) => {
-                        const sizeA = _.size(a);
-                        const sizeB = _.size(b);
+                        const sizeA = _.size(a.metadata.labels);
+                        const sizeB = _.size(b.metadata.labels);
 
                         if (sizeA > sizeB) {
                             return 1;
@@ -112,99 +67,32 @@ class InstanceListController {
                 {
                     name: 'modified',
                     field: 'metadata.creationTimestamp',
-                    enableColumnMenu: false,
-                    cellTemplate: `<div>{{ row.entity.metadata.creationTimestamp | ekHumanizeDate }} ago</div>`
+                    cellTemplate: `<div>{{ item.metadata.creationTimestamp | ekHumanizeDate }} ago</div>`
                 },
                 {
-                    name: 'actions',
-                    displayName: '',
+                    name: '',
+                    width: '70px',
                     enableSorting: false,
-                    enableColumnMenu: false,
                     cellTemplate: `<div class="ek-instance-list__table__actions" layout="row" layout-align="end center">
-                            <ek-instance-actions instance="row.entity"></ek-instance-actions>
+                            <ek-instance-actions instance="item"></ek-instance-actions>
                         </div>`
                 }
-            ],
-            onRegisterApi: (gridApi) => {
-                const selectInstance = () => this.selectedInstances = gridApi.selection.getSelectedRows();
-                const saveGroupStates = () => {
-                    if (!this._synchronizing) {
-                        sessionActionCreator.saveCollapsedInstancesState(_.chain(this.gridApi.grid.rows)
-                            .filter(_.matchesProperty('treeNode.state', 'expanded'))
-                            .map((x) => _.get(x, 'entity.metadata.uid'))
-                            .value());
-                    }
-                };
-
-                this.gridApi = gridApi;
-
-                gridApi.selection.on.rowSelectionChanged($scope, selectInstance);
-                gridApi.selection.on.rowSelectionChangedBatch($scope, selectInstance);
-
-                if (!_.isUndefined(gridApi.treeBase)) {
-                    gridApi.treeBase.on.rowCollapsed($scope, saveGroupStates);
-                    gridApi.treeBase.on.rowExpanded($scope, saveGroupStates);
-                }
-
-                gridApi.grid.registerRowsProcessor((renderableRows) => {
-                    if (!_.isUndefined(this.gridApi.treeBase)) {
-                        this._synchronizing = true;
-
-                        if (_.isUndefined(this._expandedInstances)) {
-                            this.gridApi.treeBase.expandAllRows();
-                        } else {
-                            this._expandedInstances.forEach((x) => {
-                                const instance = instancesStore.get(x);
-
-                                if (!_.isUndefined(instance)) {
-                                    const row = _.find(this.gridApi.grid.rows, _.matchesProperty('entity.metadata.uid',
-                                        instance.metadata.uid));
-
-                                    if (!_.isUndefined(row)) {
-                                        this.gridApi.treeBase.expandRow(row);
-                                    }
-                                }
-                            });
-                        }
-                        this._synchronizing = false;
-                    }
-
-                    if (!_.isEmpty(this.selectedInstances)) {
-                        this.selectedInstances = _.chain(this.selectedInstances)
-                            .map((x) => {
-                                const row = _.find(gridApi.grid.rows, _.matchesProperty('entity.metadata.uid', x.metadata.uid));
-
-                                if (!_.isUndefined(row)) {
-                                    if (!row.isSelected) {
-                                        row.setSelected(true);
-                                    }
-
-                                    return _.get(row, 'entity');
-                                }
-                            })
-                            .compact()
-                            .value();
-                    }
-
-                    return renderableRows;
-                });
-            }
+            ]
         };
 
-        sessionStore.addExpandedInstancesChangeListener(onCollapsedChange);
-
-        $scope.$watchCollection('ctrl.instances', (instances) => {
-            this.groupedInstances = this.groupInstances(instances);
-            this.containsGroups = _.find(this.groupedInstances, (x) => x.$$treeLevel === 1);
+        $scope.$on('ek-table.status-updated', (evt, status) => {
+            this.selectedInstances = _.filter(this.instances, (x) => _.includes(status.selection || [], x.metadata.uid));
+            sessionActionCreator.saveInstancesStatus(status);
         });
 
-        $scope.$on('$destroy', () => sessionStore.removeExpandedInstancesChangeListener(onCollapsedChange));
+        $scope.$watchCollection('ctrl.instances', (instances) => this.groupedInstances = this.groupInstances(instances));
     }
 
     groupInstances(instances) {
         const key = ['metadata', 'annotations', 'kubernetes.io/created-by'];
 
         return _.chain(instances)
+            .map((x) => angular.copy(x))
             .groupBy((instance) => {
                 if (_.has(instance, key)) {
                     const data = JSON.parse(_.get(instance, key));
@@ -217,23 +105,15 @@ class InstanceListController {
             .mapValues((items) => {
                 const parent = _.find(items, (x) => !_.has(x, key));
 
-                return _.chain(items)
-                    .map((x) => {
-                        const item = angular.copy(x);
+                if (angular.isDefined(parent)) {
+                    parent._childItems = _.reject(items, (x) => x === parent);
 
-                        if (_.size(items) > 1 && !_.isUndefined(parent)) {
-                            item.$$treeLevel = _.has(item, key) ? 1 : 0;
-                        } else {
-                            item.$$treeLevel = 0;
-                        }
+                    return parent;
+                }
 
-                        return item;
-                    })
-                    .sortBy('$$treeLevel')
-                    .value();
+                return items;
             })
             .values()
-            .flatten()
             .value();
     }
 }

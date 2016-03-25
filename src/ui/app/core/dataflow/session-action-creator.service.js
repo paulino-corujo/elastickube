@@ -66,29 +66,29 @@ class SessionActionCreatorService {
             });
     }
 
-    saveCollapsedInstancesState(namespaceExpandedInstances) {
+    saveInstancesStatus(namespaceInstancesStatus) {
         const namespaceUID = this._session.getItem(constants.ACTIVE_NAMESPACE);
         const namespace = this._namespacesStore.get(namespaceUID);
 
-        this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGE, namespace, namespaceExpandedInstances });
+        this._dispatcher.dispatch({ type: this._actions.SESSION_INSTANCES_STATUS_CHANGE, namespace, namespaceInstancesStatus });
 
-        const expandedInstances = this._session.getItem(constants.EXPANDED_INSTANCES) || {};
+        const instancesStatus = this._session.getItem(constants.INSTANCES_STATUS) || {};
 
-        expandedInstances[namespaceUID] = namespaceExpandedInstances;
+        instancesStatus[namespaceUID] = namespaceInstancesStatus;
 
-        return this._session.setItem(constants.EXPANDED_INSTANCES, expandedInstances)
+        return this._session.setItem(constants.INSTANCES_STATUS, instancesStatus)
             .then(() => this._dispatcher.dispatch({
                 namespace,
-                expandedInstances: namespaceExpandedInstances,
-                type: this._actions.SESSION_EXPANDED_INSTANCES_CHANGED
+                instancesStatus: namespaceInstancesStatus,
+                type: this._actions.SESSION_INSTANCES_STATUS_CHANGED
             }));
     }
 
-    saveCollapsedAdminInstancesState(collapsedInstances) {
-        this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_ADMIN_INSTANCES_CHANGE, collapsedInstances });
+    saveAdminInstancesStatus(adminInstancesStatus) {
+        this._dispatcher.dispatch({ type: this._actions.SESSION_ADMIN_INSTANCES_STATUS_CHANGE, adminInstancesStatus });
 
-        return this._session.setItem(constants.EXPANDED_ADMIN_INSTANCES, collapsedInstances)
-            .then(() => this._dispatcher.dispatch({ type: this._actions.SESSION_EXPANDED_ADMIN_INSTANCES_CHANGED, collapsedInstances }));
+        return this._session.setItem(constants.ADMIN_INSTANCES_STATUS, adminInstancesStatus)
+            .then(() => this._dispatcher.dispatch({ type: this._actions.SESSION_ADMIN_INSTANCES_STATUS_CHANGED, adminInstancesStatus }));
     }
 
     destroy() {

@@ -24,13 +24,13 @@ class InstanceContainerChartDirective extends Directive {
         super({ Controller, template });
 
         this.bindToController = {
-            container: '='
+            container: '=',
+            metrics: '='
         };
     }
 
     compile(tElement) {
-        tElement
-            .addClass('ek-instance-container-chart');
+        tElement.addClass('ek-instance-container-chart layout-column layout-align-center-center');
     }
 }
 

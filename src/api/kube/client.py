@@ -17,13 +17,14 @@ limitations under the License.
 import json
 import logging
 import os
+import urlparse
 
 from tornado.gen import coroutine, Return
 from tornado.concurrent import Future, chain_future
 from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
 from tornado.httputil import url_concat
 
-from api.kube.exceptions import KubernetesException, WatchDisconnectedException, ResourceNotFoundException
+from api.kube.exceptions import KubernetesException, ResourceNotFoundException
 from api.kube.pods import Pods
 from api.kube.resources import Resource, NamespacedResource
 
@@ -55,22 +56,14 @@ class HTTPClient(object):
         else:
             url = self._base_url + "/" + url_path
 
-        params = {
-            "namespace": kwargs.pop("namespace", "default")
-        }
-
-        for param in kwargs.iterkeys():
-            if param in url_path:
-                params[param] = kwargs[param]
+        params = dict()
+        for kwarg in kwargs.iterkeys():
+            if kwarg in url_path:
+                params[kwarg] = kwargs[kwarg]
 
         return url.format(**params)
 
-    def build_params(self, url_path, **kwargs):
-        if url_path.startswith("/"):
-            url = self._base_url + url_path
-        else:
-            url = self._base_url + "/" + url_path
-
+    def build_params(self, url, **kwargs):
         keys = kwargs.keys()
         for key in keys:
             if key in url:
@@ -86,10 +79,17 @@ class HTTPClient(object):
         return headers
 
     @coroutine
-    def request(self, url, method="GET", **kwargs):
+    def request(self, url_path, method="GET", **kwargs):
+        params = self.build_params(url_path, **kwargs)
+
+        if not urlparse.urlparse(url_path).netloc:
+            url = url_concat(self.build_url(url_path, **kwargs), params)
+        else:
+            url = url_concat(url_path, params)
+
         client = AsyncHTTPClient(force_instance=True)
         try:
-            result = yield client.fetch(url, method=method, headers=self.build_headers(), **kwargs)
+            result = yield client.fetch(url, method=method, headers=self.build_headers())
             raise Return(result)
         finally:
             client.close()
@@ -282,7 +282,7 @@ class KubeClient(object):
             response = yield self.http_client.get(url_path, **kwargs)
         except HTTPError as http_error:
             message = self.format_error(http_error)
-            logging.exception(http_error)
+
             if http_error.code == 404:
                 raise ResourceNotFoundException(message)
             else:
@@ -342,21 +342,10 @@ class KubeClient(object):
         raise Return(json.loads(response.body))
 
     def watch(self, url_path, on_data, **kwargs):
-        try:
-            return self.http_client.watch(url_path, on_data, **kwargs)
-        except HTTPError as http_error:
-            message = self.format_error(http_error)
-
-            if http_error.code == 404:
-                raise ResourceNotFoundException(message)
-            elif http_error.code == 599:
-                raise WatchDisconnectedException(message)
-            else:
-                raise KubernetesException(message, http_error.code)
+        return self.http_client.watch(url_path, on_data, **kwargs)
 
     @coroutine
     def _build_api_resources(self, api_version):
-
         response = yield self.http_client.get("/api/%s" % api_version)
 
         resources = json.loads(response.body).get("resources", [])

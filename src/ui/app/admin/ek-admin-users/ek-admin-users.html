@@ -19,11 +19,10 @@
     </div>
 
     <div class="ek-admin-users__body" flex layout="column">
-        <div class="ek-admin-users__body__table-container"
+        <div class="ek-admin-users__body__table-container" layout="column"
              ng-style="{ height: ctrl.users.length < 5 ? (ctrl.users.length * 50) + 32 + 'px' : '100%'}">
-            <div class="ek-admin-users__body__table-container__table ek-table"
-                 ng-style="{ height: ctrl.users.length < 5 ? (ctrl.users.length * 50) + 32 + 'px' : '100%'}"
-                 ui-grid="ctrl.gridOptions" ui-grid-selection></div>
+             <ek-table options="ctrl.tableOptions"
+                       status="ctrl.namespacesStatus" flex></ek-table>
         </div>
 
         <div class="ek-admin-users__body__invite"
@@ -36,4 +35,3 @@
         </div>
     </div>
 </div>
-

@@ -14,59 +14,54 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import rowTemplate from './ek-admin-charts-row.template.html';
-
 class AdminChartsController {
     constructor($scope, chartsStore) {
         'ngInject';
 
-        const onChange = () => this.charts = this._chartsStore.getAll();
+        const onChange = () => this.charts = chartsStore.getAll();
 
-        this._chartsStore = chartsStore;
-        this._chartsStore.addChangeListener(onChange);
+        chartsStore.addChangeListener(onChange);
 
         this.bulkActions = 'Bulk Actions';
-        this.charts = this._chartsStore.getAll();
+        this.charts = chartsStore.getAll();
         this.filteredCharts = [];
 
-        this.gridOptions = {
-            rowTemplate,
+        this.tableOptions = {
             data: 'ctrl.filteredCharts',
-            enableFiltering: false,
-            enableRowSelection: true,
-            enableSelectAll: true,
-            selectionRowHeaderWidth: 50,
-            rowHeight: 50,
+            enableSelection: false,
+            getIdentity: (item) => item._id.$oid,
             columnDefs: [
                 {
                     name: 'name',
                     field: 'name',
-                    enableColumnMenu: false,
-                    cellTemplate: `<ek-chart-name chart="row.entity"></ek-chart-name>`
+                    cellTemplate: `<ek-chart-name chart="item"></ek-chart-name>`
                 },
                 {
                     name: 'maintainers',
-                    enableColumnMenu: false,
-                    cellTemplate: `<div>{{ row.entity.maintainers[0] }}</div>`
+                    field: 'maintainers',
+                    cellTemplate: `<div>{{ item.maintainers[0] }}</div>`,
+                    sortingAlgorithm: (a, b) => {
+                        const sizeA = _.first(a.maintainers);
+                        const sizeB = _.first(b.maintainers);
+
+                        if (sizeA > sizeB) {
+                            return 1;
+                        } else if (sizeA < sizeB) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }
                 },
                 {
                     name: 'modified',
-                    enableColumnMenu: false,
-                    cellTemplate: `<div>{{ row.entity.committed_date | ekHumanizeDate: 'epoch' }} ago</div>`
+                    field: 'committed_date',
+                    cellTemplate: `<div>{{ item.committed_date | ekHumanizeDate: 'epoch' }} ago</div>`
                 }
-            ],
-            onRegisterApi: (gridApi) => {
-                this.gridApi = gridApi;
-
-                gridApi.selection.on.rowSelectionChanged($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-
-                gridApi.selection.on.rowSelectionChangedBatch($scope, () =>
-                    this.hasRowsSelected = !_.isEmpty(gridApi.selection.getSelectedRows()));
-            }
+            ]
         };
 
-        $scope.$on('$destroy', () => this._chartsStore.removeChangeListener(onChange));
+        $scope.$on('$destroy', () => chartsStore.removeChangeListener(onChange));
     }
 }
 

@@ -9,9 +9,15 @@
         <div class="ek-tabs"
              ng-if="ctrl.instance.kind === 'Pod'"
              layout="row" layout-align="center end">
-            <!--<div class="ek-tab ek-tab&#45;&#45;selected">overview</div>-->
-            <!--<div class="ek-tab">events</div>-->
-            <!--<div class="ek-tab">containers</div>-->
+            <div class="ek-tab"
+                 ng-class="{'ek-tab--selected': ctrl.tab === 'overview'}"
+                 ng-click="ctrl.selectTab('overview')">overview</div>
+            <div class="ek-tab"
+                 ng-class="{'ek-tab--selected': ctrl.tab === 'events'}"
+                 ng-click="ctrl.selectTab('events')">events</div>
+            <div class="ek-tab"
+                 ng-class="{'ek-tab--selected': ctrl.tab === 'containers'}"
+                 ng-click="ctrl.selectTab('containers')">containers</div>
         </div>
     </div>
 
@@ -29,7 +35,13 @@
 
         <div class="ek-instance__body__content"
              transclude-to="body" layout="column" flex>
-            <ek-instance-overview></ek-instance-overview>
+            <div layout="row">
+                <div class="ek-instance__body__content__first-column" layout="column" flex ui-view></div>
+                <div class="ek-instance__body__content__second-column" layout="column">
+                    <ek-instance-details-block></ek-instance-details-block>
+                    <ek-instance-labels-block></ek-instance-labels-block>
+                </div>
+            </div>
         </div>
 
     </ek-sidenav-layout>

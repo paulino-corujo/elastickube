@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+service kube_proxy stop || true
+service kube_kubelet stop || true
+service kube_apiserver stop || true
+service kube_controller_manager stop || true
+service kube_scheduler stop || true

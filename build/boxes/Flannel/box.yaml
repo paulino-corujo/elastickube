@@ -1,0 +1,51 @@
+description: An etcd backed network fabric for containers
+icon: aa017d34-ef7b-407a-8fe7-1845ce3dc183
+id: aa017d34-ef7b-407a-8fe7-1845ce3dc183
+name: Flannel
+requirements:
+- linux
+variables:
+- name: NETWORK
+  required: false
+  type: Text
+  value: 10.0.128.0/20
+  visibility: public
+- name: COMUNICATION_PORT
+  required: false
+  type: Port
+  value: '8285'
+  visibility: public
+- name: ETCD_VERSION
+  options: 2.2.4
+  required: false
+  type: Options
+  value: 2.2.4
+  visibility: private
+- name: FLANNEL_VERSION
+  options: 0.5.5
+  required: false
+  type: Options
+  value: 0.5.5
+  visibility: private
+- name: FLANNEL_INIT
+  required: false
+  type: File
+  value: files/flannel.jinja
+  visibility: internal
+- name: FLANNEL_CONFIG
+  required: false
+  type: File
+  value: files/config.jinja
+  visibility: internal
+- name: etcd
+  required: false
+  type: Binding
+  value: d7dec7b1-ac4e-4297-9a47-bec900d6fdff
+  visibility: private
+- automatic_updates: major
+  name: go
+  required: false
+  type: Box
+  value: a2b48401-5374-43bf-983b-0324404038d4
+  visibility: internal
+

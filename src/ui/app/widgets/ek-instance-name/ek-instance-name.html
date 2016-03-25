@@ -3,7 +3,7 @@
         <ek-ikon swap-border-fill-color="instance.kind==='ReplicationController'" name="instance.metadata.name"></ek-ikon>
     </div>
     <div>
-        <a class="mt0 mb0" ui-sref="instance({ namespace: instance.metadata.namespace, instanceId: instance.metadata.uid })">{{
+        <a class="mt0 mb0" ui-sref="instance.overview({ namespace: instance.metadata.namespace, instanceId: instance.metadata.uid })">{{
             instance.metadata.name }}</a>
     </div>
 </div>

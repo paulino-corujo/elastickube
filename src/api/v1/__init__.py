@@ -15,20 +15,20 @@ limitations under the License.
 """
 
 import httplib
-import logging
 import json
-import jwt
+import logging
 import os
 from datetime import datetime, timedelta
 
+import jwt
 from bson.json_util import dumps
 from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine
 from tornado.ioloop import IOLoop
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from api.v1.sync import SyncNamespaces
 from api.kube import client
+from api.v1.sync import SyncNamespaces
 from data import watch, init as initialize_database
 
 PING_FREQUENCY = timedelta(seconds=5)
@@ -38,9 +38,14 @@ ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
 
 
 def configure(settings):
-    if os.path.exists('/var/run/secrets/kubernetes.io/serviceaccount/token'):
-        with open('/var/run/secrets/kubernetes.io/serviceaccount/token') as token:
-            settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'), token=token.read())
+    if "KUBE_API_TOKEN_PATH" in os.environ and os.path.exists(os.environ["KUBE_API_TOKEN_PATH"]):
+        logging.info("Reading token from '%s'.", os.environ["KUBE_API_TOKEN_PATH"])
+
+        with open(os.environ["KUBE_API_TOKEN_PATH"]) as token:
+            settings["kube"] = client.KubeClient(os.environ["KUBERNETES_SERVICE_HOST"], token=token.read())
+
+    if "kube" not in settings:
+        settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'))
 
     mongo_url = "mongodb://{0}:{1}/".format(
         os.getenv('ELASTICKUBE_MONGO_SERVICE_HOST', 'localhost'),
@@ -69,38 +74,26 @@ class SecureWebSocketHandler(WebSocketHandler):
         self.ping_timeout_handler = None
 
     def open(self):
-        def _check_user(future):
-            try:
-                user = future.result()
-                if user is None:
-                    logging.debug("User not found.")
-                    self.write_message({"error": {"message": "Invalid token."}})
-                    self.close(httplib.UNAUTHORIZED, "Invalid token.")
-            except Exception:
-                logging.exception("Login exception retrieving the user.")
-                self.write_message({"error": {"message": "Invalid token."}})
-                self.close(httplib.UNAUTHORIZED, "Invalid token.")
+        # Try the header if not the cookie
+        encoded_token = self.request.headers.get(ELASTICKUBE_TOKEN_HEADER)
+        if encoded_token is None:
+            encoded_token = self.get_cookie(ELASTICKUBE_TOKEN_HEADER)
 
-        self.ping_timeout_handler = IOLoop.current().add_timeout(PING_FREQUENCY, self.send_ping)
-
-        try:
-            # Try the header if not the cookie
-            encoded_token = self.request.headers.get(ELASTICKUBE_TOKEN_HEADER)
-            if encoded_token is None:
-                encoded_token = self.get_cookie(ELASTICKUBE_TOKEN_HEADER)
-
-            if encoded_token is None:
-                self.write_message({"error": {"message": "Invalid token."}})
-                self.close(httplib.UNAUTHORIZED, "Invalid token.")
-            else:
-                token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
-                self.user = self.settings["database"].Users.find_one({"username": token["username"]})
-                self.user.add_done_callback(_check_user)
-
-        except jwt.DecodeError as jwt_error:
-            logging.exception(jwt_error)
+        if encoded_token is None:
             self.write_message({"error": {"message": "Invalid token."}})
             self.close(httplib.UNAUTHORIZED, "Invalid token.")
+        else:
+            token = None
+            try:
+                token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
+            except jwt.DecodeError as jwt_error:
+                logging.exception(jwt_error)
+                self.write_message({"error": {"message": "Invalid token."}})
+                self.close(httplib.UNAUTHORIZED, "Invalid token.")
+
+            if token:
+                self.user = self.settings["database"].Users.find_one({"username": token["username"]})
+                self.ping_timeout_handler = IOLoop.current().add_timeout(PING_FREQUENCY, self.send_ping)
 
     def on_message(self, message):
         pass

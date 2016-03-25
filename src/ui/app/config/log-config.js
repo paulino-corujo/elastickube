@@ -29,14 +29,26 @@ class Logger {
     }
 
     info(...attrs) {
+        if (this._debug) {
+            this._$delegate.info(...attrs);
+        }
+
         return this._notifications.info(...attrs);
     }
 
     warn(...attrs) {
+        if (this._debug) {
+            this._$delegate.warn(...attrs);
+        }
+
         return this._notifications.warn(...attrs);
     }
 
     error(...attrs) {
+        if (this._debug) {
+            this._$delegate.error(...attrs);
+        }
+
         return this._notifications.error(...attrs);
     }
 

@@ -32,7 +32,11 @@ class InstanceActionsDirective extends Directive {
     compile(tElement) {
         tElement.addClass('ek-instance-actions');
 
-        return ($scope) => _.extend($scope, constants);
+        return ($scope, $element, $attrs, $controller) => {
+            _.extend($scope, constants);
+
+            $controller.drop = $element.find('ek-drop').controller('ekDrop');
+        };
     }
 }
 

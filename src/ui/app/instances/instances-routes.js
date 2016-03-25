@@ -50,6 +50,7 @@ function instancesRoutes(routerHelperProvider) {
     }, {
         state: 'instance',
         config: {
+            abstract: true,
             url: '/:namespace/instances/{instanceId:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}}',
             parent: 'private',
             template: '<ek-instance flex></ek-instance>',
@@ -79,6 +80,52 @@ function instancesRoutes(routerHelperProvider) {
                             const instance = instancesStore.get($stateParams.instanceId);
 
                             return instanceActionCreator.subscribe(instance);
+                        });
+                }
+            }
+        }
+    }, {
+        state: 'instance.overview',
+        config: {
+            url: '/',
+            template: '<ek-instance-overview></ek-instance-overview>'
+        }
+    }, {
+        state: 'instance.events',
+        config: {
+            url: '/events',
+            template: '<ek-instance-events-block></ek-instance-events-block>',
+            resolve: {
+                checkInstanceType: ($stateParams, instancesNavigationActionCreator, instancesStore) => {
+                    'ngInject';
+
+                    return instancesStore.isLoading()
+                        .then(() => {
+                            const instance = instancesStore.get($stateParams.instanceId);
+
+                            if (instance.kind !== 'Pod') {
+                                return instancesNavigationActionCreator.instance($stateParams, { location: 'replace' });
+                            }
+                        });
+                }
+            }
+        }
+    }, {
+        state: 'instance.containers',
+        config: {
+            url: '/containers',
+            template: '<ek-instance-containers></ek-instance-containers>',
+            resolve: {
+                checkInstanceType: ($stateParams, instancesNavigationActionCreator, instancesStore) => {
+                    'ngInject';
+
+                    return instancesStore.isLoading()
+                        .then(() => {
+                            const instance = instancesStore.get($stateParams.instanceId);
+
+                            if (instance.kind !== 'Pod') {
+                                return instancesNavigationActionCreator.instance($stateParams, { location: 'replace' });
+                            }
                         });
                 }
             }
