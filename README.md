@@ -22,4 +22,12 @@ To install ElasticKube execute the following command:
 
   `curl -s https://elastickube.com | bash`
 
+If you cluster kube-system namespace does not have a kubernetes service and a service account use the unsecure url by adding the `-u` parameter:
+
+  `curl -s https://elastickube.com | bash -s -- -u http://<kube-apiserver>:8080`
+
+For example the default Azure scripts name the kube-api server 'kube-00', to deploy in such environment use the following command:
+
+  `curl -s https://elastickube.com | bash -s -- -u http://kube-00:8080`
+
 Once ElasticKube is installed, please complete the onboarding process using the load balancer IP address produced by the installation script.
