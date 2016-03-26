@@ -27,7 +27,7 @@ do
 
     t )  export TIMEOUT=$OPTARG;;
     r )  export REINSTALL=true;;
-    u )  export MASTER_URL=$OPTARG;;
+    u )  export KUBERNETES_MASTER_URL=$OPTARG;;
     h )  help; exit 0;;
     : )  help "Missing option argument for -$OPTARG."; exit 1;;
     \?)  help "Option does not exist : $OPTARG."; exit 1;;
