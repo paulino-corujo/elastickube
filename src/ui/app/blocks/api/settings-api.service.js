@@ -34,7 +34,7 @@ class SettingsAPIService extends AbstractAPI {
         };
 
         /* eslint no-undefined: 0 */
-        return this._$http.get('api/v1/auth/providers', code ? options : undefined)
+        return this._$http.get('/api/v1/auth/providers', code ? options : undefined)
             .then((x) => {
                 const authProviders = x.data;
 
