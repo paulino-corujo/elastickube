@@ -34,11 +34,11 @@ class PrincipalAPIService extends AbstractAPI {
         };
 
         /* eslint no-undefined: 0 */
-        return this._$http.post('/api/v1/auth/signup', user, code ? options : undefined);
+        return this._$http.post('api/v1/auth/signup', user, code ? options : undefined);
     }
 
     login(user) {
-        return this._$http.post('/api/v1/auth/login', user);
+        return this._$http.post('api/v1/auth/login', user);
     }
 }
 
