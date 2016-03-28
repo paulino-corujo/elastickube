@@ -21,24 +21,34 @@ const EVENT = 'EVENT';
 
 class WebsocketClientService extends EventEmitter {
 
-    constructor($q, $rootScope) {
+    constructor($q, $rootScope, $location) {
         'ngInject';
 
         super();
 
         this._$q = $q;
         this._$rootScope = $rootScope;
-
         this._connectionAttempts = 1;
         this._eventsSubscribed = new Set();
         this._currentOnGoingMessages = {};
+        this._apiPath = location.pathname.replace($location.path(), '');
+
+        if (this._apiPath[0] !== '/') {
+            this._apiPath = '/' + this._apiPath;
+        }
+
+        if (this._apiPath.slice(-1) !== '/') {
+            this._apiPath = this._apiPath + '/';
+        }
+
+        this._apiPath = this._apiPath + 'api/v1/ws';
     }
 
     connect() {
         const defer = this._$q.defer();
 
         if (_.isUndefined(this._websocket) || this._websocket.readyState === WebSocket.CLOSED) {
-            this._websocket = new WebSocket(`ws://${location.hostname}/api/v1/ws`);
+            this._websocket = new WebSocket(`ws://${location.hostname}:${location.port}${this._apiPath}`);
 
             this._websocket.onopen = () => {
                 const watcherPromises = [];

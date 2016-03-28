@@ -59,8 +59,8 @@ const webpackConfig = {
             { test: require.resolve('jquery'), loader: 'expose?jQuery' },
             { test: /\.json$/, exclude: /\/(node_modules)\//, loader: 'json' },
             { test: /\.js$/, exclude: /\/(node_modules)\//, loader: 'ng-annotate!babel!eslint' },
-            { test: /\.css/, loader: ExtractTextPlugin.extract('style', 'css') },
-            { test: /\.less/, loader: ExtractTextPlugin.extract('style', 'css!postcss!less') },
+            { test: /\.css/, loader: ExtractTextPlugin.extract('style', 'css', {publicPath:'../../'}) },
+            { test: /\.less/, loader: ExtractTextPlugin.extract('style', 'css!postcss!less', {publicPath:'../../'}) },
             { test: /\.html/, exclude: /\/(components)\//, loader: 'html', include: /\/(app)\// },
             {
                 test: /\.html$/,
@@ -101,7 +101,7 @@ const webpackConfig = {
 
     output: {
         path: path.join(__dirname, process.env.BUILD_FOLDER || '../build/ui'),
-        publicPath: '/',
+        publicPath: '',
         filename: isProduction ? 'assets/js/[name]-[chunkhash].js' : 'assets/js/[name].js'
     },
 
