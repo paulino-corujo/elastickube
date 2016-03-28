@@ -36,7 +36,7 @@ do
 done
 
 TIMEOUT=${TIMEOUT:-600}
-KUBERNETES_MASTER_URL=${KUBERNETES_MASTER_URL:https://kubernetes}
+KUBERNETES_MASTER_URL=${KUBERNETES_MASTER_URL-'https://kubernetes'}
 
 cat << \
 '______________________________HEADER______________________________'
@@ -191,28 +191,41 @@ ______________________________FILE______________________________
 
 SPINNER_STR='|/-\'
 
-exec_wait()
+retry()
 {
-    eval "$@ > /dev/null 2>&1 >> elastickube.log" &
-
-    local PID=$!
+    local PID=0
+    local COUNTER=0
     local SPINNER_DELAY=0.25
     local TEMP_SPINNER=${SPINNER_STR#?}
+    local RETURN_CODE=-1
+
     SPINNER_STR=${TEMP_SPINNER}${SPINNER_STR%"$TEMP_SPINNER"}
 
     printf "[ %c ] " "${SPINNER_STR}"
-    while [ "$(ps a | awk '{print $1}' | grep ${PID})" ]
+    until [[ ${COUNTER} -ge $[${TIMEOUT} * 4] ]] || [[ ${RETURN_CODE} -eq 0 ]]
     do
-        TEMP_SPINNER=${SPINNER_STR#?}
-        SPINNER_STR=${TEMP_SPINNER}${SPINNER_STR%"$TEMP_SPINNER"}
-        printf "\b\b\b\b\b\b[ %c ] " "${SPINNER_STR}"
+        if [[ ${RETURN_CODE} -ne 0 ]]
+        then
+             eval "$@ 2>>elastickube.log >>elastickube.log &"
+             PID=$!
+        fi
 
-        sleep ${SPINNER_DELAY}
+        while ps a | awk '{print $1}' | grep ${PID} 2>&1 > /dev/null
+        do
+            TEMP_SPINNER=${SPINNER_STR#?}
+            SPINNER_STR=${TEMP_SPINNER}${SPINNER_STR%"$TEMP_SPINNER"}
+            printf "\b\b\b\b\b\b[ %c ] " "${SPINNER_STR}"
+
+            sleep ${SPINNER_DELAY}
+            COUNTER=$[${COUNTER} + 1]
+        done
+
+        wait ${PID}
+        RETURN_CODE=$?
     done
     printf "\b\b\b\b\b\b    \b\b\b\b"
 
-    wait ${PID}
-    return $?
+    return ${RETURN_CODE}
 }
 
 check_tool()
@@ -229,20 +242,12 @@ check_tool()
 deploy_rc()
 {
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1}"
-
-    if ! exec_wait kubectl --namespace=kube-system get rc ${1}
+    if ! kubectl --namespace=kube-system get rc ${1} 2>> elastickube.log >> elastickube.log
     then
-        exec_wait "echo '${2}' | kubectl create --validate=false -f -"
+        echo "${2}" | kubectl create --validate=false -f - 2>> elastickube.log >> elastickube.log
     fi
 
-    local COUNTER=0
-    until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe rc ${1} | grep '0 Waiting / 0 Succeeded / 0 Failed'"
-    do
-        exec_wait sh -c "sleep 2"
-        COUNTER=$[${COUNTER} + 2]
-    done
-
-    if [[ ${COUNTER} -lt ${TIMEOUT} ]]
+    if retry "kubectl --namespace=kube-system describe rc ${1} | grep '1 Running / 0 Waiting / 0 Succeeded / 0 Failed'"
     then
         echo [ ✓ ]
     else
@@ -253,9 +258,9 @@ deploy_rc()
 deploy_svc()
 {
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1} svc"
-    if ! exec_wait kubectl --namespace=kube-system get svc ${1}
+    if ! kubectl --namespace=kube-system get svc ${1} 2>> elastickube.log >> elastickube.log
     then
-        if exec_wait "echo '${2}' | kubectl create --validate=false -f -"
+        if echo "${2}" | kubectl create --validate=false -f - 2>> elastickube.log >> elastickube.log
         then
             echo [ ✓ ]
         else
@@ -271,7 +276,7 @@ check_tool kubectl
 
 # Check the cluster is configured
 printf "%-${PROGRESS_WIDTH}s" "Verifying Kubernetes cluster"
-if exec_wait kubectl cluster-info
+if kubectl cluster-info  2>&1 >> elastickube.log
 then
     echo [ ✓ ]
 else
@@ -284,14 +289,8 @@ deploy_rc  elastickube-server "${ELASTICKUBE_SERVER_RC}"
 deploy_svc elastickube-server "${ELASTICKUBE_SERVER_SVC}"
 
 printf "%-${PROGRESS_WIDTH}s" "Waiting for LB to be ready"
-COUNTER=0
-until [[ ${COUNTER} -ge ${TIMEOUT} ]] || exec_wait "kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:'"
-do
-    exec_wait bash -c "sleep 2"
-    COUNTER=$[${COUNTER} + 2]
-done
 
-if [[ ${COUNTER} -lt ${TIMEOUT} ]]
+if retry "kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:'"
 then
     echo [ ✓ ]
 else
