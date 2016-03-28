@@ -17,7 +17,7 @@
 
         <div ng-if="ctrl.step !== 1" class="ek-choose-chart__toolbar__content" layout="row" layout-align="start center">
             <h2 class="ek-choose-chart__toolbar__content__title" flex="40">Choose chart</h2>
-            <img class="ek-choose-chart__toolbar__content__charticon" ng-src="/icons/charts/{{ ctrl.selectedChart._id.$oid }}">
+            <img class="ek-choose-chart__toolbar__content__charticon" ng-src="icons/charts/{{ ctrl.selectedChart._id.$oid }}">
             <div flex="60" class="ek-choose-chart__toolbar__content__chartname">{{ ctrl.selectedChart.name }}</div>
             <div ek-ink-ripple="dark"
                  class="ek-choose-chart__toolbar__content__edit"
