@@ -27,8 +27,8 @@ spec:
           mountPath: /opt/elastickube
         - name: elastickube-run
           mountPath: /var/run
-        - name: elasticbox-home-user
-          mountPath: /home/elasticbox
+        - name: vagrant-home-user
+          mountPath: /home/vagrant
       - name: elastickube-charts
         image: elasticbox/elastickube-charts:latest
         resources:
@@ -68,6 +68,6 @@ spec:
       - name: elastickube-run
         hostPath:
           path: /var/run/elastickube
-      - name: elasticbox-home-user
+      - name: vagrant-home-user
         hostPath:
-          path: /home/elasticbox
+          path: /home/vagrant

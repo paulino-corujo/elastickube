@@ -242,12 +242,12 @@ check_tool()
 deploy_rc()
 {
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1}"
-    if ! kubectl --namespace=kube-system get rc ${1} 2>> elastickube.log >> elastickube.log
+    if ! kubectl --namespace=kube-system get rc ${1} 2>>elastickube.log >>elastickube.log
     then
-        echo "${2}" | kubectl create --validate=false -f - 2>> elastickube.log >> elastickube.log
+        echo "${2}" | kubectl create --validate=false -f - 2>>elastickube.log >>elastickube.log
     fi
 
-    if retry "kubectl --namespace=kube-system describe rc ${1} | grep '1 Running / 0 Waiting / 0 Succeeded / 0 Failed'"
+    if retry "kubectl --namespace=kube-system describe rc ${1} 2>>elastickube.log | grep '1 Running / 0 Waiting / 0 Succeeded / 0 Failed'"
     then
         echo [ ✓ ]
     else
@@ -258,9 +258,9 @@ deploy_rc()
 deploy_svc()
 {
     printf "%-${PROGRESS_WIDTH}s" "Setting up ${1} svc"
-    if ! kubectl --namespace=kube-system get svc ${1} 2>> elastickube.log >> elastickube.log
+    if ! kubectl --namespace=kube-system get svc ${1} 2>>elastickube.log >>elastickube.log
     then
-        if echo "${2}" | kubectl create --validate=false -f - 2>> elastickube.log >> elastickube.log
+        if echo "${2}" | kubectl create --validate=false -f - 2>>elastickube.log >>elastickube.log
         then
             echo [ ✓ ]
         else
@@ -276,7 +276,7 @@ check_tool kubectl
 
 # Check the cluster is configured
 printf "%-${PROGRESS_WIDTH}s" "Verifying Kubernetes cluster"
-if kubectl cluster-info  2>&1 >> elastickube.log
+if kubectl cluster-info 2>>elastickube.log >>elastickube.log
 then
     echo [ ✓ ]
 else

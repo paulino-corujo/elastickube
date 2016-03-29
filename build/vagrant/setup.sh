@@ -6,8 +6,10 @@ apt-get -y install python-pip curl
 
 pip install --no-compile elasticbox-docker
 
-# Create code folder
-chown -R elasticbox:elasticbox /opt/elastickube
+# Create code and log folder
+mkdir -p /var/log/elastickube && chown vagrant:vagrant /var/log/elastickube
+mkdir -p /opt/elastickube && chown -R vagrant:vagrant /opt/elastickube
+
 
 sudo bash -- << \
 _____________EXECUTE_BOXES_____________

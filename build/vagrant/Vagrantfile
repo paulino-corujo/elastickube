@@ -8,7 +8,7 @@ REPOSITORY_PATH = File.join(Dir.home, "Repositories", "elastickube")
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "elasticbox/ubuntu-14.04"
+  config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder "#{REPOSITORY_PATH}", "#{ELASTICKUBE_PATH}",
     :disabled       => false,
     :type           => "rsync",
@@ -18,8 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :private_network, ip: "10.107.56.115"
   config.vm.network "public_network", bridge: 'en0: Wi-Fi (AirPort)'
 
-  config.ssh.username = "elasticbox"
-  config.ssh.password = "elasticbox"
+  config.ssh.username = "vagrant"
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
