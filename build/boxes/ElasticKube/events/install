@@ -11,7 +11,7 @@ curl -sL https://deb.nodesource.com/setup_0.12 | bash
 
 # apt-get update is executed as part of the the node repository setup script
 echo "==> Install Node JS and Mongo"
-apt-get -y install nodejs mongodb-org-shell python-dev python-pycurl libcurl4-openssl-dev
+apt-get -y install nodejs mongodb-org-shell python-dev python-pycurl libcurl4-openssl-dev libffi-dev
 
 echo "==> Install Grunt"
 npm install grunt-cli -g

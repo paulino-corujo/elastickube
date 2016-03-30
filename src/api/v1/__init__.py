@@ -23,7 +23,9 @@ from datetime import datetime, timedelta
 import jwt
 from bson.json_util import dumps
 from motor.motor_tornado import MotorClient
-from tornado.gen import coroutine
+from pymongo.errors import PyMongoError
+from tornado.gen import coroutine, Return
+from tornado.httpclient import HTTPError
 from tornado.ioloop import IOLoop
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
@@ -45,24 +47,31 @@ def configure(settings):
             settings["kube"] = client.KubeClient(os.environ["KUBERNETES_SERVICE_HOST"], token=token.read())
 
     if "kube" not in settings:
-        settings['kube'] = client.KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'))
+        settings["kube"] = client.KubeClient(os.getenv("KUBERNETES_SERVICE_HOST"))
 
     mongo_url = "mongodb://{0}:{1}/".format(
-        os.getenv('ELASTICKUBE_MONGO_SERVICE_HOST', 'localhost'),
-        os.getenv('ELASTICKUBE_MONGO_SERVICE_PORT', 27017)
+        os.getenv("ELASTICKUBE_MONGO_SERVICE_HOST", "localhost"),
+        os.getenv("ELASTICKUBE_MONGO_SERVICE_PORT", 27017)
     )
 
-    settings['motor'] = MotorClient(mongo_url)
-    settings['database'] = settings['motor'].elastickube
+    settings["motor"] = MotorClient(mongo_url)
+    settings["database"] = settings["motor"].elastickube
 
 
 @coroutine
 def initialize(settings):
-    yield initialize_database(settings['database'])
-    yield settings["kube"].build_resources()
+    yield initialize_database(settings["database"])
 
-    yield SyncNamespaces(settings).start_sync()
-    watch.start_monitor(settings['motor'])
+    try:
+
+        yield settings["kube"].build_resources()
+        yield SyncNamespaces(settings).start_sync()
+        IOLoop.current().add_future(watch.start_monitor(settings["motor"]), IOLoop.current().stop)
+    except (HTTPError, PyMongoError):
+        logging.exception("Cannot initialize ElasticKube")
+        IOLoop.current().stop()
+
+    raise Return(settings)
 
 
 class SecureWebSocketHandler(WebSocketHandler):
