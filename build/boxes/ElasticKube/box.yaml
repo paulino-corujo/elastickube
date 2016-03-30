@@ -1,6 +1,6 @@
 icon: 6da24ad0-7af2-48fc-9016-954d196c1da1
 id: 6da24ad0-7af2-48fc-9016-954d196c1da1
-name: ElasticKube Dev
+name: ElasticKube
 requirements: []
 variables:
 - name: ROLE
