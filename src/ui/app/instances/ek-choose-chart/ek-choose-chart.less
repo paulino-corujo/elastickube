@@ -4,15 +4,17 @@
     & {
         background-color: @white;
         border: 1px solid @grey300;
-        border-radius: 2px;        
+        border-radius: 2px;
         width: 805px;
         box-shadow: 0 0 3px rgba(0, 0, 0, 0.06);
+        &__toolbar {
+            border-bottom: 1px solid @grey350;
+        }
     }
 
     &--active {
         .ek-choose-chart__toolbar {
             padding-bottom: 30px;
-            border-bottom: 1px solid @grey350;
             &__step {
                 &__number {
                     color: @cyan500;
@@ -24,12 +26,15 @@
                 }
             }
         }
+
+        .ek-choose-chart__grid {
+            max-height: 500px;
+        }
     }
 
     &__toolbar {
         font-weight: bold;
         padding-bottom: 0;
-
         &__step {
             margin-left: 20px;
 
@@ -79,7 +84,7 @@
                     padding: 0;
                     background-color: @grey100;
                     border: 1px solid @grey400;
-                    
+
                     md-icon {
                         color: @black;
                     }
@@ -88,13 +93,16 @@
                 &:active {
                     padding: 0;
                     border: 1px solid @grey450;
-                    box-shadow: inset 0 2px 1px rgba(0,0,0,0.07);
+                    box-shadow: inset 0 2px 1px rgba(0, 0, 0, 0.07);
                 }
             }
         }
     }
 
-    &__grid{
+    &__grid {
+        max-height: 0;
+        transition: max-height 0.2s;
+        overflow: hidden;
 
         &__select {
             border-top: 1px solid @grey300;

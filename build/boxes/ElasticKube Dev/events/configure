@@ -1,8 +1,0 @@
-#!/bin/bash -e
-
-echo "==> Install useful aliases and function for the elasticbox user"
-curl -ks "{{ BASH_ALIASES }}" | elasticbox config -o /home/elasticbox/.bash_aliases
-chown elasticbox:elasticbox /home/elasticbox/.bash_aliases
-
-echo "==> Install and activate grunt"
-curl -ks "{{ GRUNT_UPSTART }}" -o /etc/init/kubegrunt.conf

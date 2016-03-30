@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+echo "==> Install useful aliases and function for the vagrant user"
+curl -ks "{{ BASH_ALIASES }}" | elasticbox config -o /home/vagrant/.bash_aliases
+chown vagrant:vagrant /home/vagrant/.bash_aliases
+
+echo "==> Install and activate grunt"
+curl -ks "{{ GRUNT_UPSTART }}" -o /etc/init/kubegrunt.conf

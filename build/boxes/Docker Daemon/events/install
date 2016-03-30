@@ -55,17 +55,12 @@ elif [[ -f /etc/lsb-release ]]; then
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${UBUNTU_KEY}
 
     apt-get -y update
+    apt-get -y install linux-image-extra-$(uname -r) aufs-tools
 
-    if [[ -n "$(lsb_release -cs | egrep "(vivid|utopic|trusty)")" ]]; then
+    if [[ -n "$(lsb_release -cs | egrep "(vivid|utopic|trusty)")" ]]
+    then
         apt-get -y install docker.io
         source /etc/bash_completion.d/docker.io
-
-    elif [[ -n "$(lsb_release -cs | egrep "(saucy|raring|quantal)")" ]]; then
-        apt-get -y install linux-image-extra-$(uname -r)
-
-    else
-        echo -e "$(date) - Docker is not supporting ${UBUNTU_VERSION}."
-        exit 1
     fi
 
     if [[ -e /usr/lib/apt/methods/https ]]

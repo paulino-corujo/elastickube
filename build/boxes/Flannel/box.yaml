@@ -10,11 +10,6 @@ variables:
   type: Text
   value: 10.0.128.0/20
   visibility: public
-- name: COMUNICATION_PORT
-  required: false
-  type: Port
-  value: '8285'
-  visibility: public
 - name: ETCD_VERSION
   options: 2.2.4
   required: false
