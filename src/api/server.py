@@ -42,6 +42,11 @@ def setup_server():
     )
 
     configure(settings)
+    IOLoop.current().add_future(initialize(settings), start_server)
+
+
+def start_server(future):
+    settings = future.result()
 
     handlers = [
         (r"/api/v1/auth/providers", AuthProvidersHandler),
@@ -57,8 +62,6 @@ def setup_server():
     server = HTTPServer(application)
     socket = bind_unix_socket("/var/run/elastickube-api.sock", mode=0777)
     server.add_socket(socket)
-
-    IOLoop.current().add_callback(initialize, settings)
 
 
 if __name__ == "__main__":
