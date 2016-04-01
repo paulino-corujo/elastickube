@@ -1,0 +1,13 @@
+{%- if builder != 'singlehtml' %}
+<form id="rtd-search-form" class="form-inline form-doc-search" action="{{ pathto('search') }}" method="get">
+    <div class="form-group">
+        <input class="form-group doc-input" id="016106468158298935340:md6fps55etc" type="hidden">
+        <input class="form-group doc-input" value="016106468158298935340:md6fps55etc" name="cx" type="hidden">
+        <input class="form-group doc-input" value="FORID:11" name="cof" type="hidden">
+        <input class="form-group doc-input" id="q" name="q" placeholder="Search" type="text">
+        <button class="btn btn-secondary btn-search">
+            <i class="elasticon-search"></i>
+        </button>
+    </div>
+</form>
+{%- endif %}

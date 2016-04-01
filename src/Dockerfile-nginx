@@ -8,8 +8,9 @@ RUN mkdir -p /data/nginx/cache && rm -f /etc/nginx/conf.d/default.conf
 WORKDIR ${ELASTICKUBE_PATH}
 
 # Ad UI files
-ADD build/ui ${ELASTICKUBE_PATH}/build/ui
+ADD build/documentation     ${ELASTICKUBE_PATH}/documentation
+ADD build/ui                ${ELASTICKUBE_PATH}/ui
 
 # Add configuration files
-ADD nginx/nginx.conf /etc/nginx/nginx.conf
-ADD nginx/conf.d /etc/nginx/conf.d
+ADD nginx/nginx.conf        /etc/nginx/nginx.conf
+ADD nginx/conf.d            /etc/nginx/conf.d
