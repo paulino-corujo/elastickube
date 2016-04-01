@@ -2,14 +2,13 @@
 
 # Download kubernetes
 K8S_DIR="/opt/kubernetes/v{{ KUBERNETES_VERSION }}"
-K8S_URL=https://github.com/kubernetes/kubernetes/releases/download/v{{ KUBERNETES_VERSION }}/kubernetes.tar.gz
+K8S_URL=https://storage.googleapis.com/kubernetes-release/release/v{{ KUBERNETES_VERSION }}/kubernetes-server-linux-amd64.tar.gz
 
 if [[ ! -d "${K8S_DIR}" ]]
 then
     echo "Downloading kubernetes (this make time a few minutes)..."
     mkdir -p ${K8S_DIR}
-    curl -ksL ${K8S_URL} | tar -xz -C ${K8S_DIR} --strip-components=1
-    tar xvf ${K8S_DIR}/server/kubernetes-server-linux-amd64.tar.gz -C ${K8S_DIR} --strip-components=2
+    curl -ksL ${K8S_URL} | tar -xz -C ${K8S_DIR} --strip-components=2
 fi
 
 # Install bridge utils

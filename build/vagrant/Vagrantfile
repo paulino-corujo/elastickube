@@ -13,18 +13,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     :disabled       => false,
     :type           => "rsync",
     :rsync__auto    => true,
-    :rsync__exclude => ["src/build/ui", "node_modules"]
+    :rsync__exclude => ["src/build", "node_modules"]
 
   config.vm.network :private_network, ip: "10.107.56.115"
-  config.vm.network "public_network", bridge: 'en0: Wi-Fi (AirPort)'
-
   config.ssh.username = "vagrant"
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
     v.cpus = 2
     v.name = "elastickube"
-    v.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', '10000']
   end
 
   # Execute custom setup

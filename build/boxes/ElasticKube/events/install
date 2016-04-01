@@ -9,7 +9,9 @@ echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" 
 echo "==> Register Node 12 repository"
 curl -sL https://deb.nodesource.com/setup_0.12 | bash 
 
-# apt-get update is executed as part of the the node repository setup script
+echo "==>" Update apt
+apt-get -y update
+
 echo "==> Install Node JS and Mongo"
 apt-get -y install nodejs mongodb-org-shell python-dev python-pycurl libcurl4-openssl-dev libffi-dev
 
@@ -18,4 +20,4 @@ npm install grunt-cli -g
 
 echo "==> Install pip"
 curl -sL 'https://bootstrap.pypa.io/get-pip.py' | python
-pip install motor
+pip install motor sphinx sphinx-autobuild sphinx_rtd_theme
