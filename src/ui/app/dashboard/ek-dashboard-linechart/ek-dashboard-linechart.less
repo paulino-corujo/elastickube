@@ -1,0 +1,83 @@
+@import "../../colors";
+
+.ek-dashboard-linechart {
+    width: 740px;
+    height: 495px;
+    border: 1px solid @grey400;
+    background-color: @white;
+    margin: 10px;
+
+    &__container {
+        height: 100%;
+
+        &__title {
+            border-bottom: 1px solid @grey300;
+            min-height: 50px;
+            font-size: 14px;
+            padding-left: 20px;
+        }
+
+        &__svg {
+            width: 100%;
+            min-height: 265px;
+
+            &__line {
+                fill: none;
+                stroke-width: 2px;
+            }
+
+            &__axis {
+
+                path, line {
+                    fill: none;
+                    stroke: @grey300;
+                    stroke-width: 1;
+                    shape-rendering: crispEdges;
+                }
+
+                .tick line {
+                    fill: none;
+                    opacity: 0.4;
+
+                }
+
+                text {
+                    fill: @grey600;
+                    font-size: 12px;
+                }
+            }
+
+            &__axis--hide {
+                g:nth-child(1) line {
+                    opacity: 1;
+                }
+
+                path {
+                    visibility: hidden;
+                }
+            }
+        }
+
+        &__replication-controllers {
+            width: 100%;
+            height: 100%;
+            &__title {
+                min-height: 30px;
+                padding-left: 20px;
+                border-top: 1px solid @grey300;
+                border-bottom: 1px solid @grey300;
+                background-color: @grey100;
+            }
+
+            &__content {
+                width: 100%;
+                height: 148px;
+
+                md-content {
+                    background: @white;
+                    overflow: hidden;
+                }
+            }
+        }
+    }
+}
