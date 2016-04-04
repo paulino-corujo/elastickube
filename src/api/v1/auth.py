@@ -35,6 +35,7 @@ from data.query import Query
 
 ROUNDS = 40000
 
+
 def _generate_hashed_password(password):
     salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
     hash = sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=ROUNDS)
