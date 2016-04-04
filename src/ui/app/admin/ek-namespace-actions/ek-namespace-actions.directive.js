@@ -33,7 +33,10 @@ class NamespaceActionsDirective extends Directive {
         tElement
             .addClass('ek-namespace-actions');
 
-        return ($scope) => _.extend($scope, { icons });
+        return ($scope, $element, $attrs, $controller) => {
+            _.extend($scope, { icons });
+            $controller.drop = $element.find('ek-drop').controller('ekDrop');
+        }
     }
 }
 
