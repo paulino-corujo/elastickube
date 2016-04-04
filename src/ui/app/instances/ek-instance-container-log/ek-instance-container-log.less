@@ -1,0 +1,60 @@
+@import "../../colors";
+
+.ek-instance-container-log {
+    display: block;
+    width: 100%;
+    position: relative;
+    height: 250px;
+
+    &__content {
+        background-color: @black;
+        color: @grey300;
+        padding: 12px;
+        font-size: 12px;
+        font-family: Consolas, "Andale Mono", monospace;
+        white-space: nowrap;
+        overflow: scroll;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+
+        &__progress {
+            height: 100%;
+
+            md-progress-circular {
+                .md-gap {
+                    border-top-color: @grey600;
+                    border-bottom-color: @grey600;
+                }
+                .md-left {
+                    .md-half-circle {
+                        border-top-color: @grey600;
+                        border-left-color: @grey600;
+                    }
+                }
+                .md-right {
+                    .md-half-circle {
+                        border-right-color: @grey600;
+                        border-top-color: @grey600;
+                    }
+                }
+            }
+        }
+
+        .md-button {
+            background-color: @grey600;
+
+            &:hover {
+                background-color: @grey500;
+            }
+        }
+
+        p {
+            margin: 0;
+
+            &:not(:first-child) {
+                line-height: 18px;
+            }
+        }
+    }
+}

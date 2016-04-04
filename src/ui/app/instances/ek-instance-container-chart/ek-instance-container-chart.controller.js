@@ -15,14 +15,14 @@ limitations under the License.
 */
 
 class InstanceContainerChartController {
-    constructor() {
+    constructor(instanceStore) {
         'ngInject';
 
-        const containerMetrics = _.find(this.metrics, { name: this.container.name });
+        this.metrics = instanceStore.getMetricByContainer(this.container.name);
 
         this.dataset = [
-            { cpu: _.isUndefined(containerMetrics) ? 0 : containerMetrics.cpuUsage },
-            { memory: _.isUndefined(containerMetrics) ? 0 : containerMetrics.memUsage }
+            { cpu: _.isUndefined(this.metrics) ? 0 : this.metrics.cpuUsage },
+            { memory: _.isUndefined(this.metrics) ? 0 : this.metrics.memUsage }
         ];
     }
 }

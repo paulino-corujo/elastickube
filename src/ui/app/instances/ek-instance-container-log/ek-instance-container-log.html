@@ -1,0 +1,8 @@
+<div class="ek-instance-container-log__content">
+    <div class="ek-instance-container-log__content__progress" layout="row" layout-align="center center" ng-if="ctrl.loading">
+        <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>
+    </div>
+    <div vs-scroll-parent=".ek-instance-container-log__content" vs-repeat="18" ng-init="setUpWatcher()">
+        <p ng-repeat="log in ctrl.logs track by log.timestamp" ng-bind-html="log.text"></p>
+    </div>
+</div>

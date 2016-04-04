@@ -1,18 +1,22 @@
 <h3>{{:: ctrl.container.name }}</h3>
 <ek-container-state container="ctrl.container"></ek-container-state>
 
-<div class="ek-instance-container-block__row"
-     layout="row">
-    <ek-instance-container-chart container="ctrl.container" metrics="ctrl.metrics"></ek-instance-container-chart>
+<div layout="column">
+    <div class="ek-instance-container-block__row"
+         layout="row">
+        <ek-instance-container-chart container="ctrl.container"></ek-instance-container-chart>
 
-    <div layout="column">
-        <div class="ek-instance-container-block__row__title">Container ID</div>
-        <div class="ek-instance-container-block__row__value">{{:: ctrl.container.containerID }}</div>
+        <div layout="column">
+            <div class="ek-instance-container-block__row__title">Container ID</div>
+            <div class="ek-instance-container-block__row__value">{{:: ctrl.container.containerID }}</div>
 
-        <div class="ek-instance-container-block__row__title">Image</div>
-        <div class="ek-instance-container-block__row__value">{{:: ctrl.container.image }}</div>
+            <div class="ek-instance-container-block__row__title">Image</div>
+            <div class="ek-instance-container-block__row__value">{{:: ctrl.container.image }}</div>
 
-        <div class="ek-instance-container-block__row__title">Image ID</div>
-        <div class="ek-instance-container-block__row__value">{{:: ctrl.container.imageID }}</div>
+            <div class="ek-instance-container-block__row__title">Image ID</div>
+            <div class="ek-instance-container-block__row__value">{{:: ctrl.container.imageID }}</div>
+        </div>
     </div>
+    <md-divider class="ek-instance-container-block__divider"></md-divider>
+    <ek-instance-container-log container="ctrl.container"></ek-instance-container-log>
 </div>

@@ -103,18 +103,6 @@ class KubeWatcher(object):
                                 "name": "%(name)s"
                             }
                         },
-                        "logs": {
-                            "resource": "pods",
-                            "type": "LogList",
-                            "method": "LOGS",
-                            "parameters": {
-                                "namespace": "%(namespace)s",
-                                "name": "%(name)s",
-                                "timestamps": "true",
-                                "tailLines": "50",
-                                "follow": "false"
-                            }
-                        },
                         "metrics": {
                             "resource": "pods",
                             "type": "MetricList",

@@ -17,6 +17,7 @@ limitations under the License.
 import ChartsAPIService from './charts-api.service';
 import InstanceAPIService from './instance-api.service';
 import InstancesAPIService from './instances-api.service';
+import LogsAPIService from './logs-api.service';
 import NamespacesAPIService from './namespaces-api.service';
 import PrincipalAPIService from './principal-api.service';
 import SettingsAPIService from './settings-api.service';
@@ -32,6 +33,7 @@ angular
     .service('chartsAPI', ChartsAPIService)
     .service('instanceAPI', InstanceAPIService)
     .service('instancesAPI', InstancesAPIService)
+    .service('logsAPI', LogsAPIService)
     .service('namespacesAPI', NamespacesAPIService)
     .service('principalAPI', PrincipalAPIService)
     .service('settingsAPI', SettingsAPIService)

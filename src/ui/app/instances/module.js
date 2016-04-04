@@ -30,6 +30,7 @@ import InstanceDirective from './ek-instance/ek-instance.directive';
 import InstanceContainersDirective from './ek-instance-containers/ek-instance-containers.directive';
 import InstanceContainerBlockDirective from './ek-instance-container-block/ek-instance-container-block.directive';
 import InstanceContainerChartDirective from './ek-instance-container-chart/ek-instance-container-chart.directive';
+import InstanceContainerLogDirective from './ek-instance-container-log/ek-instance-container-log.directive';
 import InstanceActionsDirective from './ek-instance-actions/ek-instance-actions.directive';
 import InstanceBulkActionsDirective from './ek-instance-bulk-actions/ek-instance-bulk-actions.directive';
 import InstanceDetailsBlockDirective from './ek-instance-details-block/ek-instance-details-block.directive';
@@ -64,6 +65,7 @@ angular
     .directive('ekInstanceContainers', () => new InstanceContainersDirective())
     .directive('ekInstanceContainerBlock', () => new InstanceContainerBlockDirective())
     .directive('ekInstanceContainerChart', () => new InstanceContainerChartDirective())
+    .directive('ekInstanceContainerLog', () => new InstanceContainerLogDirective())
     .directive('ekInstanceActions', () => new InstanceActionsDirective())
     .directive('ekInstanceBulkActions', () => new InstanceBulkActionsDirective())
     .directive('ekInstanceDetailsBlock', () => new InstanceDetailsBlockDirective())
