@@ -3,7 +3,7 @@
         <h3 class="ek-dashboard__title ek-title"><span>{{ ctrl.namespace.name }}</span></h3>
     </div>
     <div transclude-to="body" layout="column" flex>
-        <md-content fill-parent>
+        <md-content class="ek-dashboard__content" fill-parent>
             <div layout="row" layout-align="center start" layout-wrap>
                 <ek-dashboard-card title="Replication Controllers">
                     <h1>{{ ctrl.statistics.replicationControllers.total || 0 }}</h1>

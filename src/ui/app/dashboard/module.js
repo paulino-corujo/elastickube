@@ -23,6 +23,7 @@ import dashboardRoutes from './dashboard-routes';
 import NavigationActionCreator from './navigation-action-creator.service';
 
 import DashboardDirective from './ek-dashboard/ek-dashboard.directive';
+import DashboardBarDirective from './ek-dashboard-bar/ek-dashboard-bar.directive';
 import DashboardCardDirective from './ek-dashboard-card/ek-dashboard-card.directive';
 import DashboardLineChartDirective from './ek-dashboard-linechart/ek-dashboard-linechart.directive';
 
@@ -39,6 +40,7 @@ angular
     .service('dashboardNavigationActionCreator', NavigationActionCreator)
 
     .directive('ekDashboard', () => new DashboardDirective())
+    .directive('ekDashboardBar', () => new DashboardBarDirective())
     .directive('ekDashboardCard', () => new DashboardCardDirective())
     .directive('ekDashboardLinechart', () => new DashboardLineChartDirective());
 

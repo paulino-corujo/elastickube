@@ -17,7 +17,7 @@ limitations under the License.
 const mockDataCPU = [{
     timestamp: '2016-03-29 14:36:30',
     value: 55
-},{
+}, {
     timestamp: '2016-03-29 14:36:00',
     value: 65
 }, {
