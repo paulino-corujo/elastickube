@@ -41,16 +41,13 @@ TIMEOUT=${TIMEOUT:-600}
 if [ "${KUBERNETES_SERVICE_HOST}" ]
 then
 
-MASTER_URL_ENV_SECTION="$(cat << \
-______________________________SECTION______________________________
+MASTER_URL_ENV_SECTION="
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: ${KUBERNETES_SERVICE_HOST}
-______________________________SECTION______________________________
-)"
+"
 
 fi
-
 
 cat << \
 '______________________________HEADER______________________________'
@@ -64,8 +61,7 @@ ______________________________HEADER______________________________
 
 PROGRESS_WIDTH=40
 
-ELASTICKUBE_MONGO_RC="$(cat << \
-______________________________FILE______________________________
+ELASTICKUBE_MONGO_RC="
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -98,12 +94,10 @@ spec:
       - name: mongo-persistent-storage
         hostPath:
           path: /data/mongodb
-______________________________FILE______________________________
-)"
+"
 
 
-ELASTICKUBE_MONGO_SVC="$(cat << \
-______________________________FILE______________________________
+ELASTICKUBE_MONGO_SVC="
 apiVersion: v1
 kind: Service
 metadata:
@@ -117,11 +111,9 @@ spec:
       targetPort: 27017
   selector:
     name: elastickube-mongo
-______________________________FILE______________________________
-)"
+"
 
-ELASTICKUBE_SERVER_RC="$(cat << \
-______________________________FILE______________________________
+ELASTICKUBE_SERVER_RC="
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -179,11 +171,9 @@ ${MASTER_URL_ENV_SECTION}
       - name: elastickube-run
         hostPath:
           path: /var/run/elastickube
-______________________________FILE______________________________
-)"
+"
 
-ELASTICKUBE_SERVER_SVC="$(cat << \
-______________________________FILE______________________________
+ELASTICKUBE_SERVER_SVC="
 apiVersion: v1
 kind: Service
 metadata:
@@ -198,8 +188,7 @@ spec:
       targetPort: 80
   selector:
     name: elastickube-server
-______________________________FILE______________________________
-)"
+"
 
 SPINNER_STR='|/-\'
 
@@ -300,10 +289,20 @@ deploy_svc elastickube-mongo  "${ELASTICKUBE_MONGO_SVC}"
 deploy_rc  elastickube-mongo  "${ELASTICKUBE_MONGO_RC}"
 deploy_rc  elastickube-server "${ELASTICKUBE_SERVER_RC}"
 
+# Detect whether this is a GKE LoadBalancer
+if kubectl get pods --namespace=kube-system -l name=glbc 2>>elastickube.log | grep "Running"  >>elastickube.log
+then
+    LOADBALANCER_IP_PROPERTY='LoadBalancer Ingress:'
+else
+    LOADBALANCER_IP_PROPERTY='IP:'
+cat << \
+______________________________RESULT______________________________
+$(tput sgr0)$(tput bold)WARNING:$(tput sgr0) LoadBalancer Ingress not detected, please ensure the address is accessible from outside the cluster. Check http://kubernetes.io/docs/user-guide/ingress/ for more information.
+______________________________RESULT______________________________
+fi
 
 printf "%-${PROGRESS_WIDTH}s" "Waiting for LB to be ready"
-
-if retry "kubectl --namespace=kube-system describe svc elastickube-server | grep -e 'LoadBalancer Ingress' -e 'IP'"
+if retry "kubectl --namespace=kube-system describe svc elastickube-server | grep -e '${LOADBALANCER_IP_PROPERTY}'"
 then
     echo [ ✓ ]
 else
@@ -314,8 +313,5 @@ cat << \
 ______________________________RESULT______________________________
 
 ElasticKube has been deployed!
-$(tput bold)
-Please complete the installation here: http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep -e "LoadBalancer Ingress" -e "IP" | tail -1 | cut -d ":" -f 2 | xargs)
-$(tput sgr0)
+Please complete the installation here: $(tput sgr0)$(tput bold)http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep -e "${LOADBALANCER_IP_PROPERTY}" | cut -d ":" -f 2 | xargs)$(tput sgr0)
 ______________________________RESULT______________________________
-
