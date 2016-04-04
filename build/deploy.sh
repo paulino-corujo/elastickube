@@ -144,7 +144,7 @@ spec:
         resources:
           limits:
             cpu: 100m
-            memory: 500Mi
+            memory: 300Mi
         volumeMounts:
         - name: elastickube-run
           mountPath: /var/run
@@ -154,7 +154,7 @@ ${MASTER_URL_ENV_SECTION}
         resources:
           limits:
             cpu: 100m
-            memory: 500Mi
+            memory: 300Mi
         volumeMounts:
         - name: elastickube-charts
           mountPath: /var/elastickube/charts
@@ -163,7 +163,7 @@ ${MASTER_URL_ENV_SECTION}
         resources:
           limits:
             cpu: 100m
-            memory: 500Mi
+            memory: 300Mi
         volumeMounts:
         - name: elastickube-run
           mountPath: /var/run
@@ -295,14 +295,15 @@ else
     echo [ NOT RUNNING ]
 fi
 
-deploy_rc  elastickube-mongo  "${ELASTICKUBE_MONGO_RC}"
-deploy_svc elastickube-mongo  "${ELASTICKUBE_MONGO_SVC}"
-deploy_rc  elastickube-server "${ELASTICKUBE_SERVER_RC}"
 deploy_svc elastickube-server "${ELASTICKUBE_SERVER_SVC}"
+deploy_svc elastickube-mongo  "${ELASTICKUBE_MONGO_SVC}"
+deploy_rc  elastickube-mongo  "${ELASTICKUBE_MONGO_RC}"
+deploy_rc  elastickube-server "${ELASTICKUBE_SERVER_RC}"
+
 
 printf "%-${PROGRESS_WIDTH}s" "Waiting for LB to be ready"
 
-if retry "kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:'"
+if retry "kubectl --namespace=kube-system describe svc elastickube-server | grep -e 'LoadBalancer Ingress' -e 'IP'"
 then
     echo [ ✓ ]
 else
@@ -314,7 +315,7 @@ ______________________________RESULT______________________________
 
 ElasticKube has been deployed!
 $(tput bold)
-Please complete the installation here: http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep 'IP:' | awk '{print $2}')
+Please complete the installation here: http://$(kubectl --namespace=kube-system describe svc elastickube-server | grep -e "LoadBalancer Ingress" -e "IP" | tail -1 | cut -d ":" -f 2 | xargs)
 $(tput sgr0)
 ______________________________RESULT______________________________
 
