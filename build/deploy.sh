@@ -27,7 +27,7 @@ do
 
     t )  export TIMEOUT=$OPTARG;;
     r )  export REINSTALL=true;;
-    u )  export KUBERNETES_MASTER_URL=$OPTARG;;
+    u )  export KUBERNETES_SERVICE_HOST=$OPTARG;;
     h )  help; exit 0;;
     : )  help "Missing option argument for -$OPTARG."; exit 1;;
     \?)  help "Option does not exist : $OPTARG."; exit 1;;
@@ -35,8 +35,22 @@ do
   esac
 done
 
+# Default timeout
 TIMEOUT=${TIMEOUT:-600}
-KUBERNETES_MASTER_URL=${KUBERNETES_MASTER_URL-'https://kubernetes'}
+
+if [ "${KUBERNETES_SERVICE_HOST}" ]
+then
+
+MASTER_URL_ENV_SECTION="$(cat << \
+______________________________SECTION______________________________
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: ${KUBERNETES_SERVICE_HOST}
+______________________________SECTION______________________________
+)"
+
+fi
+
 
 cat << \
 '______________________________HEADER______________________________'
@@ -134,9 +148,7 @@ spec:
         volumeMounts:
         - name: elastickube-run
           mountPath: /var/run
-        env:
-        - name: KUBERNETES_SERVICE_HOST
-          value: ${KUBERNETES_MASTER_URL}
+${MASTER_URL_ENV_SECTION}
       - name: elastickube-charts
         image: elasticbox/elastickube-charts:latest
         resources:
