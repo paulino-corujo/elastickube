@@ -120,7 +120,21 @@ class SignupHandler(AuthHandler):
         user = yield Query(self.settings["database"], "Users").find_one(
             {"invite_token": validation_token, "email": data["email"]})
 
-        if user is not None and 'email_validated_at' not in user:
+        if user is not None and "email_validated_at" not in user:
+            for namespace_name in user["namespaces"]:
+                namespace = yield Query(self.settings["database"], "Namespaces").find_one({"name": namespace_name})
+                if namespace is None:
+                    logging.warn("Cannot find namespace %s", namespace_name)
+                else:
+                    if "members" in namespace:
+                        namespace["members"].append(user["username"])
+                    else:
+                        namespace["members"] = [user["username"]]
+
+                    yield Query(self.settings["database"], "Namespaces").update(namespace)
+
+            del user["namespaces"]
+
             _fill_signup_invitation_request(
                 user, firstname=data["firstname"], lastname=data["lastname"],
                 password=data["password"])

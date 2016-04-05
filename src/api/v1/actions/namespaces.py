@@ -77,7 +77,7 @@ class NamespacesActions(object):
 
         namespace = yield Query(self.database, "Namespaces").find_one({"_id": document['_id']})
         if not namespace:
-            raise ObjectNotFoundError("User %s not found." % document["_id"])
+            raise ObjectNotFoundError("Namespace %s not found." % document["_id"])
 
         # TODO: validate members before inserting and do an intersection for race conditions
         namespace["members"] = document["members"]
