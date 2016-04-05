@@ -111,7 +111,7 @@ class KubeWatcher(object):
                                 "namespace": "%(namespace)s",
                                 "name": "%(name)s",
                                 "timestamps": "true",
-                                "tailLines": "100",
+                                "tailLines": "50",
                                 "follow": "false"
                             }
                         },
