@@ -37,13 +37,14 @@ class InvitationsActions(object):
         raise Return(self.user['role'] == 'administrator')
 
     @coroutine
-    def _invite_user(self, email_address, hostname):
+    def _invite_user(self, email_address, hostname, namespaces):
         invite_user = {
             "email": email_address,
             "role": "user",
             "schema": "http://elasticbox.net/schemas/user",
             "username": email_address,
             "invite_token": str(uuid.uuid4()),
+            "namespaces": namespaces
         }
 
         yield Query(self.database, "Users").insert(invite_user)
@@ -58,6 +59,7 @@ class InvitationsActions(object):
     def create(self, document):
         addresses = document.get("emails", [])
         note = document.get("note", "")
+        namespaces = document.get("namespaces", [])
 
         settings = yield Query(self.database, "Settings").find_one()
         hostname = settings.get("hostname", "")
@@ -66,7 +68,7 @@ class InvitationsActions(object):
 
         invitations = []
         for address in addresses:
-            invite_info = yield self._invite_user(address, hostname)
+            invite_info = yield self._invite_user(address, hostname, namespaces)
             invitations.append(invite_info)
 
         if "mail" in settings:
