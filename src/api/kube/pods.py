@@ -108,20 +108,23 @@ class Pods(NamespacedResource):
 
         pod = yield self.get(namespace=namespace, name=name)
         for container_status in pod["status"]["containerStatuses"]:
-            result = yield self.log(namespace, name, container_status["name"], **kwargs)
+            result = yield self.log(namespace=namespace, name=name, container=container_status["name"], **kwargs)
             logs["items"].extend(result.get("items", []))
 
         raise Return(logs)
 
     @coroutine
-    def log(self, namespace, name, container, **kwargs):
+    def log(self, **kwargs):
         url_path = self.api_path + "/namespaces/{namespace}/pods/{name}/log"
-        params = dict(namespace=namespace, timestamps=True, name=name, container=container)
+        url = self.api.http_client.build_url(url_path, **kwargs)
+
+        params = dict(timestamps=True, container=kwargs["container"])
 
         for key in kwargs.iterkeys():
-            params[key] = kwargs[key]
+            if key not in url_path:
+                params[key] = kwargs[key]
 
-        result = yield self.api.http_client.request(url_path, **params)
+        result = yield self.api.http_client.request(url, **params)
 
         logs = dict(kind="LogList", items=[], metadata=dict(resourceVersion=time.time()))
 
@@ -136,8 +139,8 @@ class Pods(NamespacedResource):
                 timestamp = parsed_line[0]
 
             logs["items"].append(dict(
-                pod=name,
-                container=container,
+                pod=kwargs["name"],
+                container=kwargs["container"],
                 text=text,
                 timestamp=timestamp
             ))

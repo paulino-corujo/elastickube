@@ -37,9 +37,5 @@ class LogsActions(object):
     def retrieve(self, document):
         logging.debug("Retrieving logs for request %s", document)
 
-        logs = self.kube.pods.log(
-            namespace=document["namespace"],
-            name=document["name"],
-            container=document["container"])
-
+        logs = yield self.kube.pods.log(**document)
         raise Return(logs)

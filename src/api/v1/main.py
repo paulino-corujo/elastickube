@@ -33,9 +33,9 @@ from api.v1.watchers.cursor import CursorWatcher
 from api.v1.watchers.kube import KubeWatcher
 from data.query import ObjectNotFoundError
 
-REST_OPERATIONS = ["create", "update", "delete"]
+REST_OPERATIONS = ["retrieve", "create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
-SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "instance", "invitations", "charts"]
+SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "instance", "invitations", "charts", "logs"]
 
 
 class MainWebSocketHandler(SecureWebSocketHandler):
