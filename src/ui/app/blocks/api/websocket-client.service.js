@@ -82,7 +82,12 @@ class WebsocketClientService extends EventEmitter {
                 });
             };
 
-            this._websocket.onerror = () => defer.reject();
+            this._websocket.onerror = (x) => {
+                if (x.type === 'error') {
+                    window.location.assign('/diagnostics/');
+                }
+                defer.reject();
+            };
 
             this._websocket.onclose = (event) => {
                 if (event.code === 401) {

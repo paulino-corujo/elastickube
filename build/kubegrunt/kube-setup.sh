@@ -37,9 +37,10 @@ done
 echo " done!"
 
 # Rebuild images
-docker build --file=${REPO_ROOT}/src/Dockerfile-api    --tag=elasticbox/elastickube-api:latest    ${REPO_ROOT}/src
-docker build --file=${REPO_ROOT}/src/Dockerfile-charts --tag=elasticbox/elastickube-charts:latest ${REPO_ROOT}/src
-docker build --file=${REPO_ROOT}/src/Dockerfile-nginx  --tag=elasticbox/elastickube-nginx:latest  ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-api         --tag=elasticbox/elastickube-api:latest         ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-charts      --tag=elasticbox/elastickube-charts:latest      ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-nginx       --tag=elasticbox/elastickube-nginx:latest       ${REPO_ROOT}/src
+docker build --file=${REPO_ROOT}/src/Dockerfile-diagnostics --tag=elasticbox/elastickube-diagnostics:latest ${REPO_ROOT}/src
 
 # Create replication controller
 ${KUBECTL} create -f elastickube/elastickube-server-rc.yaml

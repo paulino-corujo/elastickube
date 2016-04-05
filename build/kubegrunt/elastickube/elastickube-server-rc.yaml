@@ -58,6 +58,21 @@ spec:
           hostPort: 80
           name: http
           protocol: TCP
+      - name: elastickube-diagnostics
+        image: elasticbox/elastickube-diagnostics:latest
+        env:
+        - name: DEBUG
+          value: "1"
+        resources:
+          limits:
+            cpu: 10m
+            memory: 32Mi
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: elastickube-run
+          mountPath: /var/run
+        - name: elastickube-code
+          mountPath: /opt/elastickube
       volumes:
       - name: elastickube-code
         hostPath:
