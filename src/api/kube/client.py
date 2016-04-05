@@ -162,6 +162,8 @@ class HTTPClient(object):
             client.close()
 
     def watch(self, url_path, on_data, **kwargs):
+        local_data = dict(buffer="")
+
         class WatchFuture(Future):
 
             def cancel(self):
@@ -169,7 +171,13 @@ class HTTPClient(object):
                 logging.debug("AsyncHTTPClient closed")
 
         def data_callback(data):
-            on_data(json.loads(data))
+            split_data = data.split("\n")
+            for index, fragment in enumerate(split_data):
+                if index + 1 < len(split_data):
+                    on_data(json.loads(local_data["buffer"] + fragment))
+                    local_data["buffer"] = ""
+                else:
+                    local_data["buffer"] += fragment
 
         params = self.build_params(url_path, **kwargs)
         url = url_concat(self.build_url(url_path, **kwargs), params)
