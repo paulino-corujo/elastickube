@@ -34,6 +34,7 @@ const webpackConfig = {
             'angular-material',
             'angular-cookies',
             'angular-password',
+            'angular-sanitize',
             'angular-ui-router',
             'angular-vs-repeat',
             'd3',

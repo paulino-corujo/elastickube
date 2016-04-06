@@ -33,6 +33,8 @@ import InstanceActionCreatorService from './dataflow/instance-action-creator.ser
 import InstanceStoreService from './dataflow/instance-store.service.js';
 import InstancesActionCreatorService from './dataflow/instances-action-creator.service.js';
 import InstancesStoreService from './dataflow/instances-store.service.js';
+import LogActionCreatorService from './dataflow/log-action-creator.service.js';
+import LogStoreService from './dataflow/log-store.service.js';
 import NamespacesActionCreatorService from './dataflow/namespaces-action-creator.service.js';
 import NamespacesStoreService from './dataflow/namespaces-store.service.js';
 import SessionActionCreatorService from './dataflow/session-action-creator.service';
@@ -63,6 +65,7 @@ angular
         'ngAnimate',
         'ngCookies',
         'ngMessages',
+        'ngSanitize',
         apiModule,
         routerModule
     ])
@@ -88,6 +91,9 @@ angular
 
     .service('instancesActionCreator', InstancesActionCreatorService)
     .service('instancesStore', InstancesStoreService)
+
+    .service('logActionCreator', LogActionCreatorService)
+    .service('logStore', LogStoreService)
 
     .service('namespacesActionCreator', NamespacesActionCreatorService)
     .service('namespacesStore', NamespacesStoreService)

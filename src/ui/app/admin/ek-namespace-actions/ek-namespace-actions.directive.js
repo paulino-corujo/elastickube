@@ -36,7 +36,7 @@ class NamespaceActionsDirective extends Directive {
         return ($scope, $element, $attrs, $controller) => {
             _.extend($scope, { icons });
             $controller.drop = $element.find('ek-drop').controller('ekDrop');
-        }
+        };
     }
 }
 

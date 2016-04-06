@@ -24,8 +24,7 @@ class InstanceContainerBlockDirective extends Directive {
         super({ Controller, template });
 
         this.bindToController = {
-            container: '=',
-            metrics: '='
+            container: '='
         };
     }
 

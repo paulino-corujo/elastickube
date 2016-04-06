@@ -117,8 +117,21 @@ class EventsStoreService extends AbstractStore {
         return this._instanceLogs;
     }
 
+    getLogByContainer(name) {
+        return _.reduce(this._instanceLogs, (result, value) => {
+            if (value.container === name) {
+                result.push(value);
+            }
+            return result;
+        }, []);
+    }
+
     getMetrics() {
         return this._instanceMetrics;
+    }
+
+    getMetricByContainer(name) {
+        return _.find(this._instanceMetrics, { name });
     }
 
     destroy() {

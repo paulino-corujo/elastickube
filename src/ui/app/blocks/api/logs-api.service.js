@@ -14,20 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-class InstanceContainersController {
-    constructor($scope, instanceStore) {
+import AbstractAPI from './abstract-api';
+
+class LogsAPIService extends AbstractAPI {
+
+    constructor($q, websocketClient) {
         'ngInject';
 
-        const onChange = () => {
-            this.instance = instanceStore.getInstance();
+        super('logs', websocketClient);
+
+        this._$q = $q;
+        this._websocketClient = websocketClient;
+    }
+
+    load(body) {
+        const message = {
+            action: 'logs',
+            body,
+            operation: 'retrieve'
         };
 
-        this.instance = instanceStore.getInstance();
-
-        instanceStore.addChangeListener(onChange);
-
-        $scope.$on('$destroy', () => instanceStore.removeChangeListener(onChange));
+        return this._$q.when(this._websocketClient.sendMessage(message));
     }
 }
 
-export default InstanceContainersController;
+export default LogsAPIService;
