@@ -49,7 +49,14 @@ class LogStoreService extends AbstractStore {
     removeLogChangeListener(namespace, podName, container, callback) {
         this.removeListener(`${CHANGE_EVENT}.${namespace}.${podName}.${container}`, callback);
         if (this.listenerCount(`${CHANGE_EVENT}.${namespace}.${podName}.${container}`) === 0) {
-            delete _.get(this.logs, `${namespace}.${podName}`)[container];
+            const pod = _.get(this.logs, `${namespace}.${podName}`);
+
+            if (angular.isDefined(pod)) {
+                delete pod[container];
+                if (_.size(pod) === 0) {
+                    delete this.logs[namespace][podName];
+                }
+            }
         }
     }
 }
