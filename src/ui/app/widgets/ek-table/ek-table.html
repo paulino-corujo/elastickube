@@ -1,7 +1,7 @@
 <div class="ek-table__header" layout="row" layout-align="start center">
 
-    <div class="ek-table__header__column ek-table__grouping" layout="row" layout-align="center center"
-         ng-class="{'ek-table__grouping--nogroups': !ctrl.existsGroups}">
+    <div class="ek-table__header__column__group ek-table__grouping" layout="row" layout-align="center center"
+         ng-class="{'ek-table__header__column__group--nogroups ek-table__grouping--nogroups': !ctrl.existsGroups}">
     <div ng-if="ctrl.existsGroups"
          ng-click="ctrl.toggleGroupAll()"
          ng-class="{'ek-table__grouping--collapsed': ctrl.isAllCollapsed(),
@@ -32,7 +32,7 @@
          ng-repeat="item in ctrl.items track by ctrl.options.getIdentity(item)"
          ng-class="{'ek-table__body__row--selected': ctrl.isSelected(item)}">
 
-        <div class="ek-table__body__row__column ek-table__grouping" layout="row" layout-align="center center"
+        <div class="ek-table__body__row__column__group ek-table__grouping" layout="row" layout-align="center center"
              ng-class="{'ek-table__grouping--nogroups': !ctrl.existsGroups}">
         <div ng-if="ctrl.existsGroups"
              ng-click="ctrl.toggleGroup(item)"
