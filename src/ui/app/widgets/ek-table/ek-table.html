@@ -1,11 +1,12 @@
 <div class="ek-table__header" layout="row" layout-align="start center">
 
-    <div class="ek-table__header__column ek-table__grouping"
-         layout="row" layout-align="center center"
-         ng-if="ctrl.existsGroups()"
+    <div class="ek-table__header__column ek-table__grouping" layout="row" layout-align="center center"
+         ng-class="{'ek-table__grouping--nogroups': !ctrl.existsGroups}">
+    <div ng-if="ctrl.existsGroups"
          ng-click="ctrl.toggleGroupAll()"
          ng-class="{'ek-table__grouping--collapsed': ctrl.isAllCollapsed(),
                     'ek-table__grouping--expanded': !ctrl.isAllCollapsed() }"></div>
+    </div>
 
     <div class="ek-table__header__column"
          layout="row" layout-align="start center"
@@ -31,13 +32,14 @@
          ng-repeat="item in ctrl.items track by ctrl.options.getIdentity(item)"
          ng-class="{'ek-table__body__row--selected': ctrl.isSelected(item)}">
 
-        <div class="ek-table__body__row__column ek-table__grouping"
-             layout="row" layout-align="center center"
-             ng-if="ctrl.existsGroups()"
+        <div class="ek-table__body__row__column ek-table__grouping" layout="row" layout-align="center center"
+             ng-class="{'ek-table__grouping--nogroups': !ctrl.existsGroups}">
+        <div ng-if="ctrl.existsGroups"
              ng-click="ctrl.toggleGroup(item)"
              ng-class="{ 'ek-table__grouping': item._groupParent,
                          'ek-table__grouping--collapsed': ctrl.isCollapsed(item),
                          'ek-table__grouping--expanded': ctrl.isExpanded(item)}"></div>
+        </div>
 
         <div class="ek-table__body__row__column"
              layout="row" layout-align="center center"

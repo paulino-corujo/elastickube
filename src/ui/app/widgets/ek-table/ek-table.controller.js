@@ -110,14 +110,6 @@ class TableController {
         this._setItems();
     }
 
-    existsGroups() {
-        return angular.isDefined(this.options.groupField) && !_.chain(this.groups)
-            .keys()
-            .compact()
-            .isEmpty()
-            .value();
-    }
-
     isAllCollapsed() {
         return _.chain(this.groups)
             .values()
@@ -252,6 +244,12 @@ class TableController {
 
             return memo;
         }, {});
+
+        this.existsGroups = angular.isDefined(this.options.groupField) && !_.chain(this.groups)
+                .keys()
+                .compact()
+                .isEmpty()
+                .value();
 
         this._status.grouping = _.chain(this.groups)
             .keys()
