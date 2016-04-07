@@ -21,7 +21,7 @@
         &:hover {
             &:before {
                 border-color: @grey450;
-                box-shadow: inset 0 1px 0 rgba(0,0,0,0.05);
+                box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
             }
         }
 
@@ -44,9 +44,14 @@
         width: 31px;
         padding-right: 5px !important;
 
+        &--nogroups {
+            width: 20px;
+        }
+
         &--collapsed:before,
         &--expanded:before {
             content: '';
+            display: block;
             cursor: pointer;
             background-image: none;
             background-size: 16px 16px;
