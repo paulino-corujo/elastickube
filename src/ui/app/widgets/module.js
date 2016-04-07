@@ -89,11 +89,7 @@ angular
     .directive('ekOwnersSelector', () => new OwnersSelectorDirective())
     .directive('ekSearchFilter', () => new SearchFilterDirective())
     .directive('ekSelectUsers', () => new SelectUsersDirective())
-    .directive('ekTable', ($compile) => {
-        'ngInject';
-
-        return new TableDirective($compile);
-    })
+    .directive('ekTable', () => new TableDirective())
     .directive('ekTableCell', () => new TableCellDirective())
     .directive('ekUserInfo', () => new UserInfoDirective());
 
