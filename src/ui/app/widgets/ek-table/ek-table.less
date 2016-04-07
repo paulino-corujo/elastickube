@@ -42,10 +42,11 @@
 
     &__grouping {
         width: 31px;
-        padding-right: 5px !important;
+        padding-right: 5px;
 
         &--nogroups {
-            width: 20px;
+            width: 10px;
+            padding-right: 0;
         }
 
         &--collapsed:before,
@@ -74,6 +75,7 @@
         min-height: 30px;
 
         &__column {
+
             & {
                 text-transform: capitalize;
                 height: 30px;
@@ -82,6 +84,16 @@
                 color: @grey500;
                 padding: 0 10px;
                 border-bottom: 1px solid @grey300;
+
+                &__group {
+                    text-transform: capitalize;
+                    height: 30px;
+                    line-height: 30px;
+                    font-weight: 500;
+                    color: @grey500;
+                    padding-left: 10px;
+                    border-bottom: 1px solid @grey300;
+                }
             }
 
             &--sortable {
@@ -133,6 +145,10 @@
 
             &__column {
                 padding: 0 10px;
+
+                &__group {
+                    padding-left: 10px;
+                }
 
                 .ek-table-cell {
                     display: block;
