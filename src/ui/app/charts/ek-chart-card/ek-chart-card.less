@@ -49,6 +49,24 @@
             margin-top: 5px;
             color: @grey500;
             font-size: 12px;
+            white-space: nowrap;
+
+            &__maintainer {
+                width: 100%;
+                p {
+                    margin: 0;
+                }
+
+                &__name {
+                    max-width: 100px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &__separator {
+                    padding: 0 3px;
+                }
+            }
 
             &__text {
                 width: 100%;
@@ -84,7 +102,7 @@
 
         &:hover {
             border-color: @grey450;
-            
+
             md-icon {
                 color: @black;
             }

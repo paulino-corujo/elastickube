@@ -18,10 +18,9 @@ class ChartController {
     constructor($filter, chartsNavigationActionCreator) {
         'ngInject';
 
-        const date = $filter('ekHumanizeDate')(this.chart.committed_date, 'epoch');
-
+        this.lastModified = $filter('ekHumanizeDate')(this.chart.committed_date, 'epoch');
         this._chartsNavigationActionCreator = chartsNavigationActionCreator;
-        this.description = `${this.chart.maintainers[0].split('<')[0]} · ${date} ago`;
+        this.maintainer = this.chart.maintainers[0].split('<')[0];
     }
 
     deploy() {

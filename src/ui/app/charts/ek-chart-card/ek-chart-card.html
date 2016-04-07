@@ -7,8 +7,12 @@
         <span class="ek-chart-card__info__name">{{ ctrl.chart.name }}</span>
 
         <div class="ek-chart-card__info__description" layout="row">
-            <span class="ek-chart-card__info__description__text">{{ ctrl.description }}</span>
-            <a ng-if="ctrl.chart.home" target="_blank" href="{{ ctrl.chart.home }}">
+            <div class="ek-chart-card__info__description__maintainer" layout="row" layout-align="start center">
+                <p class="ek-chart-card__info__description__maintainer__name">{{:: ctrl.maintainer }}</p>
+                <p class="ek-chart-card__info__description__maintainer__separator">·</p>
+                <p class="ek-chart-card__info__description__maintainer__last-modified">{{:: ctrl.lastModified }} ago</p>
+            </div>
+            <a ng-if="ctrl.chart.home" target="_blank" href="{{:: ctrl.chart.home }}">
                 <img class="ek-chart-card__info__description__icon" src="{{:: icons.GITHUB_MARK_32PX }}">
             </a>
         </div>
