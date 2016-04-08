@@ -80,8 +80,8 @@
                 text-transform: capitalize;
                 height: 30px;
                 line-height: 30px;
-                font-weight: 500;
-                color: @grey500;
+                font-weight: normal;
+                color: @grey600;
                 padding: 0 10px;
                 border-bottom: 1px solid @grey300;
 
@@ -114,6 +114,11 @@
                     transition: all 150ms linear;
                 }
 
+                &--asc, &--desc {
+                    span {
+                        font-weight: 500;
+                    }
+                }
                 &--asc:after,
                 &--desc:after {
                     opacity: 0.4;
