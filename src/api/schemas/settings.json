@@ -46,9 +46,6 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "email_mapping": {
-              "type": "string"
-            },
             "first_name_mapping": {
               "type": "string"
             },

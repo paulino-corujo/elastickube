@@ -37,7 +37,7 @@
     </div>
 </form>
 
-<div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && ctrl.authProviders.google">
+<div layout="row" layout-align="center" ng-if="ctrl.authProviders.password && (ctrl.authProviders.google || ctrl.authProviders.saml)">
     <div class="ek-login__divider"><span>OR</span></div>
 </div>
 
@@ -45,10 +45,6 @@
     <md-button href="/api/v1/auth/google" target="_self"
                class="ek-login__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Login with Google
     </md-button>
-</div>
-
-<div layout="row" layout-align="center" ng-if="(ctrl.authProviders.password || ctrl.authProviders.google) && ctrl.authProviders.saml">
-    <div class="ek-login__divider"><span>OR</span></div>
 </div>
 
 <div layout="row" layout-align="center" ng-if="ctrl.authProviders.saml">

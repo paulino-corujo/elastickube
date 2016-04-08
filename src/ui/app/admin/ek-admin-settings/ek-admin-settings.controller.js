@@ -78,7 +78,6 @@ class AdminSettingsController {
         const settings = this._settingsStore.getSettings();
         const googleData = angular.copy(settings.authentication && settings.authentication.google_oauth || {});
         const samlData = angular.copy(settings.authentication && settings.authentication.saml || {});
-        const passwordData = angular.copy(settings.authentication && settings.authentication.password || {});
 
         this._settings = angular.copy(settings);
 
@@ -90,8 +89,6 @@ class AdminSettingsController {
             saml: settings.authentication && hasValues(samlData),
             saml_data: samlData,
             github: false,
-            password: settings.authentication && hasValues(passwordData),
-            password_data: passwordData,
             ldap: false
         };
 
@@ -102,6 +99,11 @@ class AdminSettingsController {
         } else {
             this.auth_sso = 'off';
         }
+
+        this.samlMapping = hasValues(_.get(this.auth.saml_data, 'first_name_mapping'))
+            || hasValues(_.get(this.auth.saml_data, 'last_name_mapping'));
+        this.samlSpCert = hasValues(_.get(this.auth.saml_data, 'sp_certificate'))
+            || hasValues(_.get(this.auth.saml_data, 'sp_key'));
 
         this.gitChartRepo = _.get(this._settings, 'charts.repo_url');
 
@@ -137,14 +139,16 @@ class AdminSettingsController {
 
             if (this.auth.saml && hasValues(this.auth.saml_data)) {
                 this._settings.authentication.saml = this.auth.saml_data;
+                if (!this.samlMapping) {
+                    delete this._settings.authentication.saml.first_name_mapping;
+                    delete this._settings.authentication.saml.last_name_mapping;
+                }
+                if (!this.samlSpCert) {
+                    delete this._settings.authentication.saml.sp_certificate;
+                    delete this._settings.authentication.saml.sp_key;
+                }
             } else {
                 delete this._settings.authentication.saml;
-            }
-
-            if (this.auth.password && hasValues(this.auth.password_data)) {
-                this._settings.authentication.password = this.auth.password_data;
-            } else {
-                delete this._settings.authentication.password;
             }
 
             if (this.mail && hasValues(this.mail_data)) {
@@ -161,20 +165,6 @@ class AdminSettingsController {
                 this._settingsActionCreator.update(this._settings);
             }
         }
-    }
-
-    isAuthDisabled(name) {
-        const enabled = _.chain(this.auth)
-            .pick(['google', 'saml', 'github', 'password', 'ldap'])
-            .values()
-            .reduce((counter, x) => x ? counter + 1 : counter, 0)
-            .value();
-
-        return this.auth[name] && enabled === 1;
-    }
-
-    isSsoOffDisabled() {
-        return !(this.auth.password && hasValues(this.auth.password_data));
     }
 
     removeAdmin(admin) {

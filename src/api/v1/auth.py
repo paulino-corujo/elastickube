@@ -27,7 +27,6 @@ from datetime import datetime, timedelta
 import jwt
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.authn_request import OneLogin_Saml2_Authn_Request
 from passlib.hash import sha512_crypt
 from tornado.auth import GoogleOAuth2Mixin
 from tornado.gen import coroutine, Return
@@ -59,7 +58,7 @@ def _fill_signup_invitation_request(document, firstname, lastname, password=None
 class AuthHandler(RequestHandler):
 
     @coroutine
-    def authenticate_user(self, user, data=None):
+    def authenticate_user(self, user):
         logging.info("Authenticating user '%(username)s'", user)
 
         token = dict(
@@ -72,9 +71,6 @@ class AuthHandler(RequestHandler):
             created=datetime.utcnow().isoformat(),
             exp=datetime.utcnow() + timedelta(30)
         )
-
-        if data is not None:
-            token["data"] = data
 
         user["last_login"] = datetime.utcnow()
         yield self.settings["database"].Users.update({"_id": user["_id"]}, user)
@@ -377,6 +373,10 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
 
 class Saml2LoginHandler(AuthHandler):
 
+    NS_IDENTITY_CLAIMS = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/'
+    NS_FIRST_NAME = NS_IDENTITY_CLAIMS + 'givenname'
+    NS_LAST_NAME = NS_IDENTITY_CLAIMS + 'surname'
+
     def _get_saml_settings(self, saml_config, settings):
         saml_settings = dict(
             sp=dict(
@@ -387,7 +387,7 @@ class Saml2LoginHandler(AuthHandler):
                 singleLogoutService=dict(
                     url="{0}/login".format(settings["hostname"]),
                     binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT),
-                NameIDFormat=OneLogin_Saml2_Constants.NAMEID_TRANSIENT,
+                NameIDFormat=OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS,
                 x509cert=saml_config.get("sp_certificate", ""),
                 privateKey=saml_config.get("sp_key", "")
             ),
@@ -441,29 +441,8 @@ class Saml2LoginHandler(AuthHandler):
         logging.info("Initiating SAML 2.0 Auth.")
         auth = yield self._get_saml_auth(self.request)
 
-        if self.get_query_arguments('slo', False):
-            encoded_token = self.request.headers.get(ELASTICKUBE_TOKEN_HEADER)
-            if encoded_token is None:
-                encoded_token = self.get_cookie(ELASTICKUBE_TOKEN_HEADER)
-
-            if encoded_token is None:
-                self.redirect('/')
-            else:
-                token = None
-                try:
-                    token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
-                except jwt.DecodeError as jwt_error:
-                    logging.exception(jwt_error)
-                    self.write_message({"error": {"message": "Invalid token."}})
-                    self.close(httplib.UNAUTHORIZED, "Invalid token.")
-
-                if token:
-                    logging.debug("Redirecting to SAML for logout.")
-                    self.redirect(auth.logout(name_id=token["data"]["name_id"], session_index=token["data"]["session_index"]))
-
-        else:
-            logging.debug("Redirecting to SAML for authentication.")
-            self.redirect(auth.login())
+        logging.info("Redirecting to SAML for authentication.")
+        self.redirect(auth.login())
 
     @coroutine
     def post(self):
@@ -486,28 +465,26 @@ class Saml2LoginHandler(AuthHandler):
         settings = yield Query(self.settings["database"], "Settings").find_one()
         saml = settings[u'authentication'].get('saml', None)
 
-        if saml["email_mapping"] not in user_attributes:
-            logging.info('User Email attribute (%s) missing at response.', saml["email_mapping"])
-            raise HTTPError(401, reason='User Email attribute not found. Please review mapping at SAML settings')
-
-        user_email = user_attributes.get(saml["email_mapping"], [""])[0]
-        user = yield self.settings["database"].Users.find_one({"email": user_email})
+        user_id = auth.get_nameid()
+        user = yield self.settings["database"].Users.find_one({"email": user_id})
 
         # Validate user if it signup by SAML
         if user and 'email_validated_at' not in user:
-            logging.debug('User validated via SAML %s', user_email)
+            logging.debug('User validated via SAML %s', user_id)
+            first_name_mapping = saml.get("first_name_mapping", self.NS_FIRST_NAME)
+            first_name = user_attributes.get(first_name_mapping, [])
+            last_name_mapping = saml.get("last_name_mapping", self.NS_LAST_NAME)
+            last_name = user_attributes.get(last_name_mapping, [])
             _fill_signup_invitation_request(
                 user,
-                firstname=user_attributes.get(saml["first_name_mapping"], [""])[0],
-                lastname=user_attributes.get(saml["last_name_mapping"], [""])[0],
+                firstname=first_name[0] if len(first_name) > 0 else "",
+                lastname=last_name[0] if len(last_name) > 0 else "",
                 password=None)
-
             user = yield Query(self.settings["database"], 'Users').update(user)
 
         if user:
-            data = dict(name_id=auth.get_nameid(), session_index=auth.get_session_index())
-            yield self.authenticate_user(user, data)
+            yield self.authenticate_user(user)
             self.redirect('/')
         else:
-            logging.debug("User '%s' not found", user_email)
+            logging.debug("User '%s' not found", user_id)
             raise HTTPError(400, "Invalid authentication request.")

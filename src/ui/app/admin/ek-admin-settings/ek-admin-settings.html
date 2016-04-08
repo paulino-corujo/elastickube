@@ -40,11 +40,9 @@
             <md-radio-group ng-model="ctrl.auth_sso">
 
                 <div class="ek-admin-settings__authentication__methods__method"
-                    layout="row" layout-align="start center">
+                     layout="row" layout-align="start center">
                     <md-radio-button class="md-primary ek-radio-button" aria-label="Switch Off"
-                                     value="off"
-                                     ng-disabled="ctrl.isSsoOffDisabled()">
-                    </md-radio-button>
+                                     value="off"></md-radio-button>
                     <div layout="row" layout-align="start center">
                         <span>Off</span>
                     </div>
@@ -52,7 +50,7 @@
                 <md-divider></md-divider>
 
                 <div class="ek-admin-settings__authentication__methods__method"
-                    layout="row" layout-align="start center">
+                     layout="row" layout-align="start center">
                     <md-radio-button class="md-primary ek-radio-button" aria-label="Switch Google authentication"
                                      value="google"></md-radio-button>
                     <div layout="row" layout-align="start center">
@@ -63,15 +61,15 @@
                 <div class="ek-admin-settings__authentication__methods__configuration" ng-if="ctrl.auth_sso === 'google'">
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Key</div>
                     <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.google_data.key" required>
+                           ng-model="ctrl.auth.google_data.key" required>
 
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Redirect URL</div>
                     <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.google_data.redirect_uri" required>
+                           ng-model="ctrl.auth.google_data.redirect_uri" required>
 
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Secret</div>
                     <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.google_data.secret" required>
+                           ng-model="ctrl.auth.google_data.secret" required>
                 </div>
                 <md-divider></md-divider>
 
@@ -87,39 +85,49 @@
                 <div class="ek-admin-settings__authentication__methods__configuration" ng-if="ctrl.auth_sso === 'saml'">
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Identity Provider Metadata URI</div>
                     <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.saml_data.metadata_uri" required>
+                           ng-model="ctrl.auth.saml_data.metadata_uri" required>
 
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SAML Sign-On URI</div>
                     <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.saml_data.sign_on_uri" required>
+                           ng-model="ctrl.auth.saml_data.sign_on_uri" required>
 
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SAML Sign-Out URI</div>
                     <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.saml_data.sign_out_uri" required>
+                           ng-model="ctrl.auth.saml_data.sign_out_uri" required>
 
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Identity Provider X.509 Certificate</div>
                     <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
                               ng-model="ctrl.auth.saml_data.idp_certificate" required cols='80'></textarea>
 
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">EmailAddress Attribute Mapping</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.saml_data.email_mapping" required>
+                    <div layout="row" layout-align="space-between center">
+                        <span class="ek-admin-settings__subtitle">User Attribute Mapping</span>
+                        <md-switch class="md-primary" aria-label="Attribute Mapping" ng-model="ctrl.samlMapping"></md-switch>
+                    </div>
+                    <div ng-if="ctrl.samlMapping">
+                        <div class="ek-admin-settings__subtitle">First Name</div>
+                        <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
+                               ng-model="ctrl.auth.saml_data.first_name_mapping"
+                               placeholder="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname">
 
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">FirstName Attribute Mapping</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.saml_data.first_name_mapping" required>
+                        <div class="ek-admin-settings__subtitle">Last Name</div>
+                        <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
+                               ng-model="ctrl.auth.saml_data.last_name_mapping"
+                               placeholder="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname">
+                    </div>
 
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">LastName Attribute Mapping</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                        ng-model="ctrl.auth.saml_data.last_name_mapping" required>
+                    <div layout="row" layout-align="space-between center">
+                        <span class="ek-admin-settings__subtitle">Service Provider Certificate</span>
+                        <md-switch class="md-primary" aria-label="Service Provider Certificate" ng-model="ctrl.samlSpCert"></md-switch>
+                    </div>
+                    <div ng-if="ctrl.samlSpCert">
+                        <div class="ek-admin-settings__subtitle">X.509 Certificate</div>
+                        <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
+                                  ng-model="ctrl.auth.saml_data.sp_certificate" cols='80'></textarea>
 
-                    <div class="ek-admin-settings__subtitle">Service Provider X.509 Certificate</div>
-                    <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
-                              ng-model="ctrl.auth.saml_data.sp_certificate" cols='80'></textarea>
-
-                    <div class="ek-admin-settings__subtitle">Service Provider Private Key</div>
-                    <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
-                              ng-model="ctrl.auth.saml_data.sp_key" cols='80'></textarea>
+                        <div class="ek-admin-settings__subtitle">Private Key</div>
+                        <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
+                                  ng-model="ctrl.auth.saml_data.sp_key" cols='80'></textarea>
+                    </div>
                 </div>
             </md-radio-group>
         </div>
