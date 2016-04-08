@@ -32,7 +32,7 @@ start() {
     else
         $DAEMON \
         --admission-control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
-	    --service_account_key_file=/etc/kubernetes/serviceaccount.key \
+	      --service_account_key_file=/etc/kubernetes/serviceaccount.key \
         --service_account_lookup=false \
         --runtime_config=api/v1 \
         --allow_privileged=true \
