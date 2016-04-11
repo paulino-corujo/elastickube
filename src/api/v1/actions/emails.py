@@ -73,15 +73,20 @@ def send(smtp_config, address, subject, body, body_type):
     logging.debug("Mail sent")
 
 
-def generate_invite_template(invite_address, message):
-    escaped_message = cgi.escape(message)  # Message must be unicode
-    return INVITE_TEMPLATE.format(invite_address=invite_address, custom_message=escaped_message)
+def generate_invite_template(origin_user, invite_address, message):
+    message_escaped = cgi.escape(message)  # Message must be unicode and escaped
+    name_escaped = cgi.escape(origin_user['name'])
+    email_escaped = cgi.escape(origin_user['email'], quote=True)
+    invite_address_escaped = cgi.escape(invite_address)
+
+    return INVITE_TEMPLATE.format(invite_address=invite_address_escaped, custom_message=message_escaped,
+                                  origin_name=name_escaped, origin_email=email_escaped)
 
 
-def send_invites_sync(smtp_config, info_invites, message):
+def send_invites_sync(smtp_config, origin_user, info_invites, message):
     try:
         for invite in info_invites:
-            template = generate_invite_template(invite['confirm_url'], message)
+            template = generate_invite_template(origin_user, invite['confirm_url'], message)
             send(smtp_config, invite['email'], INVITE_SUBJECT, template, INVITE_BODY_TYPE)
     except Exception:
         logging.exception("Exception detected sending invites")
@@ -89,9 +94,9 @@ def send_invites_sync(smtp_config, info_invites, message):
 
 
 @coroutine
-def send_invites(smtp_config, info_invites, message, threadpool=None):
+def send_invites(smtp_config, origin_user, info_invites, message, threadpool=None):
     if threadpool is None:
         threadpool = DEFAULT_THREADPOOL
 
-    result = yield threadpool.submit(send_invites_sync, smtp_config, info_invites, message)
+    result = yield threadpool.submit(send_invites_sync, smtp_config, origin_user, info_invites, message)
     raise Return(result)
