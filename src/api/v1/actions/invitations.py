@@ -71,7 +71,11 @@ class InvitationsActions(object):
 
         if "mail" in settings:
             mail_settings = settings["mail"]
-            yield emails.send_invites(mail_settings, invitations, note)
+            origin_user = {
+                'name': ' '.join((self.user.get('firstname'), self.user.get('lastname'))),
+                'email': self.user['email']
+                }
+            yield emails.send_invites(mail_settings, origin_user, invitations, note)
         else:
             logging.warning("Mail settings not added")
 
