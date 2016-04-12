@@ -57,14 +57,23 @@ class UsersStoreService extends AbstractStore {
         });
     }
 
+    _decodeUserInfo(user) {
+        return Object.assign(user, {
+            firstname: decodeURI(user.firstname),
+            lastname: decodeURI(user.lastname)
+        });
+    }
+
     _setUser(user) {
-        this._users[user.username] = user;
+        this._users[user.username] = this._decodeUserInfo(user);
     }
 
     _setUsers(users) {
         const newUsers = {};
 
-        _.each(users, (x) => newUsers[x.username] = x);
+        _.each(users, (x) => {
+            newUsers[x.username] = this._decodeUserInfo(x);
+        });
 
         this._users = newUsers;
     }
