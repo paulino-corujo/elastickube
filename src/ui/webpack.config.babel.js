@@ -33,6 +33,7 @@ const webpackConfig = {
             'angular-aria',
             'angular-material',
             'angular-cookies',
+            'angular-messages',
             'angular-password',
             'angular-sanitize',
             'angular-ui-router',
@@ -60,8 +61,8 @@ const webpackConfig = {
             { test: require.resolve('jquery'), loader: 'expose?jQuery' },
             { test: /\.json$/, exclude: /\/(node_modules)\//, loader: 'json' },
             { test: /\.js$/, exclude: /\/(node_modules)\//, loader: 'ng-annotate!babel!eslint' },
-            { test: /\.css/, loader: ExtractTextPlugin.extract('style', 'css', {publicPath:'../../'}) },
-            { test: /\.less/, loader: ExtractTextPlugin.extract('style', 'css!postcss!less', {publicPath:'../../'}) },
+            { test: /\.css/, loader: ExtractTextPlugin.extract('style', 'css', { publicPath: '../../' }) },
+            { test: /\.less/, loader: ExtractTextPlugin.extract('style', 'css!postcss!less', { publicPath: '../../' }) },
             { test: /\.html/, exclude: /\/(components)\//, loader: 'html', include: /\/(app)\// },
             {
                 test: /\.html$/,

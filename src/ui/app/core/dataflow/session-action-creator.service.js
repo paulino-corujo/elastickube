@@ -17,8 +17,10 @@ limitations under the License.
 import constants from './constants';
 
 class SessionActionCreatorService {
-    constructor(actions, dispatcher, instancesAPI, namespacesStore, session) {
+    constructor($q, actions, dispatcher, instancesAPI, namespacesStore, session) {
         'ngInject';
+
+        this._$q = $q;
 
         this._actions = actions;
         this._dispatcher = dispatcher;
@@ -41,22 +43,11 @@ class SessionActionCreatorService {
 
         return this._session.setItem(constants.ACTIVE_NAMESPACE, namespace.metadata.uid)
             .then(() => {
+                let oldNamespace;
+
                 this._dispatcher.dispatch({ type: this._actions.SESSION_NAMESPACE_CHANGED, namespace });
-
-                if (!_.isUndefined(oldNamespaceUID)) {
-                    const oldNamespace = this._namespacesStore.get(oldNamespaceUID);
-
-                    this._dispatcher.dispatch({
-                        type: this._actions.INSTANCES_UNSUBSCRIBE,
-                        namespace: oldNamespace
-                    });
-
-                    return this._instancesAPI.unsubscribe({ namespace: oldNamespace.metadata.name })
-                        .then((x) => this._dispatcher.dispatch({
-                            type: this._actions.INSTANCES_UNSUBSCRIBED,
-                            namespace: this._namespacesStore.get(x)
-                        }));
-                }
+                return this._$q.when(!_.isUndefined(oldNamespaceUID)
+                    && (oldNamespace = this._namespacesStore.get(oldNamespaceUID)) && this._unsubscribeNamespace(oldNamespace));
             })
             .then(() => {
                 this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBE, namespace });
@@ -64,6 +55,20 @@ class SessionActionCreatorService {
                 return this._instancesAPI.subscribe({ namespace: namespace.metadata.name })
                     .then((x) => this._dispatcher.dispatch({ type: this._actions.INSTANCES_SUBSCRIBED, namespace, instances: x }));
             });
+    }
+
+    _unsubscribeNamespace(oldNamespace) {
+        this._dispatcher.dispatch({
+            type: this._actions.INSTANCES_UNSUBSCRIBE,
+            namespace: oldNamespace
+        });
+
+        return this._$q.when(angular.isDefined(oldNamespace)
+                && this._instancesAPI.unsubscribe({ namespace: oldNamespace.metadata.name }))
+            .then((x) => this._dispatcher.dispatch({
+                type: this._actions.INSTANCES_UNSUBSCRIBED,
+                namespace: this._namespacesStore.get(x)
+            }));
     }
 
     saveInstancesStatus(namespaceInstancesStatus) {
