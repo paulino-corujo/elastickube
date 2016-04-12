@@ -1,4 +1,4 @@
-# """
+"""
 # Copyright 2016 ElasticBox All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# """
+"""
+
 from __future__ import unicode_literals
 
 import copy
-import functools
 import json
 import logging
 import os
@@ -28,10 +28,53 @@ import tornado.httpserver
 import tornado.netutil
 import tornado.web
 from tornado.gen import Return, coroutine, sleep
+from tornado.httpclient import AsyncHTTPClient
 from tornado.ioloop import IOLoop
 
 
 logger = logging.getLogger(__name__)
+
+
+@coroutine
+def _check_heapster_status(settings):
+    if "HEAPSTER_SERVICE_HOST" in settings:
+        heapster_endpoint = settings["HEAPSTER_SERVICE_HOST"]
+        heapster_port = settings["HEAPSTER_SERVICE_PORT"]
+        endpoint = "http://%s:%s/api/v1/model" % (heapster_endpoint, heapster_port)
+        headers = dict()
+    else:
+        kubernetes_endpoint = settings["KUBERNETES_SERVICE_HOST"]
+        if not kubernetes_endpoint.startswith("http"):
+            kubernetes_endpoint = "https://%s:%s" % (kubernetes_endpoint, settings["KUBERNETES_SERVICE_PORT"])
+
+        endpoint = "%s%s" % (
+            kubernetes_endpoint,
+            "/api/v1/proxy/namespaces/kube-system/services/heapster/api/v1/model"
+        )
+
+        headers = dict(Authorization="Bearer %s" % settings['token'])
+
+    client = AsyncHTTPClient(force_instance=True)
+    try:
+        result = yield client.fetch(
+            endpoint + "/metrics",
+            method="GET",
+            validate_cert=False,
+            headers=headers,
+            raise_error=False)
+
+        if not result.error:
+            raise Return(status_ok())
+        else:
+            raise Return(status_error(result.error))
+    finally:
+        client.close()
+
+
+@coroutine
+def check_heapster(settings, status):
+    result = yield _check_heapster_status(settings)
+    status.heapster = result
 
 
 def _state_initial():
@@ -53,13 +96,18 @@ class SystemStatus(object):
         self.rcs = {}
         for namespace, name in initial_rcs:
             self.rcs[namespace + '.' + name] = _state_initial()
+
         self.kubernetes = _state_initial()
         self.internet = _state_initial()
+        self.heapster = _state_initial()
 
     def to_view(self):
-        view = {}
-        view['kubernetes'] = copy.deepcopy(self.kubernetes)
-        view['internet'] = copy.deepcopy(self.internet)
+        view = {
+            'kubernetes': copy.deepcopy(self.kubernetes),
+            'internet': copy.deepcopy(self.internet),
+            'heapster': copy.deepcopy(self.heapster)
+        }
+
         kubernetes_not_ok = not self.kubernetes['status']
         for full_name in self.rcs:
             view[full_name] = copy.deepcopy(self.rcs[full_name])
@@ -136,7 +184,7 @@ def check_kubernetes(settings, status):
 
 @coroutine
 def _run_every(fn, args=[], kwargs={}, delay=30):
-    ''' Runs function async once every delay seconds'''
+    """ Runs function async once every delay seconds """
     while True:
         finish_waiting = sleep(delay)
         try:
@@ -232,12 +280,13 @@ def _run_forever(fn, *args):
 
 
 def settings_from_env(settings, env):
-    port = env['KUBERNETES_SERVICE_PORT']
-    host = env['KUBERNETES_SERVICE_HOST']
-    if port == '443':
-        connection = 'https://{}:{}'.format(host, port)
+    settings["KUBERNETES_SERVICE_HOST"] = env['KUBERNETES_SERVICE_HOST']
+    settings["KUBERNETES_SERVICE_PORT"] = env['KUBERNETES_SERVICE_PORT']
+
+    if settings["KUBERNETES_SERVICE_PORT"] == '443':
+        connection = 'https://{}:{}'.format(settings["KUBERNETES_SERVICE_HOST"], settings["KUBERNETES_SERVICE_PORT"])
     else:
-        connection = 'http://{}:{}'.format(host, port)
+        connection = 'http://{}:{}'.format(settings["KUBERNETES_SERVICE_HOST"], settings["KUBERNETES_SERVICE_PORT"])
 
     settings['kubernetes_url'] = connection
 
@@ -249,6 +298,12 @@ def settings_from_env(settings, env):
         # Token is None
         token = None
 
+    if "HEAPSTER_SERVICE_HOST" in os.environ:
+        settings["HEAPSTER_SERVICE_HOST"] = os.getenv("HEAPSTER_SERVICE_HOST")
+
+    if "HEAPSTER_SERVICE_PORT" in os.environ:
+        settings["HEAPSTER_SERVICE_PORT"] = os.getenv("HEAPSTER_SERVICE_PORT")
+
     settings['token'] = token
     settings['check_connectivity_url'] = env.get('CHECK_CONNECTIVITY_URL', 'http://google.com')
 
@@ -259,6 +314,7 @@ def start_background_checks(settings, status, replica_names):
     _run_forever(check_kubernetes, settings, status)
     check_replicasets_forever(settings, status, replica_names)
     _run_forever(check_internet, settings, status)
+    _run_forever(check_heapster, settings, status)
 
 
 class DiagnosticsHtmlHandler(tornado.web.RequestHandler):
@@ -310,7 +366,6 @@ def run_server():
     replication_controllers = (
         ('kube-system', 'elastickube-server'),
         ('kube-system', 'elastickube-mongo'),
-        ('kube-system', 'heapster'),
         ('kube-system', 'kube-dns-v9'),
     )
     logger.debug('Loaded settings')
