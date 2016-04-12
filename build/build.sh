@@ -29,6 +29,13 @@ docker build --file=${REPO_ROOT}/src/Dockerfile-nginx \
    --tag=elasticbox/elastickube-nginx:latest \
    ${REPO_ROOT}/src
 
+docker build --file=${REPO_ROOT}/src/Dockerfile-diagnostics \
+  --tag=elasticbox/elastickube-diagnostics \
+  --tag=elasticbox/elastickube-diagnostics:${ELASTICKUBE_VERSION} \
+  --tag=elasticbox/elastickube-diagnostics:latest \
+  ${REPO_ROOT}/src
+
 docker push elasticbox/elastickube-api
 docker push elasticbox/elastickube-charts
 docker push elasticbox/elastickube-nginx
+docker push elasticbox/elastickube-diagnostics

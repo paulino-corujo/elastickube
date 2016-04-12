@@ -164,6 +164,16 @@ ${MASTER_URL_ENV_SECTION}
           hostPort: 80
           name: http
           protocol: TCP
+      - name: elastickube-diagnostics
+        image: elasticbox/elastickube-diagnostics:latest
+        resources:
+          limits:
+            cpu: 10m
+            memory: 32Mi
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: elastickube-run
+          mountPath: /var/run
       volumes:
       - name: elastickube-charts
         hostPath:

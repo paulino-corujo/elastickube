@@ -18,12 +18,13 @@ import AbstractAPI from './abstract-api';
 
 class SettingsAPIService extends AbstractAPI {
 
-    constructor($http, websocketClient) {
+    constructor($http, $q, websocketClient) {
         'ngInject';
 
         super('settings', websocketClient);
 
         this._$http = $http;
+        this._$q = $q;
     }
 
     authProviders(code) {
@@ -43,6 +44,12 @@ class SettingsAPIService extends AbstractAPI {
                 }
 
                 return authProviders;
+            })
+            .catch((x) => {
+                if (x.status >= 500) {
+                    window.location.assign('/diagnostics/');
+                }
+                return this._$q.reject(x);
             });
     }
 }

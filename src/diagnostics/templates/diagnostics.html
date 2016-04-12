@@ -1,0 +1,101 @@
+<html lang=""><head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta http-equiv="expires" content="0">
+    <title>ElasticKube Diagnostics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <meta http-equiv="refresh" content="60"> -->
+    <link rel="shortcut icon" href="assets/favicon.png">
+    <link href="assets/css/vendor.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* HEADER */
+        .header {
+            height: 60px;
+            background-color: #3F51B5;
+        }
+        .logo {
+            height: 30px;
+            margin: 0 55px 0 20px;
+        }
+        /* DIAGNOSTICS */
+        .diagnostics-title {
+            color: black;
+            font-size: 38px;
+        }
+        .checklist-item {
+            color: black;
+            font-size: 16px;
+            min-height: 60px;
+            width: 600px;
+            border-bottom: 1px solid #E0E0E0;
+            padding: 12px 10px;
+        }
+        .checklist-item:last-child {
+            border-bottom: 0;
+        }
+        .checklist-item .checklist-messages {
+            padding-top: 4px;
+        }
+        .checklist-item .checklist-message {
+            font-size: 13px;
+            color: #757575;
+            padding-top: 8px;
+            padding-bottom: 12px;
+        }
+        .title {
+            margin-top: 60px;
+            margin-bottom: 50px;
+            font-size: 38px;
+            font-weight: 300;
+        }
+        .report-link {
+            color:#00BCD4;
+            text-decoration: none;
+        }
+        /* Check icon */
+        .status {
+            height: 26px;
+            width: 40px;
+        }
+        .check {
+            color: #12C700;
+        }
+        .close {
+            color: #FF1744;
+        }
+        .warning {
+            color: #FFB300;
+        }
+    </style>
+</head>
+<body>
+<!--[if lt IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+    <div class="layout-fill layout-column">
+        <div class="layout-fill layout-column flex">
+            <div class="header layout-align-start-center layout-row flex-none">
+                <img class="logo" role="button" tabindex="0" src="assets/images/kubernetes-logo.svg">
+            </div>
+
+            <div class="layout-column flex">
+                <div class="layout-column flex">
+                    <div class="layout-column layout-align-center-center">
+                        <h2 class="title">Diagnostics</h2>
+                        {% module StateUI(status['kubernetes'], 'Kubernetes Connection') %}
+                        {% module StateUI(status['kube-system.elastickube-mongo'], 'Mongo Connection') %}
+                        {% module StateUI(status['kube-system.elastickube-server'], 'Websocket Service') %}
+                        {% module StateUI(status['kube-system.elastickube-server'], 'Chart Service') %}
+                        {% module StateUI(status['internet'], 'Internet Connection') %}
+                        {% module StateUI(status['kube-system.heapster'], 'Heapster Connection') %}
+                        {% module StateUI(status['kube-system.kube-dns-v9'], 'Kubernetes DNS') %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
