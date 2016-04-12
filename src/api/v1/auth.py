@@ -18,6 +18,7 @@ import json
 import logging
 import random
 import string
+import urllib
 from datetime import datetime, timedelta
 
 import jwt
@@ -169,8 +170,8 @@ class SignupHandler(AuthHandler):
                 email=data["email"],
                 username=data["email"],
                 password=_generate_hashed_password(data["password"]),
-                firstname=data["firstname"],
-                lastname=data["lastname"],
+                firstname=urllib.quote(data["firstname"]),
+                lastname=urllib.quote(data["lastname"]),
                 role="administrator",
                 schema="http://elasticbox.net/schemas/user",
                 email_validated_at=datetime.utcnow().isoformat()
