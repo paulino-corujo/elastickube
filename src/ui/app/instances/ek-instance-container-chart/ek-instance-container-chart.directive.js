@@ -30,6 +30,11 @@ class InstanceContainerChartDirective extends Directive {
 
     compile(tElement) {
         tElement.addClass('ek-instance-container-chart layout-column layout-align-center-center');
+
+        return ($scope, $element, attrs, ctrl) => {
+            ctrl.hideName = _.has(attrs, 'hideName');
+            ctrl.hideLegend = _.has(attrs, 'hideLegend');
+        };
     }
 }
 
