@@ -7,8 +7,8 @@ layout="row" layout-align="center center">
 </div>
 
 <div layout="column" layout-align="center center">
-    <div class="ek-instance-container-chart__name">{{ ctrl.container.name }}</div>
-    <div ng-if="ctrl.metrics">
+    <div ng-if="!ctrl.hideName" class="ek-instance-container-chart__name">{{ ctrl.container.name }}</div>
+    <div ng-if="!ctrl.hideLegend && ctrl.metrics">
         <div class="ek-instance-container-chart__legend-cpu" layout="row" layout-align="center center">
             <span></span>
             <div>CPU: {{ ctrl.dataset[0].cpu }}%</div>
