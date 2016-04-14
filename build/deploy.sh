@@ -170,7 +170,6 @@ ${MASTER_URL_ENV_SECTION}
           limits:
             cpu: 10m
             memory: 32Mi
-        imagePullPolicy: Never
         volumeMounts:
         - name: elastickube-run
           mountPath: /var/run
