@@ -19,12 +19,10 @@ import copy
 import json
 import logging
 import os
-import time
 
 from concurrent.futures import Future
 import mock
 import pytest
-import tornado
 
 from diagnostics import diagnostics
 

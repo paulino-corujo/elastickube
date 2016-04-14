@@ -29,8 +29,8 @@ class ActionsSettingsTests(testing.AsyncTestCase):
     _multiprocess_can_split_ = True
 
     @testing.gen_test(timeout=60)
-    def create_settings_test(self):
-        logging.debug("Start create_settings_test")
+    def test_create_settings(self):
+        logging.debug("Start test_create_settings")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -54,11 +54,11 @@ class ActionsSettingsTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed create_settings_test")
+        logging.debug("Completed test_create_settings")
 
     @testing.gen_test(timeout=60)
-    def update_settings_test(self):
-        logging.debug("Start update_settings_test")
+    def test_update_settings(self):
+        logging.debug("Start test_update_settings")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -101,11 +101,11 @@ class ActionsSettingsTests(testing.AsyncTestCase):
                             previous_version, message["body"]["metadata"]["resourceVersion"]))
 
         connection.close()
-        logging.debug("Completed update_settings_test")
+        logging.debug("Completed test_update_settings")
 
     @testing.gen_test(timeout=60)
-    def delete_settings_test(self):
-        logging.debug("Start delete_settings_test")
+    def test_delete_settings(self):
+        logging.debug("Start test_delete_settings")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -129,11 +129,11 @@ class ActionsSettingsTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed delete_settings_test")
+        logging.debug("Completed test_delete_settings")
 
     @testing.gen_test(timeout=60)
-    def forbidden_update_test(self):
-        logging.debug("Start forbidden_update_test")
+    def test_forbidden_update(self):
+        logging.debug("Start test_forbidden_update")
 
         request = yield get_ws_request(self.io_loop, username="engineer@elasticbox.com")
         connection = yield websocket_connect(request)
@@ -157,7 +157,7 @@ class ActionsSettingsTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed forbidden_update_test")
+        logging.debug("Completed test_forbidden_update")
 
 
 if __name__ == "__main__":

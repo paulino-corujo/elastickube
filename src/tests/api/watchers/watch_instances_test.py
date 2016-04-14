@@ -27,8 +27,8 @@ from tests.api import get_ws_request, validate_response, wait_message
 class WatchInstancesTest(testing.AsyncTestCase):
 
     @testing.gen_test(timeout=60)
-    def watch_instances_test(self):
-        logging.debug("Start watch_instances_test")
+    def test_watch_instances(self):
+        logging.debug("Start test_watch_instances")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -154,7 +154,7 @@ class WatchInstancesTest(testing.AsyncTestCase):
                         "Message is %s instead of 'Action not previously watch.'" % message["body"]["message"])
 
         connection.close()
-        logging.debug("Completed watch_instances_test")
+        logging.debug("Completed test_watch_instances")
 
 
 if __name__ == '__main__':

@@ -38,8 +38,8 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
         database.Users.remove({"email": email})
 
     @testing.gen_test(timeout=60)
-    def create_invitations_test(self):
-        logging.debug("Start create_invitations_test")
+    def test_create_invitations(self):
+        logging.debug("Start test_create_invitations")
 
         user_email = "test_%s@elasticbox.com" % str(uuid.uuid4())[:10]
         self.addCleanup(self._delete_user, user_email)
@@ -93,11 +93,11 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
         self.assertIsNotNone(new_user)
 
         connection.close()
-        logging.debug("Completed update_settings_test")
+        logging.debug("Completed test_create_invitations")
 
     @testing.gen_test(timeout=60)
-    def update_invitations_test(self):
-        logging.debug("Start update_invitations_test")
+    def test_update_invitations(self):
+        logging.debug("Start test_update_invitations")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -120,11 +120,11 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed update_invitations_test")
+        logging.debug("Completed test_update_invitations")
 
     @testing.gen_test(timeout=60)
-    def delete_invitations_test(self):
-        logging.debug("Start delete_invitations_test")
+    def test_delete_invitations(self):
+        logging.debug("Start test_delete_invitations")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -147,11 +147,11 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed delete_invitations_test")
+        logging.debug("Completed test_delete_invitations")
 
     @testing.gen_test(timeout=60)
-    def invite_unauthorized_test(self):
-        logging.debug("Start invite_unauthorized_test")
+    def test_invite_unauthorized(self):
+        logging.debug("Start test_invite_unauthorized")
 
         request = yield get_ws_request(self.io_loop, username="engineer@elasticbox.com")
         connection = yield websocket_connect(request)
@@ -175,7 +175,7 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed invite_unauthorized_test")
+        logging.debug("Completed test_invite_unauthorized")
 
 
 if __name__ == "__main__":
