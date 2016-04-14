@@ -7,3 +7,13 @@
     <md-icon class="ek-admin-menu__item__icon" md-svg-src="{{:: item.icon }}"></md-icon>
     <span class="ek-admin-menu__item__name">{{:: item.name }}</span>
 </div>
+<div class="ek-admin-menu__divider">
+    <md-divider></md-divider>
+</div>
+<div layout="row" layout-align="start center"
+    ek-ink-ripple="dark"
+    class="ek-admin-menu__item"
+    ng-click="ctrl.goDiagnostics()">
+    <md-icon class="ek-admin-menu__item__icon" md-svg-src="{{:: icons.IC_NETWORK_CHECK_48PX }}"></md-icon>
+    <span class="ek-admin-menu__item__name">Diagnostics</span>
+</div>
