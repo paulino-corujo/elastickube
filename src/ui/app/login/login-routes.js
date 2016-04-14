@@ -61,6 +61,35 @@ const states = [{
             }
         }
     }
+}, {
+    state: 'reset-password',
+    config: {
+        url: '/reset-password',
+        parent: 'anonymous',
+        template: '<ek-reset-password></ek-reset-password>'
+    }
+}, {
+    state: 'confirm-reset-password',
+    config: {
+        url: '/confirm-reset-password',
+        parent: 'anonymous',
+        template: '<ek-confirm-reset-password></ek-confirm-reset-password>'
+    }
+}, {
+    state: 'change-password',
+    config: {
+        controller,
+        url: '/change-password',
+        parent: 'anonymous',
+        template: '<ek-change-password auth-providers="authProviders"></ek-change-password>',
+        resolve: {
+            authProviders: ($stateParams, settingsActionCreator) => {
+                'ngInject';
+
+                return settingsActionCreator.authProviders($stateParams.code);
+            }
+        }
+    }
 }];
 
 function loginRoutes(routerHelperProvider) {

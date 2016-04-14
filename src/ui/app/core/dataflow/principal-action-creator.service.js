@@ -38,6 +38,18 @@ class PrincipalActionCreatorService {
         return this._principalAPI.login(user);
     }
 
+    resetPassword(email) {
+        this._dispatcher.dispatch({ type: this._actions.PRINCIPAL_PASSWORD_RESET });
+
+        return this._principalAPI.resetPassword(email);
+    }
+
+    changePassword(password, token) {
+        this._dispatcher.dispatch({ type: this._actions.PRINCIPAL_PASSWORD_CHANGE });
+
+        return this._principalAPI.changePassword(password, token);
+    }
+
     loggedIn(username) {
         this._dispatcher.dispatch({
             type: this._actions.PRINCIPAL_LOGGED,

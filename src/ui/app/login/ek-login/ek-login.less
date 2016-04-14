@@ -12,12 +12,26 @@
     &__email,
     &__password {
         margin: 0 0 18px 0;
+
+        &__forgot {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            right: 0;
+        }
+
         label, input {
             font-size: 16px;
         }
 
         input {
             width: 410px;
+        }
+    }
+
+    &__password {
+        input {
+            padding-right: 60px;
         }
     }
 
@@ -53,7 +67,7 @@
             box-shadow: none;
         }
         &.md-raised[disabled] {
-            background-color: rgba(38,198,218,0.4);
+            background-color: rgba(38, 198, 218, 0.4);
             color: @white !important;
         }
         .md-ripple-container {

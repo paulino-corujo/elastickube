@@ -22,7 +22,10 @@ import loginRoutes from './login-routes';
 
 import NavigationActionCreator from './navigation-action-creator.service';
 
+import ChangePasswordDirective from './ek-change-password/ek-change-password.directive';
+import ConfirmResetPasswordDirective from './ek-confirm-reset-password/ek-confirm-reset-password.directive';
 import LoginDirective from './ek-login/ek-login.directive';
+import ResetPasswordDirective from './ek-reset-password/ek-reset-password.directive';
 import SignupDirective from './ek-signup/ek-signup.directive';
 import ValidateUserDirective from './ek-validate-user/ek-validate-user.directive';
 
@@ -37,7 +40,10 @@ angular
 
     .service('loginNavigationActionCreator', NavigationActionCreator)
 
+    .directive('ekChangePassword', () => new ChangePasswordDirective())
+    .directive('ekConfirmResetPassword', () => new ConfirmResetPasswordDirective())
     .directive('ekLogin', () => new LoginDirective())
+    .directive('ekResetPassword', () => new ResetPasswordDirective())
     .directive('ekSignup', () => new SignupDirective())
     .directive('ekValidateUser', () => new ValidateUserDirective());
 
