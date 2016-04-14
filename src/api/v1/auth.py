@@ -25,6 +25,7 @@ import urlparse
 from datetime import datetime, timedelta
 
 import jwt
+from lxml import etree
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from passlib.hash import sha512_crypt
@@ -374,32 +375,45 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
 class Saml2LoginHandler(AuthHandler):
 
     NS_IDENTITY_CLAIMS = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/'
-    NS_FIRST_NAME = NS_IDENTITY_CLAIMS + 'givenname'
-    NS_LAST_NAME = NS_IDENTITY_CLAIMS + 'surname'
+    FIRST_NAME_ATTRIBUTES = ['FirstName', 'User.FirstName', NS_IDENTITY_CLAIMS + 'givenname']
+    LAST_NAME_ATTRIBUTES = ['LastName', 'User.LastName', NS_IDENTITY_CLAIMS + 'surname']
+
+    IDP_CERT_PATH = "md:IDPSSODescriptor/md:KeyDescriptor[@use='signing']/ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+    IDP_SSO_PATH = "md:IDPSSODescriptor/md:SingleSignOnService[@Binding='{0}']".format(
+        OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
 
     def _get_saml_settings(self, saml_config, settings):
+        try:
+            metadata = etree.fromstring(str(saml_config['metadata']))
+        except etree.XMLSyntaxError:
+            raise HTTPError(400, reason="Invalid SAML identity provider metadata")
+
+        try:
+            if metadata.tag.endswith('EntitiesDescriptor'):
+                metadata = metadata.find("md:EntityDescriptor", namespaces=OneLogin_Saml2_Constants.NSMAP)
+
+            idp_entity_id = metadata.attrib['entityID']
+            idp_cert = metadata.find(self.IDP_CERT_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).text
+            idp_sso = metadata.find(self.IDP_SSO_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).attrib['Location']
+        except:
+            raise HTTPError(400, reason="Invalid SAML identity provider metadata")
+            
         saml_settings = dict(
             sp=dict(
                 entityId=settings["hostname"],
                 assertionConsumerService=dict(
                     url="{0}/api/v1/auth/saml".format(settings["hostname"]),
                     binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST),
-                singleLogoutService=dict(
-                    url="{0}/login".format(settings["hostname"]),
-                    binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT),
                 NameIDFormat=OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS,
                 x509cert=saml_config.get("sp_certificate", ""),
                 privateKey=saml_config.get("sp_key", "")
             ),
             idp=dict(
-                entityId=saml_config["metadata_uri"],
+                entityId=idp_entity_id,
                 singleSignOnService=dict(
-                    url=saml_config["sign_on_uri"],
+                    url=idp_sso,
                     binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT),
-                singleLogoutService=dict(
-                    url=saml_config["sign_out_uri"],
-                    binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT),
-                x509cert=saml_config["idp_certificate"]
+                x509cert=idp_cert
             )
         )
 
@@ -436,6 +450,14 @@ class Saml2LoginHandler(AuthHandler):
 
         raise Return(OneLogin_Saml2_Auth(saml_request, saml_settings))
 
+    def _get_attribute(self, attributes, mappings):
+        for mapping in mappings:
+            values = attributes.get(mapping, [])
+            if len(values) > 0:
+                return values[0]
+
+        return ""
+
     @coroutine
     def get(self):
         logging.info("Initiating SAML 2.0 Auth.")
@@ -460,8 +482,8 @@ class Saml2LoginHandler(AuthHandler):
             logging.info("SAML user not authenticated.")
             raise HTTPError(401, reason="SAML user not authenticated.")
 
-        user_attributes = auth.get_attributes()
-        logging.debug('SAML Attributes received: {0}'.format(user_attributes))
+        attributes = auth.get_attributes()
+        logging.debug('SAML Attributes received: {0}'.format(attributes))
         settings = yield Query(self.settings["database"], "Settings").find_one()
         saml = settings[u'authentication'].get('saml', None)
 
@@ -471,15 +493,10 @@ class Saml2LoginHandler(AuthHandler):
         # Validate user if it signup by SAML
         if user and 'email_validated_at' not in user:
             logging.debug('User validated via SAML %s', user_id)
-            first_name_mapping = saml.get("first_name_mapping", self.NS_FIRST_NAME)
-            first_name = user_attributes.get(first_name_mapping, [])
-            last_name_mapping = saml.get("last_name_mapping", self.NS_LAST_NAME)
-            last_name = user_attributes.get(last_name_mapping, [])
-            _fill_signup_invitation_request(
-                user,
-                firstname=first_name[0] if len(first_name) > 0 else "",
-                lastname=last_name[0] if len(last_name) > 0 else "",
-                password=None)
+            first_name = self._get_attribute(
+                attributes, saml.get("first_name_mapping", []) + self.FIRST_NAME_ATTRIBUTES)
+            last_name = self._get_attribute(attributes, saml.get("last_name_mapping", []) + self.LAST_NAME_ATTRIBUTES)
+            _fill_signup_invitation_request(user, firstname=first_name, lastname=last_name, password=None)
             user = yield Query(self.settings["database"], 'Users').update(user)
 
         if user:

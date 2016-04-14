@@ -83,21 +83,9 @@
                     </div>
                 </div>
                 <div class="ek-admin-settings__authentication__methods__configuration" ng-if="ctrl.auth_sso === 'saml'">
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Identity Provider Metadata URI</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                           ng-model="ctrl.auth.saml_data.metadata_uri" required>
-
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SAML Sign-On URI</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                           ng-model="ctrl.auth.saml_data.sign_on_uri" required>
-
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SAML Sign-Out URI</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                           ng-model="ctrl.auth.saml_data.sign_out_uri" required>
-
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Identity Provider X.509 Certificate</div>
+                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Identity Provider Metadata</div>
                     <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
-                              ng-model="ctrl.auth.saml_data.idp_certificate" required cols='80'></textarea>
+                              ng-model="ctrl.auth.saml_data.metadata" required cols='80'></textarea>
 
                     <div layout="row" layout-align="space-between center">
                         <span class="ek-admin-settings__subtitle">User Attribute Mapping</span>
@@ -107,12 +95,12 @@
                         <div class="ek-admin-settings__subtitle">First Name</div>
                         <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                                ng-model="ctrl.auth.saml_data.first_name_mapping"
-                               placeholder="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname">
+                               placeholder="FirstName">
 
                         <div class="ek-admin-settings__subtitle">Last Name</div>
                         <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                                ng-model="ctrl.auth.saml_data.last_name_mapping"
-                               placeholder="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname">
+                               placeholder="LastName">
                     </div>
 
                     <div layout="row" layout-align="space-between center">

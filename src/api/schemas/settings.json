@@ -49,19 +49,10 @@
             "first_name_mapping": {
               "type": "string"
             },
-            "idp_certificate": {
-              "type": "string"
-            },
             "last_name_mapping": {
               "type": "string"
             },
-            "metadata_uri": {
-              "type": "string"
-            },
-            "sign_on_uri": {
-              "type": "string"
-            },
-            "sign_out_uri": {
+            "metadata": {
               "type": "string"
             },
             "sp_certificate": {
