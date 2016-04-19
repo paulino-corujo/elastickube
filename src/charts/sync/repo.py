@@ -110,6 +110,7 @@ class GitSync(object):
                 yield Query(self.database, 'Charts').remove(existing)
             else:
                 discovered["_id"] = existing["_id"]
+                discovered["metadata"] = existing["metadata"]
 
                 if discovered["commit"] != existing["commit"]:
                     logging.debug("Updating existing chart %(name)s", discovered)
