@@ -1,5 +1,6 @@
 cairosvg
 futures
+mock
 motor
 nose==1.3.7
 passlib
@@ -7,4 +8,5 @@ pep8
 pycurl
 PyJWT
 pylint
+pytest
 tornado

@@ -76,7 +76,7 @@ class InvitationsActions(object):
             origin_user = {
                 'name': ' '.join((self.user.get('firstname'), self.user.get('lastname'))),
                 'email': self.user['email']
-                }
+            }
             yield emails.send_invites(mail_settings, origin_user, invitations, note)
         else:
             logging.warning("Mail settings not added")
