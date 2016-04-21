@@ -47,7 +47,7 @@ class InstancesActions(object):
 
         namespace = document["namespace"]
 
-        chart = yield Query(self.database, "Charts").find_one({"_id": ObjectId(document["uid"])})
+        chart = yield Query(self.database, "Charts", manipulate=True).find_one({"_id": ObjectId(document["uid"])})
         if chart is None:
             raise ObjectNotFoundError("Cannot find Chart %s" % document["uid"])
 

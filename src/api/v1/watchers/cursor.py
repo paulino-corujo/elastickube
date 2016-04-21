@@ -26,22 +26,26 @@ ACTIONS_METADATA = {
     "users": {
         "collection": "Users",
         "projection": {"password": 0},
-        "filter_data": None
+        "filter_data": None,
+        "manipulate": False
     },
     "namespaces": {
         "collection": "Namespaces",
         "projection": None,
-        "filter_data": filter_namespaces
+        "filter_data": filter_namespaces,
+        "manipulate": False
     },
     "settings": {
         "collection": "Settings",
         "projection": None,
-        "filter_data": None
+        "filter_data": None,
+        "manipulate": False
     },
     "charts": {
         "collection": "Charts",
         "projection": None,
-        "filter_data": None
+        "filter_data": None,
+        "manipulate": True
     }
 }
 
@@ -63,8 +67,10 @@ class CursorWatcher(object):
         action = self.message["action"]
         logging.info("Starting watch for collection %s", ACTIONS_METADATA[action]["collection"])
 
-        data = yield Query(self.settings["database"], ACTIONS_METADATA[action]["collection"]).find(
-            projection=ACTIONS_METADATA[action]["projection"])
+        data = yield Query(
+            self.settings["database"],
+            ACTIONS_METADATA[action]["collection"],
+            manipulate=ACTIONS_METADATA[action]["manipulate"]).find(projection=ACTIONS_METADATA[action]["projection"])
 
         data = self.filter_data(data)
         self.callback(dict(

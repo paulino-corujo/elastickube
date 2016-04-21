@@ -19,8 +19,6 @@ import time
 from pymongo.errors import PyMongoError
 from tornado.gen import coroutine, Return
 
-from data.son_manipulator import KeyManipulator
-
 
 class ObjectNotFoundError(PyMongoError):
     """Raised when object is not found into the collection.
@@ -29,16 +27,10 @@ class ObjectNotFoundError(PyMongoError):
 
 class Query(object):
 
-    def __init__(self, database, collection):
+    def __init__(self, database, collection, manipulate=False):
         self.database = database
         self.collection = collection
-
-        if self.collection == "Charts":
-            self.manipulate = True
-            if KeyManipulator.__name__ not in self.database.incoming_manipulators:
-                self.database.add_son_manipulator(KeyManipulator())
-        else:
-            self.manipulate = False
+        self.manipulate = manipulate
 
         self.default_criteria = {"$and": [{"metadata.deletionTimestamp": None}]}
 
@@ -55,7 +47,9 @@ class Query(object):
 
     @coroutine
     def find_one(self, criteria=None, projection=None):
-        document = yield self.database[self.collection].find_one(self._generate_query(criteria), projection,
+        document = yield self.database[self.collection].find_one(
+            self._generate_query(criteria),
+            projection,
             manipulate=self.manipulate)
         raise Return(document)
 
@@ -63,7 +57,9 @@ class Query(object):
     def find(self, criteria=None, projection=None):
         documents = []
 
-        cursor = self.database[self.collection].find(self._generate_query(criteria), projection,
+        cursor = self.database[self.collection].find(
+            self._generate_query(criteria),
+            projection,
             manipulate=self.manipulate)
         while (yield cursor.fetch_next):
             documents.append(cursor.next_object())
@@ -84,19 +80,24 @@ class Query(object):
             )
 
         document_id = yield self.database[self.collection].insert(document, manipulate=self.manipulate)
-        inserted_document = yield self.database[self.collection].find_one({"_id": document_id},
+        inserted_document = yield self.database[self.collection].find_one(
+            {"_id": document_id},
             manipulate=self.manipulate)
         raise Return(inserted_document)
 
     @coroutine
     def update(self, document):
         document["metadata"]["resourceVersion"] = time.time()
-        response = yield self.database[self.collection].update({"_id": document["_id"]}, document,
-            upsert=True, manipulate=self.manipulate)
+        response = yield self.database[self.collection].update(
+            {"_id": document["_id"]},
+            document,
+            upsert=True,
+            manipulate=self.manipulate)
         if response['n'] == 0:
             raise ObjectNotFoundError()
 
-        updated_document = yield self.database[self.collection].find_one({"_id": document["_id"]},
+        updated_document = yield self.database[self.collection].find_one(
+            {"_id": document["_id"]},
             manipulate=self.manipulate)
         raise Return(updated_document)
 

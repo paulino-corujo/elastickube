@@ -23,6 +23,7 @@ from tornado.ioloop import IOLoop
 
 from charts.sync.repo import GitSync
 from data import watch
+from data.son.manipulators import KeyManipulator
 
 
 @coroutine
@@ -38,7 +39,10 @@ def initialize():
 
     try:
         watch.start_monitor(motor_client)
-        yield GitSync(motor_client.elastickube).sync_loop()
+
+        elastickube_db = motor_client.elastickube
+        elastickube_db.add_son_manipulator(KeyManipulator())
+        yield GitSync(elastickube_db).sync_loop()
     except:
         logging.exception("Unexpected error executing GitSync sync loop.")
         IOLoop.current().stop()

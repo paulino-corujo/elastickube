@@ -32,6 +32,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from api.kube import client
 from api.v1.sync import SyncNamespaces
 from data import watch, init as initialize_database
+from data.son.manipulators import KeyManipulator
 
 PING_FREQUENCY = timedelta(seconds=5)
 RESPONSE_TIMEOUT = timedelta(seconds=5)
@@ -55,7 +56,10 @@ def configure(settings):
     )
 
     settings["motor"] = MotorClient(mongo_url)
-    settings["database"] = settings["motor"].elastickube
+
+    elastickube_db = settings["motor"].elastickube
+    elastickube_db.add_son_manipulator(KeyManipulator())
+    settings["database"] = elastickube_db
 
 
 @coroutine
