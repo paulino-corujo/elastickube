@@ -65,7 +65,7 @@ spec:
           value: "1"
         resources:
           limits:
-            cpu: 10m
+            cpu: 20m
             memory: 32Mi
         imagePullPolicy: Never
         volumeMounts:
