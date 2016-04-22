@@ -20,7 +20,7 @@ class ChartController {
 
         this.lastModified = $filter('ekHumanizeDate')(this.chart.committed_date, 'epoch');
         this._chartsNavigationActionCreator = chartsNavigationActionCreator;
-        this.maintainer = this.chart.maintainers[0].split('<')[0];
+        this.maintainer = _.isEmpty(this.chart.maintainers) ? 'Last modified' : _.first(this.chart.maintainers).split('<')[0];
     }
 
     deploy() {
