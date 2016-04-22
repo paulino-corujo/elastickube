@@ -100,12 +100,14 @@ class SystemStatus(object):
         self.kubernetes = _state_initial()
         self.internet = _state_initial()
         self.heapster = _state_initial()
+        self.dns = _state_initial()
 
     def to_view(self):
         view = {
             'kubernetes': copy.deepcopy(self.kubernetes),
             'internet': copy.deepcopy(self.internet),
-            'heapster': copy.deepcopy(self.heapster)
+            'heapster': copy.deepcopy(self.heapster),
+            'dns': copy.deepcopy(self.dns),
         }
 
         kubernetes_not_ok = not self.kubernetes['status']
@@ -193,6 +195,28 @@ def _run_every(fn, args=[], kwargs={}, delay=30):
             logger.exception('Unexpected exception {}'.format(unicode(e)))
 
         yield finish_waiting
+
+
+@coroutine
+def _check_dns(settings):
+    hostname = settings['dns_test_hostname']
+    resolver = tornado.netutil.Resolver()
+    try:
+        ip = yield resolver.resolve(hostname, 80)
+    except (RuntimeError, IOError, tornado.httpclient.HTTPError) as e:
+        error_message = unicode(e)
+        raise Return(status_error("Couldn't find default DNS {} : {}".format(hostname, error_message)))
+
+    if ip is not None:
+        raise Return(status_ok())
+    else:
+        raise Return(status_error('Hostname to test DNS not found {}'.format(hostname)))
+
+
+@coroutine
+def check_dns(settings, status):
+    state = yield _check_dns(settings)
+    status.dns = state
 
 
 @coroutine
@@ -295,17 +319,17 @@ def settings_from_env(settings, env):
         with open(token_path, 'r') as f:
             token = f.read().rstrip()
     else:
-        # Token is None
         token = None
 
-    if "HEAPSTER_SERVICE_HOST" in os.environ:
-        settings["HEAPSTER_SERVICE_HOST"] = os.getenv("HEAPSTER_SERVICE_HOST")
+    if "HEAPSTER_SERVICE_HOST" in env:
+        settings["HEAPSTER_SERVICE_HOST"] = env["HEAPSTER_SERVICE_HOST"]
 
-    if "HEAPSTER_SERVICE_PORT" in os.environ:
-        settings["HEAPSTER_SERVICE_PORT"] = os.getenv("HEAPSTER_SERVICE_PORT")
+    if "HEAPSTER_SERVICE_PORT" in env:
+        settings["HEAPSTER_SERVICE_PORT"] = env["HEAPSTER_SERVICE_PORT"]
 
     settings['token'] = token
     settings['check_connectivity_url'] = env.get('CHECK_CONNECTIVITY_URL', 'http://google.com')
+    settings['dns_test_hostname'] = env.get('DNS_TEST_HOSTNAME', 'kubernetes.default')
 
 
 def start_background_checks(settings, status, replica_names):
@@ -315,6 +339,7 @@ def start_background_checks(settings, status, replica_names):
     check_replicasets_forever(settings, status, replica_names)
     _run_forever(check_internet, settings, status)
     _run_forever(check_heapster, settings, status)
+    _run_forever(check_dns, settings, status)
 
 
 class DiagnosticsHtmlHandler(tornado.web.RequestHandler):
@@ -366,7 +391,6 @@ def run_server():
     replication_controllers = (
         ('kube-system', 'elastickube-server'),
         ('kube-system', 'elastickube-mongo'),
-        ('kube-system', 'kube-dns-v9'),
     )
     logger.debug('Loaded settings')
 
@@ -382,7 +406,7 @@ def run_server():
     server.add_socket(socket)
 
     if os.getenv('DEBUG'):
-        IOLoop.current().set_blocking_log_threshold(0.25)
+        IOLoop.current().set_blocking_log_threshold(0.5)
 
     IOLoop.current().start()
 

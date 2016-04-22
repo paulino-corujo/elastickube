@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from __future__ import unicode_literals
+
 import copy
 import json
 import logging
@@ -209,13 +211,20 @@ def token_path(tmpdir):
 def env(token_path):
     return {'KUBERNETES_SERVICE_PORT': '8080',
             'KUBERNETES_SERVICE_HOST': '10.107.56.115',
-            'KUBE_API_TOKEN_PATH': token_path}
+            'KUBE_API_TOKEN_PATH': token_path,
+            'DNS_TEST_HOSTNAME': 'google.com',  # Use a public DNS not kubernetes.default for testing outside kubernetes
+            'HEAPSTER_SERVICE_HOST': '10.0.127.162',
+            'HEAPSTER_SERVICE_PORT': '80',
+            }
 
 
 @pytest.fixture
 def settings():
     return {'kubernetes_url': 'http://10.107.56.115:8080', 'token': SAMPLE_TOKEN,
-            'check_connectivity_url': 'http://google.com'}
+            'check_connectivity_url': 'http://google.com', 'dns_test_hostname': 'google.com',
+            'HEAPSTER_SERVICE_HOST': '10.0.127.162', 'HEAPSTER_SERVICE_PORT': '80',
+            'KUBERNETES_SERVICE_HOST': '10.107.56.115', 'KUBERNETES_SERVICE_PORT': '8080',
+            }
 
 
 @pytest.fixture
@@ -223,8 +232,6 @@ def replica_names():
     return [
         ('kube-system', 'elastickube-server'),
         ('kube-system', 'elastickube-mongo'),
-        ('kube-system', 'heapster'),
-        ('kube-system', 'kube-dns-v9'),
     ]
 
 
@@ -237,6 +244,8 @@ def status(replica_names):
 def status_ok(status):
     status.internet = diagnostics.status_ok()
     status.kubernetes = diagnostics.status_ok()
+    status.dns = diagnostics.status_ok()
+    status.heapster = diagnostics.status_ok()
     for name in status.rcs:
         status.rcs[name] = diagnostics.status_ok()
 
@@ -289,6 +298,13 @@ def test_default_settings_connectivity_url(env):
     assert settings['check_connectivity_url'] == 'TEST_URL.COM'
 
 
+def test_default_settings_dns(env):
+    settings = {}
+    env['DNS_TEST_HOSTNAME'] = 'TEST_URL.COM'
+    diagnostics.settings_from_env(settings, env)
+    assert settings['dns_test_hostname'] == 'TEST_URL.COM'
+
+
 def test_default_settings_from_default_env(env, settings):
     base_settings = {}
     diagnostics.settings_from_env(base_settings, env)
@@ -300,6 +316,7 @@ def test_system_status_initial(status):
     serialized_status = json.dumps(status.to_view())
     assert 'internet' in serialized_status
     assert 'kubernetes' in serialized_status
+    assert 'dns' in serialized_status
     for rc in status.rcs:
         assert rc in serialized_status
 
@@ -309,7 +326,7 @@ def test_system_status_custom_replica_name():
         ('namespace', 'name'),
     )
     s = diagnostics.SystemStatus(replica_names)
-    serialized_status = json.dumps(s.to_view())
+    serialized_status = s.to_view()
     assert 'namespace.name' in serialized_status
     assert 'internet' in serialized_status
     assert 'kubernetes' in serialized_status
@@ -392,6 +409,14 @@ def test_check_internet(settings):
     assert status['status'] is True
 
 
+@pytest.mark.integration
+@pytest.mark.gen_test
+def test_check_dns(settings):
+    status = yield diagnostics._check_dns(settings)
+    assert status['reason'] == ''
+    assert status['status'] is True
+
+
 @pytest.mark.gen_test
 def test_check_internet_ioerror(settings):
     settings['check_connectivity_url'] = 'test_url'
@@ -469,6 +494,8 @@ def test_application_json_rcs_ok(http_client, base_url, status_ok):
     assert response.code == 200
     data = json.loads(response.body)
     for name in data:
+        print name
+        assert data[name]['reason'] == ''
         assert data[name]['status'] is True
 
 
