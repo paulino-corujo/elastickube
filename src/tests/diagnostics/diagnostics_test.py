@@ -460,15 +460,6 @@ def test_application_html_initializing(http_client, base_url):
 
 
 @pytest.mark.gen_test(run_sync=False)
-def test_application_html_initializing(http_client, base_url):
-    response = yield http_client.fetch(base_url)
-    # assert app is None
-    assert response.code == 200
-    assert 'Diagnostics' in response.body
-    assert 'Initializing' in response.body
-
-
-@pytest.mark.gen_test(run_sync=False)
 def test_application_json_initializing(http_client, base_url, status):
     response = yield http_client.fetch(base_url + '/json')
     assert response.code == 200
