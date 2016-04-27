@@ -30,8 +30,8 @@ class ActionsInstancesTests(testing.AsyncTestCase):
     _multiprocess_can_split_ = True
 
     @testing.gen_test(timeout=60)
-    def create_instances_test(self):
-        logging.debug("Start create_instances_test")
+    def test_create_instances(self):
+        logging.debug("Start test_create_instances")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -56,7 +56,7 @@ class ActionsInstancesTests(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (message["body"]["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed create_instances_test")
+        logging.debug("Completed test_create_instances")
 
 
 if __name__ == "__main__":

@@ -30,8 +30,8 @@ class WatchChartsTest(testing.AsyncTestCase):
     _multiprocess_can_split_ = True
 
     @testing.gen_test(timeout=60)
-    def watch_charts_test(self):
-        logging.debug("Start watch_charts_test")
+    def test_watch_charts(self):
+        logging.debug("Start test_watch_charts")
 
         token = yield get_token(self.io_loop)
         request = HTTPRequest(
@@ -104,7 +104,7 @@ class WatchChartsTest(testing.AsyncTestCase):
         self.assertTrue(len(deserialized_message['body'].keys()) == 0, "Body is not empty")
 
         connection.close()
-        logging.debug("Completed watch_charts_test")
+        logging.debug("Completed test_watch_charts")
 
 
 if __name__ == '__main__':

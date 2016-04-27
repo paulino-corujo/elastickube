@@ -26,8 +26,8 @@ class AuthTests(testing.AsyncTestCase):
     _multiprocess_can_split_ = True
 
     @testing.gen_test
-    def auth_providers_test(self):
-        logging.debug("Start auth_providers_test")
+    def test_auth_providers(self):
+        logging.debug("Start test_auth_providers")
 
         response = yield AsyncHTTPClient(self.io_loop).fetch("http://localhost/api/v1/auth/providers")
         auth_providers = json.loads(response.body)
@@ -39,11 +39,11 @@ class AuthTests(testing.AsyncTestCase):
                 "Missing property 'regex' in auth password method %s" % auth_providers
             )
 
-        logging.debug("Completed auth_providers_test")
+        logging.debug("Completed test_auth_providers")
 
     @testing.gen_test
-    def signup_disabled_test(self):
-        logging.debug("Start signup_disabled_test")
+    def test_signup_disabled(self):
+        logging.debug("Start test_signup_disabled")
 
         error = None
         try:
@@ -58,11 +58,11 @@ class AuthTests(testing.AsyncTestCase):
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/signup")
         self.assertEquals(error.code, 403, "/api/v1/auth/signup raised %d instead of 403" % error.code)
 
-        logging.debug("Completed signup_disabled_test")
+        logging.debug("Completed test_signup_disabled")
 
     @testing.gen_test
-    def login_success_test(self):
-        logging.debug("Start login_success_test")
+    def test_login_success(self):
+        logging.debug("Start test_login_success")
 
         response = yield AsyncHTTPClient(self.io_loop).fetch(
             "http://localhost/api/v1/auth/login",
@@ -70,11 +70,11 @@ class AuthTests(testing.AsyncTestCase):
             body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube123")))
 
         self.assertTrue(response.body, "Token not included in response body")
-        logging.debug("Completed login_success_test")
+        logging.debug("Completed test_login_success")
 
     @testing.gen_test
-    def login_wrong_password_test(self):
-        logging.debug("Start login_wrong_password_test")
+    def test_login_wrong_password(self):
+        logging.debug("Start test_login_wrong_password")
 
         error = None
         try:
@@ -88,7 +88,7 @@ class AuthTests(testing.AsyncTestCase):
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/login")
         self.assertEquals(error.code, 401, "/api/v1/auth/login raised %d instead of 401" % error.code)
 
-        logging.debug("Completed login_wrong_password_test")
+        logging.debug("Completed test_login_wrong_password")
 
 
 if __name__ == '__main__':

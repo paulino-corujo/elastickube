@@ -48,8 +48,8 @@ class ActionsUsersTests(testing.AsyncTestCase):
         yield database.Users.remove({"_id": ObjectId(self.user_id)})
 
     @testing.gen_test(timeout=60)
-    def create_user_test(self):
-        logging.debug("Start create_user_test")
+    def test_create_user(self):
+        logging.debug("Start test_create_user")
 
         request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
@@ -68,7 +68,7 @@ class ActionsUsersTests(testing.AsyncTestCase):
             message,
             dict(status_code=405, correlation=correlation, operation="create", action="users", body_type=dict))
 
-        logging.debug("Completed create_user_test")
+        logging.debug("Completed test_create_user")
 
 
 if __name__ == "__main__":

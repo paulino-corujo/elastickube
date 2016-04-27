@@ -30,8 +30,8 @@ class WatchSettingsTest(testing.AsyncTestCase):
     _multiprocess_can_split_ = True
 
     @testing.gen_test(timeout=60)
-    def watch_settings_test(self):
-        logging.debug("Start watch_settings_test")
+    def test_watch_settings(self):
+        logging.debug("Start test_watch_settings")
 
         token = yield get_token(self.io_loop)
         request = HTTPRequest(
@@ -105,7 +105,7 @@ class WatchSettingsTest(testing.AsyncTestCase):
         self.assertTrue(len(deserialized_message['body'].keys()) == 0, "Body is not empty")
 
         connection.close()
-        logging.debug("Completed watch_settings_test")
+        logging.debug("Completed test_watch_settings")
 
 
 if __name__ == '__main__':

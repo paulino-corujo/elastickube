@@ -19,8 +19,7 @@ import argparse
 import logging
 import sys
 
-import nose
-from nose.plugins.multiprocess import MultiProcess
+import pytest
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -54,4 +53,4 @@ def parse_arguments():
     return options
 
 if __name__ == "__main__":
-    nose.main(parse_arguments(), plugins=[MultiProcess()])
+    pytest.main()

@@ -28,8 +28,8 @@ from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
 class MessageValidationTest(testing.AsyncTestCase):
 
     @testing.gen_test(timeout=60)
-    def message_validation_test(self):
-        logging.debug("Start message_validation_test")
+    def test_message_validation(self):
+        logging.debug("Start test_message_validation")
 
         token = yield get_token(self.io_loop)
         request = HTTPRequest(
@@ -122,7 +122,7 @@ class MessageValidationTest(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (deserialized_message['body']["message"], expected_message))
 
         connection.close()
-        logging.debug("Completed message_validation_test")
+        logging.debug("Completed test_message_validation")
 
 
 if __name__ == '__main__':

@@ -28,8 +28,8 @@ from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
 class WatchNamespacesTest(testing.AsyncTestCase):
 
     @testing.gen_test(timeout=60)
-    def watch_namespaces_test(self):
-        logging.debug("Start watch_namespaces_test")
+    def test_watch_namespaces(self):
+        logging.debug("Start test_watch_namespaces")
 
         token = yield get_token(self.io_loop)
         request = HTTPRequest(
@@ -102,7 +102,7 @@ class WatchNamespacesTest(testing.AsyncTestCase):
         self.assertTrue(len(deserialized_message['body'].keys()) == 0, "Body is not empty")
 
         connection.close()
-        logging.debug("Completed watch_namespaces_test")
+        logging.debug("Completed test_watch_namespaces")
 
 
 if __name__ == '__main__':

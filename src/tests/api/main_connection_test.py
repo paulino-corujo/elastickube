@@ -30,8 +30,8 @@ class MainConnectionTest(testing.AsyncTestCase):
     _multiprocess_can_split_ = True
 
     @testing.gen_test(timeout=60)
-    def main_connection_test(self):
-        logging.debug("Start main_connection_test")
+    def test_main_connection(self):
+        logging.debug("Start test_main_connection")
 
         request = HTTPRequest(
             "ws://localhost/api/v1/ws",
@@ -61,7 +61,7 @@ class MainConnectionTest(testing.AsyncTestCase):
                         "Message is %s instead of '%s'" % (deserialized_message["error"]["message"], expected_message))
         connection.close()
 
-        logging.debug("Completed main_connection_test")
+        logging.debug("Completed test_main_connection")
 
 
 if __name__ == "__main__":

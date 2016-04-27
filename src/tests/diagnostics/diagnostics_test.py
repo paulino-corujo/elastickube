@@ -19,12 +19,10 @@ import copy
 import json
 import logging
 import os
-import time
 
 from concurrent.futures import Future
 import mock
 import pytest
-import tornado
 
 from diagnostics import diagnostics
 
@@ -450,15 +448,6 @@ def test_check_replicaset_ok(settings):
     status = yield diagnostics._check_replicaset(settings, 'kube-system', 'elastickube-server')
     assert status['reason'] == ''
     assert status['status'] is True
-
-
-@pytest.mark.gen_test(run_sync=False)
-def test_application_html_initializing(http_client, base_url):
-    response = yield http_client.fetch(base_url)
-    # assert app is None
-    assert response.code == 200
-    assert 'Diagnostics' in response.body
-    assert 'Initializing' in response.body
 
 
 @pytest.mark.gen_test(run_sync=False)

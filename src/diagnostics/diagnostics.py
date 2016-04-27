@@ -251,9 +251,9 @@ def _document_rc_status(replication_controller):
 def _check_replicaset(settings, namespace, name):
     try:
         document = yield _get_rc(settings, namespace, name)
-    except RuntimeError as e:
-        raise Return(status_error(unicode(e)))
-    except Exception as e:
+    except RuntimeError as ex:
+        raise Return(status_error(unicode(ex)))
+    except Exception as ex:
         logger.exception('Exception detected, %s', type(ex))
         raise Return(status_error('ex {}'.format(unicode(ex))))
 

@@ -7,6 +7,12 @@ passlib
 pep8
 pycurl
 PyJWT
+pylama
 pylint
 pytest
+pytest-cache
+pytest-pep8
+pytest-pythonpath
+pytest-tornado
+pytest-xdist
 tornado
