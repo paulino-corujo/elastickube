@@ -44,7 +44,9 @@ class IconGenerator(RequestHandler):
             self.set_status(httplib.NOT_FOUND)
             raise Return()
 
-        chart = yield Query(self.settings["database"], entity_id.capitalize()).find_one({"_id": ObjectId(chart_id)})
+        manipulate = entity_id == 'charts'
+        chart = yield Query(self.settings["database"], entity_id.capitalize(), manipulate=manipulate).find_one(
+            {"_id": ObjectId(chart_id)})
         if chart is None:
             self.set_status(httplib.NOT_FOUND)
             raise Return()

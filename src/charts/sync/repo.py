@@ -88,7 +88,7 @@ class GitSync(object):
     def sync(self):
         logging.info("Syncing '%s'.", REPO_DIRECTORY)
 
-        charts = yield Query(self.database, "Charts").find()
+        charts = yield Query(self.database, "Charts", manipulate=True).find()
         for chart in charts:
             path = chart["path"]
             self.charts[path] = chart
@@ -110,16 +110,17 @@ class GitSync(object):
                 yield Query(self.database, 'Charts').remove(existing)
             else:
                 discovered["_id"] = existing["_id"]
+                discovered["metadata"] = existing["metadata"]
 
                 if discovered["commit"] != existing["commit"]:
                     logging.debug("Updating existing chart %(name)s", discovered)
-                    yield Query(self.database, "Charts").update(discovered)
+                    yield Query(self.database, "Charts", manipulate=True).update(discovered)
 
         for path, discovered in discovered_charts.iteritems():
             if discovered and "_id" not in discovered:
                 logging.debug("Inserting new chart %(name)s", discovered)
                 try:
-                    yield Query(self.database, "Charts").insert(discovered)
+                    yield Query(self.database, "Charts", manipulate=True).insert(discovered)
                 except:
                     logging.error("Failed to insert chart %(name)s", discovered)
 
