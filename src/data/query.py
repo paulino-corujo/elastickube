@@ -16,6 +16,7 @@ limitations under the License.
 
 import time
 
+from bson.objectid import ObjectId
 from pymongo.errors import PyMongoError
 from tornado.gen import coroutine, Return
 
@@ -79,6 +80,8 @@ class Query(object):
                 deletionTimestamp=None
             )
 
+        if '_id' not in document and not self.manipulate:
+            document['_id'] = ObjectId()
         document_id = yield self.database[self.collection].insert(document, manipulate=self.manipulate)
         inserted_document = yield self.database[self.collection].find_one(
             {"_id": document_id},
