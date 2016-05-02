@@ -18,6 +18,7 @@ import CHARTS from 'images/icon-charts.svg';
 import GOOGLE_G_LOGO from 'images/google-g-logo.svg';
 import IC_CLEAR_48PX from 'material-design-icons/content/svg/production/ic_clear_48px.svg';
 import IC_MORE_VERT_48PX from 'material-design-icons/navigation/svg/production/ic_more_vert_48px.svg';
+import IC_NETWORK_CHECK_48PX from 'material-design-icons/notification/svg/production/ic_network_check_48px.svg';
 import NAMESPACES from 'images/icon-globe.svg';
 import IC_PERSON_48PX from 'material-design-icons/social/svg/production/ic_person_48px.svg';
 import SETTINGS from 'images/icon-settings.svg';
@@ -29,6 +30,7 @@ const icons = {
     GOOGLE_G_LOGO,
     IC_CLEAR_48PX,
     IC_MORE_VERT_48PX,
+    IC_NETWORK_CHECK_48PX,
     NAMESPACES,
     IC_PERSON_48PX,
     SETTINGS,

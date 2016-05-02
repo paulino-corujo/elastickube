@@ -42,6 +42,10 @@ class AdminMenuController {
         return _.find(this.items, (x) => this._$state.current.name.split('.')[1] === x.state);
     }
 
+    goDiagnostics() {
+        window.location.assign('/diagnostics');
+    }
+
     selectItem(item) {
         return this._adminNavigationActionCreator[item.state]();
     }

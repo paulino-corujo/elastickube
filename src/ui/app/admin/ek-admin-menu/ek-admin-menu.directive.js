@@ -18,6 +18,7 @@ import './ek-admin-menu.less';
 import Directive from 'directive';
 import Controller from './ek-admin-menu.controller';
 import template from './ek-admin-menu.html';
+import icons from '../icons';
 
 class AdminMenuDirective extends Directive {
     constructor() {
@@ -28,6 +29,9 @@ class AdminMenuDirective extends Directive {
         tElement
             .addClass('ek-admin-menu')
             .attr('layout', 'column');
+        return ($scope) => {
+            _.extend($scope, { icons });
+        };
     }
 }
 
