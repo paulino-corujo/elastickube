@@ -19,10 +19,9 @@ import logging
 import uuid
 
 from tornado import testing
-from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
-from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
+from tests.api import get_ws_request, wait_message
 
 
 class WatchMetricsTest(testing.AsyncTestCase):
@@ -31,13 +30,7 @@ class WatchMetricsTest(testing.AsyncTestCase):
     def test_watch_metrics(self):
         logging.debug("Start test_watch_metrics")
 
-        token = yield get_token(self.io_loop)
-        request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
-            headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
-            validate_cert=False
-        )
-
+        request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
 
         correlation = str(uuid.uuid4())[:10]
@@ -61,7 +54,6 @@ class WatchMetricsTest(testing.AsyncTestCase):
                         "Action is %s instead of metrics" % deserialized_message["action"])
         self.assertTrue(isinstance(deserialized_message["body"], list),
                         "Body is not a list but %s" % type(deserialized_message["body"]))
-        self.assertTrue(len(deserialized_message["body"]) > 0, "No Namespaces returned as part of the response")
 
         correlation = str(uuid.uuid4())[:10]
         connection.write_message(json.dumps({
