@@ -72,6 +72,7 @@
           "type": "string",
           "maxLength": 256
         },
+        "rounds": 20,
         "salt": {
           "type": "string",
           "maxLength": 64

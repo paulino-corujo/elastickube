@@ -37,7 +37,9 @@ ROUNDS = 40000
 
 def _generate_hashed_password(password):
     salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
-    return {'hash': sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=ROUNDS), 'salt': salt}
+    hash = sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=ROUNDS)
+    hash_parts = hash.split("$rounds={0}$".format(ROUNDS))
+    return {"hash": hash_parts[1], "rounds": "{0}$rounds={1}$".format(hash_parts[0], ROUNDS), "salt": salt}
 
 
 def _fill_signup_invitation_request(document, firstname, lastname, password=None):
@@ -291,7 +293,7 @@ class PasswordHandler(AuthHandler):
             logging.debug("Username '%s' not found.", username)
             raise HTTPError(401, reason="Invalid username or password.")
 
-        encoded_user_password = user["password"]["hash"].encode("utf-8")
+        encoded_user_password = '{0}{1}'.format(user["password"]["rounds"], user["password"]["hash"])
         if sha512_crypt.verify((password + user["password"]["salt"]).encode("utf-8"), encoded_user_password):
             token = yield self.authenticate_user(user)
             self.write(token)

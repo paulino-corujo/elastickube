@@ -21,7 +21,7 @@ from tornado.gen import coroutine
 
 DEFAULT_GITREPO = "https://github.com/helm/charts.git"
 DEFAULT_PASSWORD_REGEX = "^.{8,256}$"
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 
 @coroutine
@@ -54,7 +54,7 @@ def init(database):
         logging.debug("Initial Settings document created, %s", result)
     else:
         if settings["schema_version"] != SCHEMA_VERSION:
-            migrate(database, settings)
+            yield migrate(database, settings)
 
 
 @coroutine
@@ -64,14 +64,31 @@ def setup_indexes(database):
     yield database.Users.ensure_index(key_or_list="metadata.deletionTimestamp", unique=False, sparse=True)
 
 
+@coroutine
 def migrate(database, settings):
-    logging.debug("Migrating DB from version %d to %d", settings['schema_version'], SCHEMA_VERSION)
+    logging.debug("Migrating DB from version %d to %d", settings["schema_version"], SCHEMA_VERSION)
 
-    if settings['schema_version'] == 1:
-        settings['charts'] = {
+    if settings["schema_version"] == 1:
+        settings["charts"] = {
             "repo_url": DEFAULT_GITREPO
         }
+        settings["schema_version"] = 2
 
-        settings['schema_version'] = 2
+    if settings["schema_version"] == 2:
 
-    database.Settings.update({"_id": settings['_id']}, settings)
+        cursor = database.Users.find()
+
+        while (yield cursor.fetch_next):
+            user = cursor.next_object()
+            if "password" in user:
+                user["password"] = dict(
+                    salt=user["password"]["salt"],
+                    rounds='$6$rounds=40000$',
+                    hash=user["password"]["hash"].split("$rounds=40000$")[1]
+                )
+                database.Users.update({"_id": user["_id"]}, user)
+
+        settings["schema_version"] = 3
+        database.Settings.update({"_id": settings["_id"]}, settings)
+
+
