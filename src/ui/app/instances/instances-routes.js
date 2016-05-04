@@ -54,8 +54,9 @@ function instancesRoutes(routerHelperProvider) {
             url: '/:namespace/instances/{instanceId:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}}',
             parent: 'private',
             template: '<ek-instance flex></ek-instance>',
-            controller: ($scope, $stateParams, checkNamespace, instanceActionCreator, instancesStore) => {
+            onExit: ($stateParams, checkNamespace, instanceActionCreator, instancesStore) => {
                 'ngInject';
+
                 const namespace = $stateParams.namespace;
                 const instanceId = $stateParams.instanceId;
 
@@ -64,7 +65,7 @@ function instancesRoutes(routerHelperProvider) {
                 const instance = _.find(instancesStore.getAll(),
                     (x) => _.matchesProperty('metadata.namespace', namespace)(x) && _.matchesProperty('metadata.uid', instanceId)(x));
 
-                $scope.$on('$destroy', () => instanceActionCreator.unsubscribe(instance));
+                instanceActionCreator.unsubscribe(instance);
             },
             data: {
                 header: {
