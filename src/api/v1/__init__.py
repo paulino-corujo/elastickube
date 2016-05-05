@@ -111,7 +111,7 @@ class SecureWebSocketHandler(WebSocketHandler):
             token = None
             try:
                 token = jwt.decode(encoded_token, self.settings['secret'], algorithm='HS256')
-            except Exception as jwt_error:
+            except jwt.InvalidTokenError as jwt_error:
                 logging.exception(jwt_error)
                 self.write_message({"error": {"message": "Invalid token."}})
                 self.close(httplib.UNAUTHORIZED, "Invalid token.")
