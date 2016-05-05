@@ -16,6 +16,7 @@
            autocomplete="off"
            style="min-width:140px"
            ng-keypress="ctrl.addEmail($event)"
+           ng-blur="ctrl.addEmail($event)"
            ng-model="ctrl.email" placeholder="{{ ctrl.placeholder }}" flex>
 </div>
 
