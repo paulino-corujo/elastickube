@@ -18,36 +18,9 @@ import logging
 
 from tornado.gen import coroutine, Return
 
-from api.v1.watchers import filter_namespaces
+from api.v1.watchers.metadata import WatcherMetadata
 from data.query import Query
 from data.watch import add_callback, remove_callback
-
-ACTIONS_METADATA = {
-    "users": {
-        "collection": "Users",
-        "projection": {"password": 0},
-        "filter_data": None,
-        "manipulate": False
-    },
-    "namespaces": {
-        "collection": "Namespaces",
-        "projection": None,
-        "filter_data": filter_namespaces,
-        "manipulate": False
-    },
-    "settings": {
-        "collection": "Settings",
-        "projection": None,
-        "filter_data": None,
-        "manipulate": False
-    },
-    "charts": {
-        "collection": "Charts",
-        "projection": None,
-        "filter_data": None,
-        "manipulate": True
-    }
-}
 
 
 class CursorWatcher(object):
@@ -55,22 +28,24 @@ class CursorWatcher(object):
     def __init__(self, message, settings, user, callback):
         logging.info("Initializing CursorWatcher")
 
+        self._params = dict()
+
         self.callback = callback
         self.message = message
         self.settings = settings
         self.user = user
 
+        self.metadata = WatcherMetadata(self.message["action"]).get(settings)
         self.validate_message()
 
     @coroutine
     def watch(self):
-        action = self.message["action"]
-        logging.info("Starting watch for collection %s", ACTIONS_METADATA[action]["collection"])
+        logging.info("Starting watch for collection %s", self.metadata["collection"])
 
         data = yield Query(
             self.settings["database"],
-            ACTIONS_METADATA[action]["collection"],
-            manipulate=ACTIONS_METADATA[action]["manipulate"]).find(projection=ACTIONS_METADATA[action]["projection"])
+            self.metadata["collection"],
+            manipulate=self.metadata["manipulate"]).find(projection=self.metadata["projection"])
 
         data = self.filter_data(data)
         self.callback(dict(
@@ -81,12 +56,11 @@ class CursorWatcher(object):
             body=data
         ))
 
-        add_callback(ACTIONS_METADATA[self.message["action"]]["collection"], self.data_callback)
+        add_callback(self.metadata["collection"], self.data_callback)
 
     @coroutine
     def data_callback(self, document):
-        logging.info("CursorWatcher for collection %s data_callback",
-                     ACTIONS_METADATA[self.message["action"]]["collection"])
+        logging.info("CursorWatcher for collection %s data_callback", self.metadata["collection"])
 
         operation = "updated"
         if document["op"] == "i":
@@ -94,13 +68,13 @@ class CursorWatcher(object):
         elif document["op"] == "d":
             operation = "deleted"
 
-        if ACTIONS_METADATA[self.message["action"]]["projection"]:
-            for key in ACTIONS_METADATA[self.message["action"]]["projection"].iterkeys():
+        if self.metadata["projection"]:
+            for key in self.metadata["projection"].iterkeys():
                 if key in document["o"]:
                     del document["o"][key]
 
         data = self.filter_data(document["o"])
-        self.callback(dict(
+        yield self.callback(dict(
             action=self.message["action"],
             operation=operation,
             status_code=200,
@@ -110,12 +84,12 @@ class CursorWatcher(object):
         raise Return()
 
     def unwatch(self):
-        logging.info("Stopping watch for collection %s", ACTIONS_METADATA[self.message["action"]]["collection"])
-        remove_callback(ACTIONS_METADATA[self.message["action"]]["collection"], self.data_callback)
+        logging.info("Stopping watch for collection %s", self.metadata["collection"])
+        remove_callback(self.metadata["collection"], self.data_callback)
 
     def filter_data(self, data):
-        if ACTIONS_METADATA[self.message["action"]]["filter_data"]:
-            return ACTIONS_METADATA[self.message["action"]]["filter_data"](data, self.user)
+        if self.metadata["filter_data"]:
+            return self.metadata["filter_data"](data, self.user, self.message)
         else:
             return data
 
@@ -125,7 +99,7 @@ class CursorWatcher(object):
         raise Return(True)
 
     def validate_message(self):
-        if self.message["action"] not in ACTIONS_METADATA.keys():
+        if not self.metadata:
             self.callback(dict(
                 action=self.message["action"],
                 operation=self.message["operation"],

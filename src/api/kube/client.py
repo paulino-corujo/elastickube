@@ -16,7 +16,6 @@ limitations under the License.
 
 import json
 import logging
-import os
 import urlparse
 
 from tornado.gen import coroutine, Return
@@ -41,6 +40,9 @@ class HTTPClient(object):
             self._base_url = "https://%s" % self.endpoint
 
         AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient", defaults=dict(validate_cert=False))
+
+    def get_base_url(self):
+        return self._base_url
 
     def build_url(self, url_path, **kwargs):
         if url_path.startswith("/"):
@@ -226,7 +228,6 @@ class KubeClient(object):
         self.http_client = HTTPClient(endpoint, token)
         self.resources = {}
         self.kind_to_resource = {}
-        self.heapster_base_url = None
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -253,8 +254,6 @@ class KubeClient(object):
             raise Return()
 
         yield self._build_api_extensions(group_version)
-
-        yield self._check_heapster_available()
 
     def get_resource_type(self, kind):
         if kind not in self.kind_to_resource.keys():
@@ -386,28 +385,3 @@ class KubeClient(object):
                     self, "/apis/%s" % group_version, resource["name"])
             else:
                 self.resources[resource["name"]] = Resource(self, "/apis/%s" % group_version, resource["name"])
-
-    @coroutine
-    def _check_heapster_available(self):
-        if "HEAPSTER_SERVICE_HOST" in os.environ:
-            heapster_endpoint = os.getenv("HEAPSTER_SERVICE_HOST")
-            heapster_port = os.getenv("HEAPSTER_SERVICE_PORT")
-            url = "http://%s:%s/api/v1/model" % (heapster_endpoint, heapster_port)
-
-            client = AsyncHTTPClient(force_instance=True)
-            try:
-                result = yield client.fetch(url, method="GET", raise_error=False)
-                if not result.error:
-                    self.heapster_base_url = url
-            finally:
-                client.close()
-        else:
-            try:
-                yield self.http_client.get("/api/v1/proxy/namespaces/kube-system/services/heapster/api/v1/model")
-                self.heapster_base_url = "%s%s" % (
-                    self.http_client._base_url,
-                    "/api/v1/proxy/namespaces/kube-system/services/heapster/api/v1/model")
-
-            except HTTPError as http_error:
-                logging.exception(http_error)
-                logging.debug("Cannot access Heaptser API through proxy API")

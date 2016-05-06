@@ -1,8 +1,6 @@
-cairosvg
 futures
 mock
 motor
-nose==1.3.7
 passlib
 pep8
 pycurl
@@ -10,8 +8,6 @@ PyJWT
 pylama
 pylint
 pytest
-pytest-cache
-pytest-pep8
 pytest-pythonpath
 pytest-tornado
 pytest-xdist

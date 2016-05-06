@@ -25,6 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = 2
     v.name = "elastickube"
     v.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', '10000']
+    v.customize ["modifyvm", :id, "--vram", "16"]
   end
 
   # Execute custom setup

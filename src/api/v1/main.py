@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import httplib
 import logging
 
 from bson.json_util import loads
@@ -31,11 +30,22 @@ from api.v1.actions.users import UsersActions
 from api.v1.actions.invitations import InvitationsActions
 from api.v1.watchers.cursor import CursorWatcher
 from api.v1.watchers.kube import KubeWatcher
+from api.v1.watchers.metrics import MetricsWatcher
 from data.query import ObjectNotFoundError
 
 REST_OPERATIONS = ["retrieve", "create", "update", "delete"]
 WATCH_OPERATIONS = ["watch", "unwatch"]
-SUPPORTED_ACTIONS = ["users", "settings", "namespaces", "instances", "instance", "invitations", "charts", "logs"]
+SUPPORTED_ACTIONS = [
+    "users",
+    "settings",
+    "namespaces",
+    "instances",
+    "instance",
+    "invitations",
+    "charts",
+    "logs",
+    "metrics"
+]
 
 
 class MainWebSocketHandler(SecureWebSocketHandler):
@@ -59,8 +69,6 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             self.build_actions_lookup()
 
         if not self.user:
-            self.write_message({"error": {"message": "Invalid token."}})
-            self.close(httplib.UNAUTHORIZED, "Invalid token.")
             raise Return()
 
         request = yield self.validate_message(message)
@@ -121,7 +129,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                 error = "Action %s does not support operations." % request["action"]
                 response.update(dict(status_code=400, body=dict(message=error)))
 
-            self.write_message(response)
+            yield self.write_message(response)
 
         elif request["operation"] in WATCH_OPERATIONS:
             watcher_key = self._get_watcher_key(request)
@@ -134,7 +142,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                     if watcher_key in self.current_watchers.keys():
                         response["body"] = {"message": "Action already watched."}
                         response["status_code"] = 400
-                        self.write_message(response)
+                        yield self.write_message(response)
 
                     else:
                         watcher = watcher_cls(request, self.settings, self.user, self.write_message)
@@ -149,18 +157,18 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                 else:
                     response["body"] = {"message": "Action not supported for operation watch."}
                     response["status_code"] = 400
-                    self.write_message(response)
+                    yield self.write_message(response)
 
             elif request["operation"] == "unwatch":
                 response["operation"] = "unwatched"
                 if watcher_key in self.current_watchers.keys():
                     self.current_watchers[watcher_key].unwatch()
                     del self.current_watchers[watcher_key]
-                    self.write_message(response)
                 else:
                     response["body"] = {"message": "Action not previously watch."}
                     response["status_code"] = 400
-                    self.write_message(response)
+
+                yield self.write_message(response)
 
     @coroutine
     def on_close(self):
@@ -230,6 +238,9 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             instances=dict(
                 rest=InstancesActions(self.settings, self.user),
                 watcher_cls=KubeWatcher
+            ),
+            metrics=dict(
+                watcher_cls=MetricsWatcher
             ),
             namespaces=dict(
                 rest=NamespacesActions(self.settings, self.user),

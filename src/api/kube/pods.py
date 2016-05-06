@@ -27,51 +27,102 @@ from api.kube.resources import NamespacedResource
 class Pods(NamespacedResource):
 
     @coroutine
-    def metrics(self, namespace, name, **kwargs):
+    def metrics(self, heapster_client, namespace, name, **kwargs):
         metrics = dict(kind="MetricList", items=[], metadata=dict(resourceVersion=time.time()))
-        if self.api.heapster_base_url:
+
+        if (yield heapster_client.is_heapster_available()):
+            pods = yield heapster_client.pods.get(namespace=namespace)
+            if name not in pods:
+                raise Return(metrics)
+
             node_cpu_limit = None
             node_mem_limit = None
 
-            containers_url = "%s/namespaces/%s/pods/%s/containers/" % (
-                self.api.heapster_base_url, namespace, name)
+            pod = yield self.get(namespace=namespace, name=name)
+            for container in pod["spec"]["containers"]:
+                cpu_limit_response = yield heapster_client.containers.metric(
+                    "cpu/limit",
+                    name=container["name"],
+                    namespace=namespace,
+                    pod_name=name,
+                )
 
-            try:
-                containers = yield self.api.http_client.request(containers_url, **kwargs)
-            except HTTPError as http_error:
-                logging.exception(http_error)
-                raise Return(metrics)
+                if not cpu_limit_response:
+                    continue
 
-            for container in json.loads(containers.body):
-                container_stats_url = "%s/namespaces/%s/pods/%s/containers/%s/stats" % (
-                    self.api.heapster_base_url, namespace, name, container["name"])
+                cpu_limits = cpu_limit_response.get("metrics", [])
+                if len(cpu_limits) == 0:
+                    continue
+
+                cpu_limit = cpu_limits[-1]["value"]
+                if cpu_limit == 0:
+                    if not node_cpu_limit:
+                        node_cpu_limit, _ = yield self._get_node_metrics(heapster_client, pod["spec"]["nodeName"])
+
+                    cpu_limit = node_cpu_limit
+
+                mem_limit_response = yield heapster_client.containers.metric(
+                    "memory/limit",
+                    name=container["name"],
+                    namespace=namespace,
+                    pod_name=name,
+                )
+
+                if not mem_limit_response:
+                    continue
+
+                mem_limits = mem_limit_response.get("metrics", [])
+                if len(mem_limits) == 0:
+                    continue
+
+                mem_limit = mem_limits[-1]["value"]
+                if mem_limit == 0:
+                    if not node_mem_limit:
+                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(
+                            heapster_client,
+                            pod["spec"]["nodeName"])
+
+                    mem_limit = node_mem_limit
 
                 try:
-                    container_stats_response = yield self.api.http_client.request(container_stats_url, **kwargs)
+                    cpu_usage_response = yield heapster_client.containers.metric(
+                        "cpu/usage_rate",
+                        name=container["name"],
+                        namespace=namespace,
+                        pod_name=name
+                    )
                 except HTTPError as http_error:
                     logging.exception(http_error)
                     continue
 
-                container_stats = json.loads(container_stats_response.body)["stats"]
-                container_cpu_limit = container_stats["cpu-limit"]["minute"]["average"]
-                if container_cpu_limit < 2:
-                    if not node_cpu_limit:
-                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(namespace, name)
+                cpu_usage = 0
+                for metric in cpu_usage_response["metrics"]:
+                    if metric["timestamp"] == cpu_usage_response["latestTimestamp"]:
+                        cpu_usage = metric["value"]
+                        break
 
-                    container_cpu_limit = node_cpu_limit
+                try:
+                    mem_usage_response = yield heapster_client.containers.metric(
+                        "memory/usage",
+                        name=container["name"],
+                        namespace=namespace,
+                        pod_name=name
 
-                container_mem_limit = container_stats["memory-limit"]["minute"]["average"]
-                if container_mem_limit == 0:
-                    if not node_cpu_limit:
-                        node_cpu_limit, node_mem_limit = yield self._get_node_metrics(namespace, name)
+                    )
+                except HTTPError as http_error:
+                    logging.exception(http_error)
+                    continue
 
-                    container_mem_limit = node_mem_limit
+                mem_usage = 0
+                for metric in mem_usage_response["metrics"]:
+                    if metric["timestamp"] == mem_usage_response["latestTimestamp"]:
+                        mem_usage = metric["value"]
+                        break
 
                 container_metrics = dict(
                     name=container["name"],
-                    cpuUsage=int(container_stats["cpu-usage"]["minute"]["average"] / float(container_cpu_limit) * 100),
-                    memUsage=int(container_stats["memory-usage"]["minute"]["average"] /
-                                 float(container_mem_limit) * 100)
+                    cpuUsage=int(cpu_usage / float(cpu_limit) * 100),
+                    memUsage=int(mem_usage / float(mem_limit) * 100)
                 )
 
                 metrics["items"].append(container_metrics)
@@ -79,28 +130,24 @@ class Pods(NamespacedResource):
         raise Return(metrics)
 
     @coroutine
-    def _get_node_metrics(self, namespace, name):
-        node_name = None
+    def _get_node_metrics(self, heapster_client, node_name):
+        node_response = yield self.api.http_client.get("/api/v1/nodes/" + node_name)
+        node = json.loads(node_response.body)
 
-        nodes_url = "%s/nodes" % self.api.heapster_base_url
-        nodes_response = yield self.api.http_client.request(nodes_url)
-        for node in json.loads(nodes_response.body):
-            node_pods_url = "%s/nodes/%s/pods" % (self.api.heapster_base_url, node["name"])
-            node_pods_response = yield self.api.http_client.request(node_pods_url)
-            for pod in json.loads(node_pods_response.body):
-                if pod["name"] == "%s/%s/%s" % (namespace, namespace, name):
-                    node_name = node["name"]
-                    break
+        node_cpu = int(node["status"]["capacity"]["cpu"]) * 1024
+        node_mem = int(node["status"]["capacity"]["memory"].replace("Ki", ""))
 
-        node_metrics_url = "%s/nodes/%s/metrics" % (self.api.heapster_base_url, node_name)
+        node_cpu_request = 0
+        cpu_request_response = yield heapster_client.nodes.metric("cpu/request", name=node_name)
+        if cpu_request_response and len(cpu_request_response.get("metrics", [])) > 0:
+            node_cpu_request = cpu_request_response.get("metrics")[-1]["value"]
 
-        cpu_result = yield self.api.http_client.request(node_metrics_url + "/cpu-limit")
-        cpu_metrics = json.loads(cpu_result.body).get("metrics")
+        node_mem_request = 0
+        mem_request_response = yield heapster_client.nodes.metric("memory/request", name=node_name)
+        if mem_request_response and len(mem_request_response.get("metrics", [])) > 0:
+            node_mem_request = mem_request_response.get("metrics")[-1]["value"]
 
-        mem_result = yield self.api.http_client.request(node_metrics_url + "/memory-limit")
-        mem_metrics = json.loads(mem_result.body).get("metrics")
-
-        raise Return((cpu_metrics[0]["value"], mem_metrics[0]["value"]))
+        raise Return((node_cpu - node_cpu_request, (node_mem - node_mem_request / 1024) * 1024))
 
     @coroutine
     def logs(self, namespace, name, **kwargs):

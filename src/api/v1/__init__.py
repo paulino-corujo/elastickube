@@ -29,8 +29,10 @@ from tornado.httpclient import HTTPError
 from tornado.ioloop import IOLoop
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from api.kube import client
-from api.v1.sync import SyncNamespaces
+from api.heapster.client import HeapsterClient
+from api.kube.client import KubeClient
+from api.v1.sync.metrics import SyncMetrics
+from api.v1.sync.namespaces import SyncNamespaces
 from data import watch, init as initialize_database
 from data.son.manipulators import KeyManipulator
 
@@ -45,10 +47,20 @@ def configure(settings):
         logging.info("Reading token from '%s'.", os.environ["KUBE_API_TOKEN_PATH"])
 
         with open(os.environ["KUBE_API_TOKEN_PATH"]) as token:
-            settings["kube"] = client.KubeClient(os.environ["KUBERNETES_SERVICE_HOST"], token=token.read())
+            settings["kube"] = KubeClient(os.environ["KUBERNETES_SERVICE_HOST"], token=token.read())
+    else:
+        settings["kube"] = KubeClient(os.getenv('KUBERNETES_SERVICE_HOST'))
 
-    if "kube" not in settings:
-        settings["kube"] = client.KubeClient(os.getenv("KUBERNETES_SERVICE_HOST"))
+    if "HEAPSTER_SERVICE_HOST" in os.environ:
+        heapster_endpoint = os.getenv("HEAPSTER_SERVICE_HOST")
+        heapster_port = os.getenv("HEAPSTER_SERVICE_PORT")
+        endpoint = "http://%s:%s/api/v1/model" % (heapster_endpoint, heapster_port)
+        settings["heapster"] = HeapsterClient(endpoint)
+    else:
+        endpoint = "%s%s" % (
+            settings['kube'].http_client.get_base_url(),
+            "/api/v1/proxy/namespaces/kube-system/services/heapster/api/v1/model")
+        settings["heapster"] = HeapsterClient(endpoint)
 
     mongo_url = "mongodb://{0}:{1}/".format(
         os.getenv("ELASTICKUBE_MONGO_SERVICE_HOST", "localhost"),
@@ -64,12 +76,12 @@ def configure(settings):
 
 @coroutine
 def initialize(settings):
-    yield initialize_database(settings["database"])
-
     try:
-
+        yield initialize_database(settings["database"])
         yield settings["kube"].build_resources()
         yield SyncNamespaces(settings).start_sync()
+        yield SyncMetrics(settings).start_sync()
+
         IOLoop.current().add_future(watch.start_monitor(settings["motor"]), IOLoop.current().stop)
     except (HTTPError, PyMongoError):
         logging.exception("Cannot initialize ElasticKube")
@@ -111,9 +123,10 @@ class SecureWebSocketHandler(WebSocketHandler):
     def on_message(self, message):
         pass
 
+    @coroutine
     def write_message(self, message, binary=False):
         serialized = dumps(message)
-        super(SecureWebSocketHandler, self).write_message(serialized, binary=binary)
+        yield super(SecureWebSocketHandler, self).write_message(serialized, binary=binary)
 
     @coroutine
     def send_ping(self):
