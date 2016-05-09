@@ -171,11 +171,14 @@ class Pods(NamespacedResource):
             if key not in url_path:
                 params[key] = kwargs[key]
 
-        result = yield self.api.http_client.request(url, **params)
-
         logs = dict(kind="LogList", items=[], metadata=dict(resourceVersion=time.time()))
+        lines = []
+        try:
+            result = yield self.api.http_client.request(url, **params)
+            lines = result.body.splitlines()
+        except HTTPError as http_error:
+            logging.exception("Failed to retrieve Pods logs")
 
-        lines = result.body.splitlines()
         for line in lines:
             text = line
             timestamp = None
