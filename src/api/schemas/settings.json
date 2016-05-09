@@ -46,19 +46,19 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "first_name_mapping": {
-              "type": "string"
-            },
-            "last_name_mapping": {
-              "type": "string"
-            },
             "metadata": {
               "type": "string"
             },
-            "sp_certificate": {
+            "idp_entity_id": {
               "type": "string"
             },
-            "sp_key": {
+            "idp_domain": {
+              "type": "string"
+            },
+            "idp_cert": {
+              "type": "string"
+            },
+            "idp_sso": {
               "type": "string"
             }
           }

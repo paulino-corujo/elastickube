@@ -18,6 +18,8 @@ import logging
 
 from tornado.gen import coroutine, Return
 
+from api.kube.exceptions import KubernetesException
+from api.v1.auth import Saml2LoginHandler
 from data.query import Query
 
 
@@ -37,6 +39,21 @@ class SettingsActions(object):
     @coroutine
     def update(self, document):
         logging.info("Updating Setting document with _id: %s", document["_id"])
+
+        saml_config = document[u'authentication'].get('saml', None)
+        if saml_config is not None:
+            try:
+                idp_entity_id, idp_domain, idp_cert, idp_sso = Saml2LoginHandler.get_metadata_info(
+                    saml_config.get('metadata', None))
+            except Exception as error:
+                logging.exception("Error parsing metadata")
+                raise KubernetesException(
+                    "Invalid SAML IdP metadata file {0}".format(saml_config.get('metadata_file', "")), 400)
+
+            saml_config['idp_entity_id'] = idp_entity_id
+            saml_config['idp_domain'] = idp_domain
+            saml_config['idp_cert'] = idp_cert
+            saml_config['idp_sso'] = idp_sso
 
         setting = yield Query(self.database, "Settings").update(document)
         raise Return(setting)

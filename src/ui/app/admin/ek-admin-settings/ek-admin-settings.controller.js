@@ -18,14 +18,17 @@ const ADMINISTRATOR_ROLE = 'administrator';
 const USER_ROLE = 'user';
 
 class AdminSettingsController {
-    constructor($scope, $element, $location, $stateParams, $timeout, settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
+    constructor($scope, $element, $location, $log, $stateParams, $timeout,
+            settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
         'ngInject';
 
         const onUsersChange = () => this._getAdmins();
         const onSettingsChange = () => this._getSettings();
 
+        this._$scope = $scope;
         this._$element = $element;
         this._$location = $location;
+        this._$log = $log.getInstance(this.constructor.name);
         this._$stateParams = $stateParams;
         this._$timeout = $timeout;
         this._settingsActionCreator = settingsActionCreator;
@@ -65,6 +68,10 @@ class AdminSettingsController {
             usersStore.removeChangeListener(onUsersChange);
             settingsStore.removeSettingsChangeListener(onSettingsChange);
         });
+
+        $scope.setFile = (element) => {
+            this._readMetadata(element.files[0]);
+        };
     }
 
     _getAdmins() {
@@ -100,10 +107,9 @@ class AdminSettingsController {
             this.auth_sso = 'off';
         }
 
-        this.samlMapping = hasValues(_.get(this.auth.saml_data, 'first_name_mapping'))
-            || hasValues(_.get(this.auth.saml_data, 'last_name_mapping'));
-        this.samlSpCert = hasValues(_.get(this.auth.saml_data, 'sp_certificate'))
-            || hasValues(_.get(this.auth.saml_data, 'sp_key'));
+        if (this.auth_sso !== 'saml') {
+            this.metadata_error = _.undefined;
+        }
 
         this.gitChartRepo = _.get(this._settings, 'charts.repo_url');
 
@@ -139,14 +145,6 @@ class AdminSettingsController {
 
             if (this.auth.saml && hasValues(this.auth.saml_data)) {
                 this._settings.authentication.saml = this.auth.saml_data;
-                if (!this.samlMapping) {
-                    delete this._settings.authentication.saml.first_name_mapping;
-                    delete this._settings.authentication.saml.last_name_mapping;
-                }
-                if (!this.samlSpCert) {
-                    delete this._settings.authentication.saml.sp_certificate;
-                    delete this._settings.authentication.saml.sp_key;
-                }
             } else {
                 delete this._settings.authentication.saml;
             }
@@ -162,9 +160,37 @@ class AdminSettingsController {
             }
 
             if (!_.isEqual(this._settings, this._settingsStore.getSettings())) {
-                this._settingsActionCreator.update(this._settings);
+                this._settingsActionCreator
+                    .update(this._settings)
+                    .catch((error) => {
+                        this._$log.error(error.body);
+                        this._settingsActionCreator.unsubscribe();
+                        this._settingsActionCreator.subscribe();
+                    });
             }
         }
+    }
+
+    _readMetadata(file) {
+        const reader = new FileReader();
+        const filename = file.name;
+
+        reader.onload = (e) => {
+            this._$scope.$evalAsync(() => {
+                delete this._settings.authentication.google_oauth;
+                if (!this._settings.authentication.saml) {
+                    this._settings.authentication.saml = {};
+                }
+                this._settings.authentication.saml.metadata = e.target.result;
+
+                this._settingsActionCreator
+                    .update(this._settings)
+                    .then(() => this.metadata_error = _.undefined)
+                    .catch(() => this.metadata_error = 'Unable to parse file. Please upload a valid metadata document.');
+            });
+        };
+
+        reader.readAsText(file);
     }
 
     removeAdmin(admin) {
@@ -174,6 +200,10 @@ class AdminSettingsController {
         newUser.role = USER_ROLE;
 
         this._usersActionCreator.update(newUser);
+    }
+
+    uploadMetadata() {
+        angular.element(document.querySelector('#fileMetadata')).click();
     }
 }
 

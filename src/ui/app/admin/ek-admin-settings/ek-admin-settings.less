@@ -45,6 +45,30 @@
             }
             &__configuration {
                 padding: 0 0 20px 36px;
+                
+                &__file {
+                    border: 1px solid @grey300;
+                    box-shadow: 0 0 3px rgba(0, 0, 0, 0.08);
+                    margin-bottom: 10px;
+                    margin-top: 10px;
+                    padding: 10px 10px 10px 20px;
+                    
+                    &--provider {
+                        color: @grey600;
+                        text-transform: capitalize;
+                    }
+                    
+                    p {
+                        margin: 0;
+                    }
+                }
+                
+                &__icon {
+                    &--checked {
+                        color: #59C559;
+                        margin-right: 20px;
+                    }
+                }
             }
             md-divider {
                 border-top-color: @grey300;
@@ -110,24 +134,21 @@
         &--short {
             width: 94px;
         }
+
+        &--readonly {
+            background-color: @grey150;
+        }
     }
 
-    &__textarea {
-        margin: 8px 0;
-        padding: 10px;
-        height: 100px;
-        max-height: 100px;
-        min-height: 100px;
-        max-width: 100%;
-
-        &--long {
-            width: 444px;
-            max-width: 444px;
-        }
-
-        &--short {
-            width: 94px;
-            max-width: 94px;
+    &__button {
+        
+        &--file {
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            font-weight: 500;
+            margin-left: 0;
+            margin-top: 8px;
+            text-transform: capitalize;
         }
     }
 }

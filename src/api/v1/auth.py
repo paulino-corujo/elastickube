@@ -330,11 +330,12 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
         }
 
         code = self.get_argument('code', False)
+        redirect_uri = "{0}/api/v1/auth/google".format(settings["hostname"])
         if code:
             logging.debug("Google redirect received.")
 
             auth_data = yield self.get_authenticated_user(
-                redirect_uri=google_oauth["redirect_uri"],
+                redirect_uri=redirect_uri,
                 code=code)
 
             auth_user = yield self.oauth2_request(
@@ -365,7 +366,7 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
         else:
             logging.debug("Redirecting to google for authentication.")
             yield self.authorize_redirect(
-                redirect_uri=google_oauth['redirect_uri'],
+                redirect_uri=redirect_uri,
                 client_id=google_oauth['key'],
                 scope=['profile', 'email'],
                 response_type='code',
@@ -382,48 +383,38 @@ class Saml2LoginHandler(AuthHandler):
     IDP_SSO_PATH = "md:IDPSSODescriptor/md:SingleSignOnService[@Binding='{0}']".format(
         OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
 
+    @staticmethod
+    def get_metadata_info(metadata):
+        metadata_xml = etree.fromstring(str(metadata))
+
+        if metadata_xml.tag.endswith('EntitiesDescriptor'):
+            metadata_xml = metadata_xml.find("md:EntityDescriptor", namespaces=OneLogin_Saml2_Constants.NSMAP)
+
+        idp_entity_id = metadata_xml.attrib['entityID']
+        idp_domain = urlparse.urlparse(idp_entity_id).netloc;
+        idp_cert = metadata_xml.find(Saml2LoginHandler.IDP_CERT_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).text
+        idp_sso = metadata_xml.find(
+            Saml2LoginHandler.IDP_SSO_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).attrib['Location']
+
+        return (idp_entity_id, idp_domain, idp_cert, idp_sso)
+
     def _get_saml_settings(self, saml_config, settings):
-        try:
-            metadata = etree.fromstring(str(saml_config['metadata']))
-        except etree.XMLSyntaxError:
-            raise HTTPError(400, reason="Invalid SAML identity provider metadata")
-
-        try:
-            if metadata.tag.endswith('EntitiesDescriptor'):
-                metadata = metadata.find("md:EntityDescriptor", namespaces=OneLogin_Saml2_Constants.NSMAP)
-
-            idp_entity_id = metadata.attrib['entityID']
-            idp_cert = metadata.find(self.IDP_CERT_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).text
-            idp_sso = metadata.find(self.IDP_SSO_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).attrib['Location']
-        except:
-            raise HTTPError(400, reason="Invalid SAML identity provider metadata")
-            
         saml_settings = dict(
             sp=dict(
                 entityId=settings["hostname"],
                 assertionConsumerService=dict(
                     url="{0}/api/v1/auth/saml".format(settings["hostname"]),
                     binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST),
-                NameIDFormat=OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS,
-                x509cert=saml_config.get("sp_certificate", ""),
-                privateKey=saml_config.get("sp_key", "")
+                NameIDFormat=OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS
             ),
             idp=dict(
-                entityId=idp_entity_id,
+                entityId=saml_config['idp_entity_id'],
                 singleSignOnService=dict(
-                    url=idp_sso,
+                    url=saml_config['idp_sso'],
                     binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT),
-                x509cert=idp_cert
+                x509cert=saml_config['idp_cert']
             )
         )
-
-        if len(saml_settings['sp']['x509cert']) > 0 and len(saml_settings['sp']['privateKey']) > 0:
-            saml_settings['security'] = dict(
-                authnRequestsSigned=True,
-                signMetadata=True,
-                wantMessagesSigned=True,
-                wantAssertionsSigned=True
-            )
 
         return saml_settings
 
@@ -493,9 +484,8 @@ class Saml2LoginHandler(AuthHandler):
         # Validate user if it signup by SAML
         if user and 'email_validated_at' not in user:
             logging.debug('User validated via SAML %s', user_id)
-            first_name = self._get_attribute(
-                attributes, saml.get("first_name_mapping", []) + self.FIRST_NAME_ATTRIBUTES)
-            last_name = self._get_attribute(attributes, saml.get("last_name_mapping", []) + self.LAST_NAME_ATTRIBUTES)
+            first_name = self._get_attribute(attributes, self.FIRST_NAME_ATTRIBUTES)
+            last_name = self._get_attribute(attributes, self.LAST_NAME_ATTRIBUTES)
             _fill_signup_invitation_request(user, firstname=first_name, lastname=last_name, password=None)
             user = yield Query(self.settings["database"], 'Users').update(user)
 

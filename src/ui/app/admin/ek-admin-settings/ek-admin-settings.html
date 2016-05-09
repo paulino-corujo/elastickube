@@ -62,13 +62,13 @@
                     <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                            ng-model="ctrl.auth.google_data.key" required>
 
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Redirect URL</div>
-                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                           ng-model="ctrl.auth.google_data.redirect_uri" required>
-
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Secret</div>
                     <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                            ng-model="ctrl.auth.google_data.secret" required>
+
+                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle">Authorized Redirect URI</div>
+                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-admin-settings__input--readonly ek-input"
+                           ng-model="ctrl.auth.google_data.redirect_uri" ng-value="ctrl.hostname + '/api/v1/auth/google'" ng-readonly="true">
                 </div>
                 <md-divider></md-divider>
 
@@ -82,39 +82,34 @@
                     </div>
                 </div>
                 <div class="ek-admin-settings__authentication__methods__configuration" ng-if="ctrl.auth_sso === 'saml'">
-                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Identity Provider Metadata</div>
-                    <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
-                              ng-model="ctrl.auth.saml_data.metadata" required cols='80'></textarea>
+                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Metadata document</div>
 
-                    <div layout="row" layout-align="space-between center">
-                        <span class="ek-admin-settings__subtitle">User Attribute Mapping</span>
-                        <md-switch class="md-primary" aria-label="Attribute Mapping" ng-model="ctrl.samlMapping"></md-switch>
-                    </div>
-                    <div ng-if="ctrl.samlMapping">
-                        <div class="ek-admin-settings__subtitle">First Name</div>
-                        <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                               ng-model="ctrl.auth.saml_data.first_name_mapping"
-                               placeholder="FirstName">
+                    <div layout="row" layout-align="start center" ng-hide="ctrl.auth.saml_data.idp_domain">
+                        <input id="fileMetadata" name="file" type="file" size-limit="10240"
+                               onchange="angular.element(this).scope().setFile(this)" ng-hide="true">
+                        <md-button id="uploadMetadataButton" class="ek-admin-settings__button--file ek-button"
+                                   ng-click="ctrl.uploadMetadata()">Choose file</md-button>
+                         <span>No file choosen</span>
 
-                        <div class="ek-admin-settings__subtitle">Last Name</div>
-                        <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
-                               ng-model="ctrl.auth.saml_data.last_name_mapping"
-                               placeholder="LastName">
                     </div>
 
-                    <div layout="row" layout-align="space-between center">
-                        <span class="ek-admin-settings__subtitle">Service Provider Certificate</span>
-                        <md-switch class="md-primary" aria-label="Service Provider Certificate" ng-model="ctrl.samlSpCert"></md-switch>
+                    <div class="ek-admin-settings__authentication__methods__configuration__file" layout="row" layout-align="space-between center" ng-hide="!ctrl.auth.saml_data.idp_domain">
+                        <div layout="row" layout-align="start center">
+                            <md-icon class="ek-admin-settings__authentication__methods__configuration__icon--checked" md-svg-src="{{:: icons.IC_CHECK_CIRCLE_48PX }}"></md-icon>
+                            <div>
+                                <p class="ek-admin-settings__authentication__methods__configuration__file--provider">Provider domain</p>
+                                <p>{{ ctrl.auth.saml_data.idp_domain }}</p>
+                            </div>    
+                        </div>
+                        
+                        <md-button id="uploadMetadataButton" class="ek-admin-settings__button--file ek-button"
+                                   ng-click="ctrl.uploadMetadata()">Update</md-button>
                     </div>
-                    <div ng-if="ctrl.samlSpCert">
-                        <div class="ek-admin-settings__subtitle">X.509 Certificate</div>
-                        <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
-                                  ng-model="ctrl.auth.saml_data.sp_certificate" cols='80'></textarea>
 
-                        <div class="ek-admin-settings__subtitle">Private Key</div>
-                        <textarea class="ek-admin-settings__textarea ek-admin-settings__textarea--long ek-input"
-                                  ng-model="ctrl.auth.saml_data.sp_key" cols='80'></textarea>
+                    <div class="ek-message-error" ng-show="ctrl.metadata_error">
+                        {{ ctrl.metadata_error }}
                     </div>
+
                 </div>
             </md-radio-group>
         </div>
