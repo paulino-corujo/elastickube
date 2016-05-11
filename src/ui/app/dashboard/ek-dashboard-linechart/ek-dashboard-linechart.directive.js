@@ -27,6 +27,7 @@ class DashboardLinechartDirective extends Directive {
         this.bindToController = {
             title: '@',
             dataset: '=',
+            datafield: '@',
             percentage: '=',
             units: '@',
             lineColor: '@'

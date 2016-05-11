@@ -14,108 +14,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const mockDataCPU = [{
-    timestamp: '2016-03-29 14:36:30',
-    value: 55
-}, {
-    timestamp: '2016-03-29 14:36:00',
-    value: 65
-}, {
-    timestamp: '2016-03-29 14:35:30',
-    value: 75
-}, {
-    timestamp: '2016-03-29 14:35:00',
-    value: 85
-}, {
-    timestamp: '2016-03-29 14:34:30',
-    value: 80
-}, {
-    timestamp: '2016-03-29 14:34:00',
-    value: 65
-}, {
-    timestamp: '2016-03-29 14:33:30',
-    value: 10
-}, {
-    timestamp: '2016-03-29 14:33:00',
-    value: 16
-}, {
-    timestamp: '2016-03-29 14:32:30',
-    value: 25
-}, {
-    timestamp: '2016-03-29 14:32:00',
-    value: 30
-}, {
-    timestamp: '2016-03-29 14:31:30',
-    value: 40
-}, {
-    timestamp: '2016-03-29 14:31:00',
-    value: 43
-}, {
-    timestamp: '2016-03-29 14:30:30',
-    value: 75
-}, {
-    timestamp: '2016-03-29 14:30:00',
-    value: 65
-}, {
-    timestamp: '2016-03-29 14:29:30',
-    value: 30
-}, {
-    timestamp: '2016-03-29 14:29:00',
-    value: 20
-}];
-const mockDataMemory = [{
-    timestamp: '2016-03-29 10:06:04',
-    value: 4.6
-}, {
-    timestamp: '2016-03-29 10:04:04',
-    value: 5.4
-}, {
-    timestamp: '2016-03-29 10:03:04',
-    value: 5
-}, {
-    timestamp: '2016-03-29 10:00:04',
-    value: 4.8
-}, {
-    timestamp: '2016-03-29 9:56:06',
-    value: 4.8
-}, {
-    timestamp: '2016-03-29 9:55:04',
-    value: 4.7
-}, {
-    timestamp: '2016-03-29 9:54:04',
-    value: 4.7
-}, {
-    timestamp: '2016-03-29 9:53:04',
-    value: 4.7
-}, {
-    timestamp: '2016-03-29 9:52:04',
-    value: 7.6
-}, {
-    timestamp: '2016-03-29 9:51:06',
-    value: 4.5
-}, {
-    timestamp: '2016-03-29 9:50:03',
-    value: 4
-}];
-
 class DashboardController {
-    constructor($scope, instancesStore, sessionStore) {
+    constructor($scope, $timeout, instancesStore, metricsActionCreator, metricsStore, sessionStore) {
         'ngInject';
 
         const onChange = () => {
+            const previousNamespace = this.namespace;
+
             this.namespace = this._sessionStore.getActiveNamespace();
+            $timeout(() => this._metricsActionCreator.unsubscribe(previousNamespace)
+                .then(() => this._metricsActionCreator.subscribe(this.namespace)));
             this._getData();
         };
 
-        this.mockDataCPU = mockDataCPU;
-        this.mockDataMemory = mockDataMemory;
+        const metricsChange = () => {
+            this.metricsData = this._metricsStore.getMetrics();
+        };
 
-        this._sessionStore = sessionStore;
         this._instancesStore = instancesStore;
+        this._metricsActionCreator = metricsActionCreator;
+        this._metricsStore = metricsStore;
+        this._sessionStore = sessionStore;
+
         this.namespace = this._sessionStore.getActiveNamespace();
+
         this._sessionStore.addNamespaceChangeListener(onChange);
+        this._metricsStore.addChangeListener(metricsChange);
+        this._metricsActionCreator.subscribe(this.namespace);
         this._getData();
-        $scope.$on('$destroy', () => this._sessionStore.removeNamespaceChangeListener(onChange));
+
+        $scope.$on('$destroy', () => {
+            this._metricsActionCreator.unsubscribe(this.namespace);
+            this._metricsStore.removeChangeListener(metricsChange);
+            this._sessionStore.removeNamespaceChangeListener(onChange);
+        });
     }
 
     _getData() {
