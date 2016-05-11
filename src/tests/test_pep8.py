@@ -18,25 +18,27 @@ import logging
 import os
 import subprocess
 
-from tornado import testing
+import unittest2
 
 
-class Pep8Test(testing.AsyncTestCase):
-
-    _multiprocess_can_split_ = True
+class TestPep8(unittest2.TestCase):
 
     def test_pep8(self):
         logging.debug("Start test_pep8")
 
-        src_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        command = " ".join(["pep8", "--max-line-length=120 --exclude=node_modules", src_folder]).split()
-        pep8_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        errors, _ = pep8_process.communicate()
+        git_root = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip()
 
-        self.assertFalse(errors is not None and errors.strip() != '', "Pep8 errors %s" % errors)
+        os.chdir(git_root)
+        python_files = subprocess.check_output(['git', 'ls-files', '*py'])
+        python_files = python_files.strip().split()
+
+        pep8_command = ['pep8', '--max-line-length=120'] + python_files
+        result = subprocess.call(pep8_command)
+
+        self.assertEqual(result, 0, "Code not Pep8 compliant")
 
         logging.debug("Completed test_pep8")
 
 
 if __name__ == "__main__":
-    testing.main()
+    unittest2.main()

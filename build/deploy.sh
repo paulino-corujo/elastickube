@@ -8,6 +8,7 @@ Example:
 Options:
     -t Timeout in seconds per operation
     -u Master Kubernetes URL
+    -v ElasticKube version to install
     -h Display this message
 "
 
@@ -21,13 +22,14 @@ function help() {
 }
 
 # Handle options
-while getopts ":t:u:hr" ARGUMENT
+while getopts ":t:u:v:hr" ARGUMENT
 do
   case ${ARGUMENT} in
 
     t )  export TIMEOUT=$OPTARG;;
     r )  export REINSTALL=true;;
     u )  export KUBERNETES_SERVICE_HOST=$OPTARG;;
+    v )  export ELASTICKUBE_VERSION=$OPTARG;;
     h )  help; exit 0;;
     : )  help "Missing option argument for -$OPTARG."; exit 1;;
     \?)  help "Option does not exist : $OPTARG."; exit 1;;
@@ -37,6 +39,10 @@ done
 
 # Default timeout
 TIMEOUT=${TIMEOUT:-600}
+
+# DEFAULT VERSION SECTION
+VERSION=${ELASTICKUBE_VERSION:-latest}
+# DEFAULT VERSION SECTION
 
 if [ "${KUBERNETES_SERVICE_HOST}" ]
 then
@@ -132,7 +138,7 @@ spec:
     spec:
       containers:
       - name: elastickube-api
-        image: elasticbox/elastickube-api:latest
+        image: elasticbox/elastickube-api:${VERSION}
         resources:
           limits:
             cpu: 100m
@@ -142,7 +148,7 @@ spec:
           mountPath: /var/run
 ${MASTER_URL_ENV_SECTION}
       - name: elastickube-charts
-        image: elasticbox/elastickube-charts:latest
+        image: elasticbox/elastickube-charts:${VERSION}
         resources:
           limits:
             cpu: 100m
@@ -151,7 +157,7 @@ ${MASTER_URL_ENV_SECTION}
         - name: elastickube-charts
           mountPath: /var/elastickube/charts
       - name: elastickube-nginx
-        image: elasticbox/elastickube-nginx:latest
+        image: elasticbox/elastickube-nginx:${VERSION}
         resources:
           limits:
             cpu: 100m
@@ -165,7 +171,7 @@ ${MASTER_URL_ENV_SECTION}
           name: http
           protocol: TCP
       - name: elastickube-diagnostics
-        image: elasticbox/elastickube-diagnostics:latest
+        image: elasticbox/elastickube-diagnostics:${VERSION}
         resources:
           limits:
             cpu: 10m

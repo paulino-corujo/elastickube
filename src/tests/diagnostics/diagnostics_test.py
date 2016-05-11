@@ -13,28 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from __future__ import unicode_literals
+
+from __future__ import absolute_import, unicode_literals
 
 import copy
 import json
-import logging
 import os
 
 from concurrent.futures import Future
 import mock
 import pytest
 
-from diagnostics import diagnostics
-
-logging.basicConfig(level=logging.DEBUG)
-
-
-# Extra requirements to run the tests
-'''
-pip install mock
-pip install pytest
-pip install pytest-tornado
-'''
+try:
+    from diagnostics import diagnostics
+except ImportError:
+    pass
 
 
 SAMPLE_TOKEN = (
@@ -483,7 +476,6 @@ def test_application_json_rcs_ok(http_client, base_url, status_ok):
     assert response.code == 200
     data = json.loads(response.body)
     for name in data:
-        print name
         assert data[name]['reason'] == ''
         assert data[name]['status'] is True
 

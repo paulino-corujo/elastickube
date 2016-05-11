@@ -12,3 +12,5 @@ pytest-pythonpath
 pytest-tornado
 pytest-xdist
 tornado
+unittest-xml-reporting
+unittest2

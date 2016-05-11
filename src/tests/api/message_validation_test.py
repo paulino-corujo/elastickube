@@ -19,10 +19,9 @@ import logging
 import uuid
 
 from tornado import testing
-from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
-from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
+from tests.api import get_ws_request, wait_message
 
 
 class MessageValidationTest(testing.AsyncTestCase):
@@ -31,13 +30,7 @@ class MessageValidationTest(testing.AsyncTestCase):
     def test_message_validation(self):
         logging.debug("Start test_message_validation")
 
-        token = yield get_token(self.io_loop)
-        request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
-            headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
-            validate_cert=False
-        )
-
+        request = yield get_ws_request(self.io_loop)
         connection = yield websocket_connect(request)
 
         connection.write_message("No JSON object")
