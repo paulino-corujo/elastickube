@@ -391,7 +391,7 @@ class Saml2LoginHandler(AuthHandler):
             metadata_xml = metadata_xml.find("md:EntityDescriptor", namespaces=OneLogin_Saml2_Constants.NSMAP)
 
         idp_entity_id = metadata_xml.attrib['entityID']
-        idp_domain = urlparse.urlparse(idp_entity_id).netloc;
+        idp_domain = urlparse.urlparse(idp_entity_id).netloc
         idp_cert = metadata_xml.find(Saml2LoginHandler.IDP_CERT_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).text
         idp_sso = metadata_xml.find(
             Saml2LoginHandler.IDP_SSO_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).attrib['Location']

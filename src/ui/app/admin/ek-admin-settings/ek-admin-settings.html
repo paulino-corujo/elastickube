@@ -42,7 +42,8 @@
                      layout="row" layout-align="start center">
                     <md-radio-button class="md-primary ek-radio-button" aria-label="Switch Off"
                                      value="off"></md-radio-button>
-                    <div layout="row" layout-align="start center">
+                    <div class="ek-admin-settings__authentication__methods__method__label"
+                         layout="row" layout-align="start center" ng-click="ctrl.auth_sso = 'off'">
                         <span>Off</span>
                     </div>
                 </div>
@@ -52,7 +53,8 @@
                      layout="row" layout-align="start center">
                     <md-radio-button class="md-primary ek-radio-button" aria-label="Switch Google authentication"
                                      value="google"></md-radio-button>
-                    <div layout="row" layout-align="start center">
+                    <div class="ek-admin-settings__authentication__methods__method__label"
+                         layout="row" layout-align="start center" ng-click="ctrl.auth_sso = 'google'">
                         <img class="ek-admin-settings__authentication__icon" ng-src="{{:: icons.GOOGLE_G_LOGO }}">
                         <span>Google OpenID</span>
                     </div>
@@ -76,7 +78,8 @@
                     layout="row" layout-align="start center">
                     <md-radio-button class="md-primary ek-radio-button" aria-label="Switch SAML 2.0 authentication"
                                      value="saml"></md-radio-button>
-                    <div layout="row" layout-align="start center">
+                    <div class="ek-admin-settings__authentication__methods__method__label"
+                         layout="row" layout-align="start center" ng-click="ctrl.auth_sso = 'saml'">
                         <img class="ek-admin-settings__authentication__icon" ng-src="{{:: icons.SAML_LOGO }}">
                         <span>SAML 2.0</span>
                     </div>
@@ -85,8 +88,8 @@
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Metadata document</div>
 
                     <div layout="row" layout-align="start center" ng-hide="ctrl.auth.saml_data.idp_domain">
-                        <input id="fileMetadata" name="file" type="file" size-limit="10240"
-                               onchange="angular.element(this).scope().setFile(this)" ng-hide="true">
+                        <input id="fileMetadata" name="file" type="file" size-limit="10240" ek-file-change="ctrl._readMetadata"
+                               ng-hide="true">
                         <md-button id="uploadMetadataButton" class="ek-admin-settings__button--file ek-button"
                                    ng-click="ctrl.uploadMetadata()">Choose file</md-button>
                          <span>No file choosen</span>
