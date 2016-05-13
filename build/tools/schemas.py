@@ -64,7 +64,7 @@ def _walk_and_reorder(schema):
 
         for (property_name, property_value) in schema.items():
             if (isinstance(property_value, dict) and
-                'type' in property_value and
+                    'type' in property_value and
                     property_value['type'] == 'array'):
                 schema_arrays[property_name] = _walk_and_reorder(property_value)
             elif (isinstance(property_value, dict) and
@@ -87,9 +87,13 @@ def _walk_and_reorder(schema):
         return schema
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--schemas-dir', required=True, dest='schemas_dir', help='Schemas base directory')
     arguments = parser.parse_args()
     if not run(arguments.schemas_dir):
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

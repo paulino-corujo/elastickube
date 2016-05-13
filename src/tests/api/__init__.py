@@ -16,63 +16,77 @@ limitations under the License.
 
 import os
 import json
+import uuid
 
+from tornado import testing
 from tornado.gen import coroutine, Return
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.websocket import websocket_connect
 
 ELASTICKUBE_TOKEN_HEADER = "ElasticKube-Token"
 
 
-@coroutine
-def get_token(io_loop, username="operations@elasticbox.com", password="elastickube123"):
-    response = yield AsyncHTTPClient(io_loop).fetch(
-        "http://%s/api/v1/auth/login" % get_api_address(),
-        method="POST",
-        body=json.dumps(dict(username=username, password=password)))
+class ApiTestCase(testing.AsyncTestCase):
 
-    raise Return(response.body)
+    def setUp(self):
+        super(ApiTestCase, self).setUp()
 
+        request = self.build_request()
+        self.connection = self.io_loop.run_sync(lambda: websocket_connect(request))
 
-@coroutine
-def get_ws_request(io_loop, username="operations@elasticbox.com", password="elastickube123"):
-    token = yield get_token(io_loop, username, password)
-    request = HTTPRequest(
-        "ws://%s/api/v1/ws" % get_api_address(),
-        headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
-        validate_cert=False
-    )
+    def tearDown(self):
+        self.connection.close()
+        super(ApiTestCase, self).tearDown()
 
-    raise Return(request)
+    @staticmethod
+    def get_api_address():
+        return os.getenv("ELASTICKUBE_API_ADDRESS", "localhost")
 
+    @coroutine
+    def get_token(self, username="operations@elasticbox.com", password="elastickube123"):
+        response = yield AsyncHTTPClient(self.io_loop).fetch(
+            "http://%s/api/v1/auth/login" % self.get_api_address(),
+            method="POST",
+            body=json.dumps(dict(username=username, password=password)))
 
-@coroutine
-def wait_message(connection, correlation):
-    deserialized_message = None
-    while True:
-        message = yield connection.read_message()
-        deserialized_message = json.loads(message)
-        if "correlation" in deserialized_message and deserialized_message["correlation"] == correlation:
-            break
+        raise Return(response.body)
 
-    raise Return(deserialized_message)
+    @testing.gen_test
+    def build_request(self, username="operations@elasticbox.com", password="elastickube123"):
+        token = yield self.get_token(username, password)
+        request = HTTPRequest(
+            "ws://%s/api/v1/ws" % self.get_api_address(),
+            headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
+            validate_cert=False
+        )
 
+        raise Return(request)
 
-def get_api_address():
-    return os.getenv("ELASTICKUBE_API_ADDRESS", "localhost")
+    def send_message(self, action, operation, body=None):
+        correlation = str(uuid.uuid4())[:10]
+        message = dict(action=action, operation=operation, correlation=correlation)
+        if body:
+            message["body"] = body
 
+        self.connection.write_message(json.dumps(message))
+        return correlation
 
-def validate_response(test_case, message, expected_result):
-    test_case.assertTrue(message["status_code"] == expected_result["status_code"],
-                         "Status code is %d instead of %d" % (message["status_code"], expected_result["status_code"]))
-    test_case.assertTrue(message["correlation"] == expected_result["correlation"],
-                         "Correlation is %s instead of %s" % (message["correlation"], expected_result["correlation"]))
-    test_case.assertTrue(message["operation"] == expected_result["operation"],
-                         "Operation is %s instead of %s" % (message["operation"], expected_result["operation"]))
-    test_case.assertTrue(message["action"] == expected_result["action"],
-                         "Action is %s instead of %s" % (message["action"], expected_result["action"]))
+    @staticmethod
+    @coroutine
+    def wait_message(connection, correlation=None):
+        deserialized_message = None
+        while True:
+            message = yield connection.read_message()
+            deserialized_message = json.loads(message)
+            if not correlation:
+                break
+            if "correlation" in deserialized_message and deserialized_message["correlation"] == correlation:
+                break
 
-    if "body_type" in expected_result:
-        test_case.assertTrue(isinstance(message["body"], expected_result["body_type"]),
-                             "Body is not a %s but %s" % (expected_result["body_type"], type(message["body"])))
-    else:
-        test_case.assertIsNone(message["body"], "Body is not a None but '%s'" % message["body"])
+        raise Return(deserialized_message)
+
+    def validate_response(self, response, status, correlation, operation, action):
+        self.assertTrue(response["status_code"] == status, response)
+        self.assertTrue(response["correlation"] == correlation, response)
+        self.assertTrue(response["operation"] == operation, response)
+        self.assertTrue(response["action"] == action, response)

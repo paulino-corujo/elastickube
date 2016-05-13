@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import logging
 import os
 import subprocess
 
@@ -24,8 +23,6 @@ import unittest2
 class TestPep8(unittest2.TestCase):
 
     def test_pep8(self):
-        logging.debug("Start test_pep8")
-
         git_root = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip()
 
         os.chdir(git_root)
@@ -36,8 +33,6 @@ class TestPep8(unittest2.TestCase):
         result = subprocess.call(pep8_command)
 
         self.assertEqual(result, 0, "Code not Pep8 compliant")
-
-        logging.debug("Completed test_pep8")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+GitPython
 futures
 mock
 motor
@@ -11,6 +12,7 @@ pytest
 pytest-pythonpath
 pytest-tornado
 pytest-xdist
+pyyaml
 tornado
 unittest-xml-reporting
 unittest2

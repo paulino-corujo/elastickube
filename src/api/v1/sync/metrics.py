@@ -16,7 +16,7 @@ limitations under the License.
 
 import logging
 
-from tornado.gen import coroutine, sleep, Return
+from tornado.gen import coroutine, Return
 from tornado import ioloop
 
 from data.query import Query
