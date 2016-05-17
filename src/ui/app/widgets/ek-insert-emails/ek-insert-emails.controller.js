@@ -22,6 +22,14 @@ const ENTER = {
     keyCode: 13
 };
 
+const SPACE = {
+    altKey: false,
+    ctrlKey: false,
+    shiftKey: false,
+    metaKey: false,
+    keyCode: 32
+};
+
 const ENTER_EMAIL_ADDRESS_MESSAGE = 'Enter email addresses...';
 const ADD_MORE_PEOPLE_MESSAGE = 'Add more people...';
 
@@ -37,7 +45,9 @@ class InsertEmailsController {
     }
 
     addEmail(event) {
-        if (_.size(this.email) > 0 && _.isEqual(ENTER, _.pick(event, _.keys(ENTER)))) {
+        if (_.size(this.email) > 0 && (event.type === 'blur'
+            || _.isEqual(ENTER, _.pick(event, _.keys(ENTER)))
+            || _.isEqual(SPACE, _.pick(event, _.keys(SPACE))))) {
             event.preventDefault();
 
             this.emailError = !_.isUndefined(this.form.$error.email);
