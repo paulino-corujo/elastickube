@@ -19,7 +19,6 @@ class InstanceFiltersController {
         'ngInject';
 
         this.instancesFilteredByState = [];
-        this.selectedState = 'all';
         this.selectedOwners = [];
         this.filteredInstances = [];
 
@@ -32,7 +31,12 @@ class InstanceFiltersController {
 
     filterInstancesByState() {
         this.instancesFilteredByState = _.chain(this.instancesToFilter)
-            .filter((x) => this.selectedState === 'all' || this.selectedState.toLowerCase() === (x.kind || '').toLowerCase())
+            .filter((x) => {
+                return _.isUndefined(this.selectedState) || this.selectedState.state.kind === 'all'
+                    || this.selectedState.state.kind.toLowerCase() === (x.kind || '').toLowerCase()
+                    && _.isUndefined(this.selectedState.substate) || !_.isUndefined(this.selectedState.substate)
+                    && _.get(x, 'status.phase') === this.selectedState.substate.state;
+            })
             .value();
     }
 
