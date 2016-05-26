@@ -64,8 +64,8 @@ class NamespacesActions(object):
         else:
             last_timestamp = None
 
-        result, namespace = yield [self.kube.namespaces.post(body),
-                                   self._wait_namespace_creation(cursor, last_timestamp, document["name"])]
+        _, namespace = yield [self.kube.namespaces.post(body),
+                              self._wait_namespace_creation(cursor, last_timestamp, document["name"])]
 
         namespace["members"] = document["members"]
         namespace = yield Query(self.database, "Namespaces").update(namespace)

@@ -11,81 +11,7 @@ from passlib.hash import sha512_crypt
 from pymongo import MongoClient
 
 
-def add_oauth_settings(arguments):
-    database = MongoClient(arguments.connection_url).elastickube
-    settings = database.Settings.find_one({"deleted": None})
-    settings["authentication"]["google_oauth"] = {
-        "key": arguments.key,
-        "secret": arguments.secret,
-        "redirect_uri": arguments.redirect
-    }
-
-    database.Settings.update({'_id': settings['_id']}, settings)
-
-
-def remove_oauth_settings(arguments):
-    database = MongoClient(arguments.connection_url).elastickube
-    settings = database.Settings.find_one({"deleted": None})
-    settings["authentication"] = {"password": settings["authentication"]["password"]}
-
-    database.Settings.update({'_id': settings['_id']}, settings)
-
-
-def add_user(arguments):
-    database = MongoClient(arguments.connection_url).elastickube
-    user = database.Users.find_one({"metadata.deletionTimestamp": None, "email": arguments.email})
-    if user is None:
-
-        salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
-        password = dict(
-            hash=sha512_crypt.encrypt((arguments.password + salt).encode("utf-8"), rounds=40000),
-            salt=salt)
-
-        user = dict(
-            email=arguments.email,
-            username=arguments.email,
-            password=password,
-            firstname=arguments.first,
-            lastname=arguments.last,
-            role=arguments.role,
-            schema="http://elasticbox.net/schemas/user",
-            email_validated_at=datetime.utcnow().isoformat(),
-            metadata=dict(
-                resourceVersion=time.time(),
-                creationTimestamp=time.time(),
-                deletionTimestamp=None
-            )
-        )
-
-        database.Users.insert(user)
-
-    if arguments.role != "administrator":
-        default_namespace = database.Namespaces.find_one({"name": "default"})
-        if default_namespace:
-            if "members" not in default_namespace:
-                default_namespace["members"] = [arguments.email]
-            else:
-                if arguments.email not in default_namespace["members"]:
-                    default_namespace["members"].append(arguments.email)
-
-            database.Namespaces.update({"_id": default_namespace["_id"]}, default_namespace)
-
-
-def delete_database(arguments):
-    client = MongoClient(arguments.connection_url)
-    client.drop_database('elastickube')
-
-    for _ in xrange(0, 5):
-        if 'elastickube' in client.database_names():
-            time.sleep(1)
-            client.drop_database('elastickube')
-        else:
-            return
-
-    raise RuntimeError('Failed to delete elastickube database')
-
-
-if __name__ == '__main__':
+def get_parser():
     parser = argparse.ArgumentParser(
         description='ElasticKube database management',
         epilog="See 'kubeman command --help' for more information")
@@ -189,5 +115,88 @@ if __name__ == '__main__':
     delete_database_parser = database_subparsers.add_parser('delete-db', help='Delete database')
     delete_database_parser.set_defaults(func=delete_database)
 
+    return parser
+
+
+def add_oauth_settings(arguments):
+    database = MongoClient(arguments.connection_url).elastickube
+    settings = database.Settings.find_one({"deleted": None})
+    settings["authentication"]["google_oauth"] = {
+        "key": arguments.key,
+        "secret": arguments.secret,
+        "redirect_uri": arguments.redirect
+    }
+
+    database.Settings.update({'_id': settings['_id']}, settings)
+
+
+def remove_oauth_settings(arguments):
+    database = MongoClient(arguments.connection_url).elastickube
+    settings = database.Settings.find_one({"deleted": None})
+    settings["authentication"] = {"password": settings["authentication"]["password"]}
+
+    database.Settings.update({'_id': settings['_id']}, settings)
+
+
+def add_user(arguments):
+    database = MongoClient(arguments.connection_url).elastickube
+    user = database.Users.find_one({"metadata.deletionTimestamp": None, "email": arguments.email})
+    if user is None:
+
+        salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
+        password = dict(
+            hash=sha512_crypt.encrypt((arguments.password + salt).encode("utf-8"), rounds=40000),
+            salt=salt)
+
+        user = dict(
+            email=arguments.email,
+            username=arguments.email,
+            password=password,
+            firstname=arguments.first,
+            lastname=arguments.last,
+            role=arguments.role,
+            schema="http://elasticbox.net/schemas/user",
+            email_validated_at=datetime.utcnow().isoformat(),
+            metadata=dict(
+                resourceVersion=time.time(),
+                creationTimestamp=time.time(),
+                deletionTimestamp=None
+            )
+        )
+
+        database.Users.insert(user)
+
+    if arguments.role != "administrator":
+        default_namespace = database.Namespaces.find_one({"name": "default"})
+        if default_namespace:
+            if "members" not in default_namespace:
+                default_namespace["members"] = [arguments.email]
+            else:
+                if arguments.email not in default_namespace["members"]:
+                    default_namespace["members"].append(arguments.email)
+
+            database.Namespaces.update({"_id": default_namespace["_id"]}, default_namespace)
+
+
+def delete_database(arguments):
+    client = MongoClient(arguments.connection_url)
+    client.drop_database('elastickube')
+
+    for _ in xrange(0, 5):
+        if 'elastickube' in client.database_names():
+            time.sleep(1)
+            client.drop_database('elastickube')
+        else:
+            return
+
+    raise RuntimeError('Failed to delete elastickube database')
+
+
+def main():
+    parser = get_parser()
     args = parser.parse_args(sys.argv[1:])
     args.func(args)
+
+
+if __name__ == '__main__':
+    main()

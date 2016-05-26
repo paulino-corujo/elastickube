@@ -67,7 +67,7 @@ class Metric(object):
         response = yield self.api.get(url_path, raise_error=False, **params)
         if response.error:
             if response.error.code == 404 and not raise_on_404:
-                logging.warning("%s GET %s" % (response.error.message, response.effective_url))
+                logging.warning("%s GET %s", response.error.message, response.effective_url)
                 raise Return(None)
 
             raise response.error

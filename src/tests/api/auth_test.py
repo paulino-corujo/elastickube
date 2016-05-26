@@ -15,23 +15,19 @@ limitations under the License.
 """
 
 import json
-import logging
 
+import unittest2
 from tornado import testing
 from tornado.httpclient import HTTPError, AsyncHTTPClient
 
 from tests import api
 
 
-class AuthTests(testing.AsyncTestCase):
-
-    _multiprocess_can_split_ = True
+class TestAuth(api.ApiTestCase):
 
     @testing.gen_test
     def test_auth_providers(self):
-        logging.debug("Start test_auth_providers")
-
-        response = yield AsyncHTTPClient(self.io_loop).fetch("http://%s/api/v1/auth/providers" % api.get_api_address())
+        response = yield AsyncHTTPClient(self.io_loop).fetch("http://%s/api/v1/auth/providers" % self.get_api_address())
         auth_providers = json.loads(response.body)
         self.assertTrue(len(auth_providers.keys()) >= 1, "No auth methods enabled %s" % auth_providers)
 
@@ -41,16 +37,12 @@ class AuthTests(testing.AsyncTestCase):
                 "Missing property 'regex' in auth password method %s" % auth_providers
             )
 
-        logging.debug("Completed test_auth_providers")
-
     @testing.gen_test
     def test_signup_disabled(self):
-        logging.debug("Start test_signup_disabled")
-
         error = None
         try:
             yield AsyncHTTPClient(self.io_loop).fetch(
-                "http://%s/api/v1/auth/signup" % api.get_api_address(),
+                "http://%s/api/v1/auth/signup" % self.get_api_address(),
                 method="POST",
                 body=json.dumps({})
             )
@@ -60,28 +52,21 @@ class AuthTests(testing.AsyncTestCase):
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/signup")
         self.assertEquals(error.code, 403, "/api/v1/auth/signup raised %d instead of 403" % error.code)
 
-        logging.debug("Completed test_signup_disabled")
-
     @testing.gen_test
     def test_login_success(self):
-        logging.debug("Start test_login_success")
-
         response = yield AsyncHTTPClient(self.io_loop).fetch(
-            "http://%s/api/v1/auth/login" % api.get_api_address(),
+            "http://%s/api/v1/auth/login" % self.get_api_address(),
             method='POST',
             body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube123")))
 
         self.assertTrue(response.body, "Token not included in response body")
-        logging.debug("Completed test_login_success")
 
     @testing.gen_test
     def test_login_wrong_password(self):
-        logging.debug("Start test_login_wrong_password")
-
         error = None
         try:
             yield AsyncHTTPClient(self.io_loop).fetch(
-                "http://%s/api/v1/auth/login" % api.get_api_address(),
+                "http://%s/api/v1/auth/login" % self.get_api_address(),
                 method='POST',
                 body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube2")))
         except HTTPError as http_error:
@@ -90,8 +75,6 @@ class AuthTests(testing.AsyncTestCase):
         self.assertIsNotNone(error, "No error raised calling /api/v1/auth/login")
         self.assertEquals(error.code, 401, "/api/v1/auth/login raised %d instead of 401" % error.code)
 
-        logging.debug("Completed test_login_wrong_password")
-
 
 if __name__ == '__main__':
-    testing.main()
+    unittest2.main()

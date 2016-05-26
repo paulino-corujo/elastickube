@@ -76,12 +76,11 @@ class KubeWatcher(object):
                             self._watchers[watcher_key].add_done_callback(done_callback)
                             logging.debug("Reconnected watcher for %s with params %s", watcher_key, self._params)
 
-        logging.info("Starting watch KubeWatcher for message %s", self.message)
-        yield self._init_data()
-
         try:
-            logging.debug("Starting watch %s connected", self.message["action"])
+            logging.info("Starting watch KubeWatcher for message %s", self.message)
+            yield self._init_data()
 
+            logging.debug("Starting watch %s connected", self.message["action"])
             watcher_metadata = self._metadata.get("watch", {})
             for resource_name, resource_metadata in watcher_metadata.get("resources", {}).iteritems():
                 self._watchers[resource_metadata["type"]] = getattr(
@@ -102,8 +101,6 @@ class KubeWatcher(object):
                 correlation=self.message["correlation"],
                 body={"error": {"message": "Failed to connect to event source."}},
             ))
-        except Exception as e:
-            logging.exception(e)
 
     def unwatch(self):
         logging.info("Stopping watch for message %s", self.message)
@@ -149,35 +146,33 @@ class KubeWatcher(object):
     @coroutine
     def _init_data(self):
         items = []
-        try:
-            init_metadata = self._metadata.get("init", {})
-            for resource, resource_metadata in init_metadata.get("resources", {}).iteritems():
-                result = yield getattr(
-                    self.settings["kube"][resource_metadata["resource"]],
-                    resource_metadata["method"].lower())(**self._get_params(resource_metadata["parameters"]))
 
-                self._params["resourceVersion" + result["kind"]] = result["metadata"]["resourceVersion"]
+        init_metadata = self._metadata.get("init", {})
+        for _, resource_metadata in init_metadata.get("resources", {}).iteritems():
+            result = yield getattr(
+                self.settings["kube"][resource_metadata["resource"]],
+                resource_metadata["method"].lower())(**self._get_params(resource_metadata["parameters"]))
 
-                documents = []
-                if "items" in result:
-                    for item in result.get("items", []):
-                        item["kind"] = result["kind"].replace("List", "")
-                        documents.append(item)
-                else:
-                    self._params["uid"] = result["metadata"]["uid"]
-                    documents.append(result)
+            self._params["resourceVersion" + result["kind"]] = result["metadata"]["resourceVersion"]
 
-                items.extend(documents)
+            documents = []
+            if "items" in result:
+                for item in result.get("items", []):
+                    item["kind"] = result["kind"].replace("List", "")
+                    documents.append(item)
+            else:
+                self._params["uid"] = result["metadata"]["uid"]
+                documents.append(result)
 
-            self.callback(dict(
-                action=self.message["action"],
-                operation="watched",
-                correlation=self.message["correlation"],
-                status_code=200,
-                body=items
-            ))
-        except Exception as e:
-            logging.exception(e)
+            items.extend(documents)
+
+        self.callback(dict(
+            action=self.message["action"],
+            operation="watched",
+            correlation=self.message["correlation"],
+            status_code=200,
+            body=items
+        ))
 
     @coroutine
     def _data_callback(self, data):

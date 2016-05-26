@@ -176,7 +176,7 @@ class Pods(NamespacedResource):
         try:
             result = yield self.api.http_client.request(url, **params)
             lines = result.body.splitlines()
-        except HTTPError as http_error:
+        except HTTPError:
             logging.exception("Failed to retrieve Pods logs")
 
         for line in lines:

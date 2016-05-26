@@ -83,6 +83,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             status_code=200
         )
 
+        body = request["body"] if "body" in request else dict()
         if request["operation"] in REST_OPERATIONS:
             action = self.actions_lookup[request["action"]].get("rest", None)
             if action:
@@ -92,38 +93,40 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                     response.update(dict(status_code=405, body=dict(message=error)))
 
                 else:
-                    if not (yield action.check_permissions(request["operation"], request["body"])):
+                    if not (yield action.check_permissions(request["operation"], body)):
                         error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
                         response.update(dict(status_code=403, body=dict(message=error)))
 
                     else:
                         try:
                             if request["operation"] == "retrieve":
-                                response["body"] = yield action.retrieve(request["body"])
+                                response["body"] = yield action.retrieve(body)
                                 response["operation"] = "retrieved"
 
                             elif request["operation"] == "create":
-                                response["body"] = yield action.create(request["body"])
+                                response["body"] = yield action.create(body)
                                 response["operation"] = "created"
 
                             elif request["operation"] == "update":
-                                response["body"] = yield action.update(request["body"])
+                                response["body"] = yield action.update(body)
                                 response["operation"] = "updated"
 
                             elif request["operation"] == "delete":
-                                response["body"] = yield action.delete(request["body"])
+                                response["body"] = yield action.delete(body)
                                 response["operation"] = "deleted"
 
-                        except PyMongoError as e:
-                            response["body"] = dict(message=e.message)
-                            if isinstance(e, DuplicateKeyError):
+                        except PyMongoError as pymongo_error:
+                            response["body"] = dict(message=pymongo_error.message)
+                            if isinstance(pymongo_error, DuplicateKeyError):
                                 response["status_code"] = 409
-                            elif isinstance(e, ObjectNotFoundError):
+                            elif isinstance(pymongo_error, ObjectNotFoundError):
                                 response["status_code"] = 404
                             else:
                                 response["status_code"] = 400
-                        except KubernetesException as e:
-                            response.update(dict(status_code=e.status_code, body=dict(message=e.message)))
+                        except KubernetesException as kube_error:
+                            response.update(dict(
+                                status_code=kube_error.status_code, body=dict(message=kube_error.message)
+                            ))
 
             else:
                 error = "Action %s does not support operations." % request["action"]
@@ -146,8 +149,6 @@ class MainWebSocketHandler(SecureWebSocketHandler):
 
                     else:
                         watcher = watcher_cls(request, self.settings, self.user, self.write_message)
-                        body = request["body"] if "body" in request else dict()
-
                         if not (yield watcher.check_permissions(request["operation"], body)):
                             error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
                             response.update(dict(status_code=403, body=dict(message=error)))

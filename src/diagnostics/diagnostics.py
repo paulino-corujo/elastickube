@@ -32,7 +32,7 @@ from tornado.httpclient import AsyncHTTPClient
 from tornado.ioloop import IOLoop
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @coroutine
@@ -145,7 +145,7 @@ def _get_json(settings, url):
     except (IOError, tornado.httpclient.HTTPError) as ex:
         raise RuntimeError('Requesting "{}" failed: "{}"'.format(_get_url(settings, url), unicode(ex)))
     except Exception as ex:
-        logger.exception('Exception detected, %s', type(ex))
+        LOGGER.exception('Exception detected, %s', type(ex))
         raise Return(status_error('Error connecting to "{}": {}'.format(_get_url(settings, url), unicode(ex))))
 
     if base_response.code != 200:
@@ -155,7 +155,7 @@ def _get_json(settings, url):
     try:
         response = json.loads(base_response.body)
     except ValueError:
-        logger.exception('Exception detected loading JSON')
+        LOGGER.exception('Exception detected loading JSON')
         raise RuntimeError('Response not a valid json document')
 
     raise Return(response)
@@ -165,11 +165,11 @@ def _get_json(settings, url):
 def _check_kubernetes_status(settings):
     try:
         data = yield _get_json(settings, '')
-    except (RuntimeError, IOError, tornado.httpclient.HTTPError) as e:
+    except (RuntimeError, IOError, tornado.httpclient.HTTPError) as error:
         if settings['token'] is None:
-            error_message = "Missing Kubernetes API token, request to API failed. {}".format(unicode(e))
+            error_message = "Missing Kubernetes API token, request to API failed. {}".format(unicode(error))
         else:
-            error_message = unicode(e)
+            error_message = unicode(error)
         raise Return(status_error(error_message))
 
     if 'paths' not in data or '/api/v1' not in data['paths']:
@@ -192,7 +192,7 @@ def _run_every(fn, args=[], kwargs={}, delay=30):
         try:
             yield fn(*args, **kwargs)
         except Exception as e:
-            logger.exception('Unexpected exception {}'.format(unicode(e)))
+            LOGGER.exception('Unexpected exception {}'.format(unicode(e)))
 
         yield finish_waiting
 
@@ -254,7 +254,7 @@ def _check_replicaset(settings, namespace, name):
     except RuntimeError as ex:
         raise Return(status_error(unicode(ex)))
     except Exception as ex:
-        logger.exception('Exception detected, %s', type(ex))
+        LOGGER.exception('Exception detected, %s', type(ex))
         raise Return(status_error('ex {}'.format(unicode(ex))))
 
     raise Return(_document_rc_status(document))
@@ -282,7 +282,7 @@ def _check_internet(settings):
         raise Return(status_error(
             'Requesting "{}" failed: "{}"'.format(settings['check_connectivity_url'], unicode(ex))))
     except Exception as ex:
-        logger.exception('Exception detected, %s', type(ex))
+        LOGGER.exception('Exception detected, %s', type(ex))
         raise Return(status_error(unicode(ex)))
 
     if response.code != 200:
@@ -333,7 +333,7 @@ def settings_from_env(settings, env):
 
 
 def start_background_checks(settings, status, replica_names):
-    logger.debug("Starting background checks")
+    LOGGER.debug("Starting background checks")
 
     _run_forever(check_kubernetes, settings, status)
     check_replicasets_forever(settings, status, replica_names)
@@ -382,7 +382,7 @@ def run_server():
     level = 'WARNING' if not os.getenv('DEBUG') else 'DEBUG'
     logging.basicConfig(level=level)
 
-    logger.info('Starting server')
+    LOGGER.info('Starting server')
     tornado.netutil.Resolver.configure('tornado.netutil.ThreadedResolver', num_threads=10)
 
     settings = {}
@@ -392,7 +392,7 @@ def run_server():
         ('kube-system', 'elastickube-server'),
         ('kube-system', 'elastickube-mongo'),
     )
-    logger.debug('Loaded settings')
+    LOGGER.debug('Loaded settings')
 
     system_status = SystemStatus(replication_controllers)
 

@@ -356,7 +356,7 @@ class KubeClient(object):
                 self.kind_to_resource[self.RESOURCE_TO_KIND_MAPPING[resource["name"]]] = resource["name"]
 
             if resource["namespaced"]:
-                # TODO: generate it from swagger api
+                # FIXME: generate it from swagger api
                 if resource["name"] == "pods":
                     self.resources[resource["name"]] = Pods(self, "/api/%s" % api_version, resource["name"])
                 else:

@@ -457,7 +457,7 @@ def test_application_json_initializing(http_client, base_url, status):
     response = yield http_client.fetch(base_url + '/json')
     assert response.code == 200
     data = json.loads(response.body)
-    for name, status in data.items():
+    for _, status in data.items():
         assert status['status'] is None  # Initializing
 
 
