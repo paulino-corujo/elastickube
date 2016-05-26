@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from bson.objectid import ObjectId
 import json
 import logging
 import random
@@ -28,12 +29,17 @@ from tornado.gen import coroutine, Return
 from tornado.web import RequestHandler, HTTPError
 
 from api.v1 import ELASTICKUBE_TOKEN_HEADER, ELASTICKUBE_VALIDATION_TOKEN_HEADER
+from api.v1.actions import emails
 from data.query import Query
 
 
+ROUNDS = 40000
+
 def _generate_hashed_password(password):
     salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
-    return {'hash': sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=40000), 'salt': salt}
+    hash = sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=ROUNDS)
+    hash_parts = hash.split("$rounds={0}$".format(ROUNDS))
+    return {"hash": hash_parts[1], "rounds": "{0}$rounds={1}$".format(hash_parts[0], ROUNDS), "salt": salt}
 
 
 def _fill_signup_invitation_request(document, firstname, lastname, password=None):
@@ -58,7 +64,7 @@ class AuthHandler(RequestHandler):
             email=user["email"],
             role=user["role"],
             created=datetime.utcnow().isoformat(),
-            expires=(datetime.utcnow() + timedelta(30)).isoformat()
+            exp=datetime.utcnow() + timedelta(30)
         )
 
         user["last_login"] = datetime.utcnow()
@@ -183,6 +189,89 @@ class SignupHandler(AuthHandler):
             self.flush()
 
 
+class ResetPasswordHandler(AuthHandler):
+
+    @coroutine
+    def post(self):
+        logging.info("Initiating ResetPasswordHandler post")
+
+        data = json.loads(self.request.body)
+        if "email" not in data:
+            raise HTTPError(400, reason="Missing email in body request.")
+
+        email = data["email"]
+
+        user = yield self.settings["database"].Users.find_one({"email": email})
+
+        if not user:
+            logging.debug("User with email '%s' not found.", email)
+            raise HTTPError(200)
+
+        settings = yield self.settings["database"].Settings.find_one()
+        if "mail" in settings:
+            mail_settings = settings["mail"]
+
+            token = dict(
+                id=str(user["_id"]),
+                hash=user['password']['hash'][:-16],
+                exp=datetime.utcnow() + timedelta(minutes=10)
+            )
+
+            token = jwt.encode(token, self.settings["secret"], algorithm="HS256")
+
+            user_data = {
+                'name': user.get('firstname'),
+                'email': user['email'],
+                'token': token
+            }
+
+            try:
+                yield emails.send_reset_password_link(mail_settings, user_data, settings)
+            except Exception:
+                raise HTTPError(500, reason='Error sending reset password email.')
+            raise HTTPError(200)
+        else:
+            logging.warning("Mail settings not added")
+            raise HTTPError(412, reason="Mail settings not added.")
+
+
+class ChangePasswordHandler(AuthHandler):
+
+    @coroutine
+    def post(self):
+        logging.info("Initiating ChangePasswordHandler post")
+
+        data = json.loads(self.request.body)
+        if "password" not in data:
+            raise HTTPError(400, reason="Missing arguments in change password request.")
+
+        if "token" not in data:
+            raise HTTPError(400, reason="Missing arguments in change password request.")
+
+        password = data["password"]
+
+        try:
+            token = jwt.decode(data["token"], self.settings['secret'], algorithm='HS256')
+        except Exception:
+            raise HTTPError(400, reason="Invalid token or token has expired")
+
+        user = yield self.settings["database"].Users.find_one({"_id": ObjectId(token["id"])})
+
+        if not user:
+            logging.error("Error trying to change user password for token: '%s'.", token)
+            raise HTTPError(200)
+
+        if not user["password"]["hash"][:-16] == token["hash"]:
+            raise HTTPError(400, reason="Invalid token or token has expired")
+
+        user["password"] = _generate_hashed_password(password)
+
+        yield Query(self.settings["database"], "Users").update_fields({"_id": user["_id"]}, {
+            "password": user["password"]
+        })
+        raise HTTPError(200)
+
+
 class PasswordHandler(AuthHandler):
 
     @coroutine
@@ -204,7 +293,7 @@ class PasswordHandler(AuthHandler):
             logging.debug("Username '%s' not found.", username)
             raise HTTPError(401, reason="Invalid username or password.")
 
-        encoded_user_password = user["password"]["hash"].encode("utf-8")
+        encoded_user_password = '{0}{1}'.format(user["password"]["rounds"], user["password"]["hash"])
         if sha512_crypt.verify((password + user["password"]["salt"]).encode("utf-8"), encoded_user_password):
             token = yield self.authenticate_user(user)
             self.write(token)

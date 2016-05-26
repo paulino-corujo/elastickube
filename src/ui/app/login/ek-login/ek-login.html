@@ -18,12 +18,14 @@
         <md-input-container class="ek-login__password md-block animate">
             <label>Password</label>
             <input type="password" name="password" required
+                   class="ek-login__password__input"
                    ng-model="ctrl.user.password"
                    ng-pattern="ctrl.authProviders.password.regex">
             <div ng-messages="loginForm.password.$error">
                 <div ng-message="required">Your password is required.</div>
                 <div ng-message="pattern">Your password not match the specified format.</div>
             </div>
+            <p ng-click="ctrl.resetPassword()" class="ek-login__password__forgot">Forgot?</p>
         </md-input-container>
     </div>
 

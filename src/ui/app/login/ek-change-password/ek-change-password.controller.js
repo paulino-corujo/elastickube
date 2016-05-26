@@ -14,28 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-class LoginController {
-    constructor($log, $scope, initialization, instancesNavigationActionCreator, loginNavigationActionCreator, principalActionCreator) {
+class ChangePasswordController {
+    constructor($log, $location, loginNavigationActionCreator, principalActionCreator) {
         'ngInject';
 
-        this._$log = $log.getInstance(this.constructor.name);
-        this._$scope = $scope;
-        this._initialization = initialization;
-        this._instancesNavigationActionCreator = instancesNavigationActionCreator;
+        this._$log = $log;
+        this._$location = $location;
+
         this._loginNavigationActionCreator = loginNavigationActionCreator;
         this._principalActionCreator = principalActionCreator;
+
+        this.PASSWORD_REGEX = new RegExp(this.authProviders.password.regex);
     }
 
     submit() {
-        return this._principalActionCreator.login(this.user)
-            .then(() => this._initialization.initializeLoggedInUser())
-            .then(() => this._instancesNavigationActionCreator.instances())
+        return this._principalActionCreator.changePassword({ password: this.password, token: Object.keys(this._$location.search())[0] })
+            .then(() => this._loginNavigationActionCreator.login())
             .catch((error) => this._$log.warn(error.statusText));
-    }
-
-    resetPassword() {
-        this._loginNavigationActionCreator.resetPassword();
     }
 }
 
-export default LoginController;
+export default ChangePasswordController;
+

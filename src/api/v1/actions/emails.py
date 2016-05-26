@@ -22,10 +22,10 @@ from smtplib import SMTP, SMTP_SSL
 import concurrent.futures
 from tornado.gen import Return, coroutine
 
-from api.resources import INVITE_TEMPLATE, INVITE_SUBJECT
+from api.templates import INVITE_TEMPLATE, INVITE_SUBJECT, RESET_PASSWORD_EMAIL_TEMPLATE, RESET_PASSWORD_EMAIL_SUBJECT
 
 DEFAULT_THREADPOOL = concurrent.futures.ThreadPoolExecutor(max_workers=6)
-INVITE_BODY_TYPE = 'html'
+HTML_BODY_TYPE = 'html'
 
 
 def start_connection(secure, server, port):
@@ -87,7 +87,7 @@ def send_invites_sync(smtp_config, origin_user, info_invites, message):
     try:
         for invite in info_invites:
             template = generate_invite_template(origin_user, invite['confirm_url'], message)
-            send(smtp_config, invite['email'], INVITE_SUBJECT, template, INVITE_BODY_TYPE)
+            send(smtp_config, invite['email'], INVITE_SUBJECT, template, HTML_BODY_TYPE)
     except Exception:
         logging.exception("Exception detected sending invites")
         raise
@@ -100,3 +100,21 @@ def send_invites(smtp_config, origin_user, info_invites, message, threadpool=Non
 
     result = yield threadpool.submit(send_invites_sync, smtp_config, origin_user, info_invites, message)
     raise Return(result)
+
+
+def send_reset_password_email_sync(smtp_config, user_data, settings):
+    try:
+        email_body = RESET_PASSWORD_EMAIL_TEMPLATE.format(
+            name=cgi.escape(user_data['name']), token=cgi.escape(user_data['token']), endpoint=cgi.escape(settings['hostname']))
+        send(smtp_config, user_data['email'], RESET_PASSWORD_EMAIL_SUBJECT, email_body, HTML_BODY_TYPE)
+    except Exception:
+        logging.exception("Exception detected sending reset password email")
+        raise
+
+
+@coroutine
+def send_reset_password_link(smtp_config, user_data, settings, threadpool=None):
+    if threadpool is None:
+        threadpool = DEFAULT_THREADPOOL
+
+    yield threadpool.submit(send_reset_password_email_sync, smtp_config, user_data, settings)

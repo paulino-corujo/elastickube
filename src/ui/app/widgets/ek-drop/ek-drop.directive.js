@@ -52,10 +52,6 @@ class DropDirective extends Directive {
                         attachment: $scope.ctrl.position || 'top right'
                     }
                 });
-
-                $scope.$on('$destroy', () => {
-                    $scope.ctrl.drop.destroy();
-                });
             }
         };
     }

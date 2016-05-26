@@ -33,6 +33,14 @@ class NavigationActionCreatorService {
     validateUser() {
         return this._routerHelper.changeToState('validate-user');
     }
+
+    resetPassword() {
+        return this._routerHelper.changeToState('reset-password');
+    }
+
+    confirmResetPassword() {
+        return this._routerHelper.changeToState('confirm-reset-password');
+    }
 }
 
 export default NavigationActionCreatorService;

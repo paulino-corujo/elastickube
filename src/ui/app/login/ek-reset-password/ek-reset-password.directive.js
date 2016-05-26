@@ -1,4 +1,4 @@
-"""
+/*
 Copyright 2016 ElasticBox All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,25 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-"""
+*/
 
-import os
+import './ek-reset-password.less';
+import Directive from 'directive';
+import Controller from './ek-reset-password.controller';
+import icons from '../icons';
+import template from './ek-reset-password.html';
 
-ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
+class ResetPasswordDirective extends Directive {
 
-IF_MODIFIED_HEADER = 'If-Modified-Since'
-ACCEPT_HEADER = 'Accept'
-CONTENT_TYPE_HEADER = 'Content-type'
-CACHE_CONTROL = 'Cache-Control'
-CACHE_CONTROL_NO_CACHE = 'no-cache, must-revalidate'
+    constructor() {
+        super({ Controller, template });
+    }
 
-SVG_CONTENT_TYPE = 'image/svg+xm'
-PNG_CONTENT_TYPE = 'image/png'
+    compile(tElement) {
+        tElement.addClass('ek-reset-password layout-column layout-align-center-center');
+
+        return ($scope) => $scope.icons = icons;
+    }
+}
+
+export default ResetPasswordDirective;
