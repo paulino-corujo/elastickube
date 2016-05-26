@@ -43,7 +43,7 @@ class ConfirmController {
     ok() {
         return this._$q.when(this._acceptListener && this._acceptListener.accept())
             .then(() => this._$mdDialog.hide())
-            .catch((error) => this._$log.error(error.statusText));
+            .catch((error) => this._$log.error(error.body));
     }
 }
 

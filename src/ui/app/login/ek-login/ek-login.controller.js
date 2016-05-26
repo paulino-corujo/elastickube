@@ -30,7 +30,7 @@ class LoginController {
         return this._principalActionCreator.login(this.user)
             .then(() => this._initialization.initializeLoggedInUser())
             .then(() => this._instancesNavigationActionCreator.instances())
-            .catch((error) => this._$log.warn(error.statusText));
+            .catch((error) => this._$log.warn(error.body));
     }
 
     resetPassword() {

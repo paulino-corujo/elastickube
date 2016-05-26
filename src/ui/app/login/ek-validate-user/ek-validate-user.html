@@ -82,14 +82,13 @@
 
     <div layout="row" layout-align="center" ng-if="ctrl.authProviders.google">
         <md-button href="/api/v1/auth/google" target="_self"
-                   class="ek-validate-user__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Validate with your
-            Google account
+                   class="ek-validate-user__google-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.GOOGLE_G_LOGO }}">Login with Google
         </md-button>
     </div>
 
     <div layout="row" layout-align="center" ng-if="ctrl.authProviders.saml">
         <md-button href="/api/v1/auth/saml" target="_self"
-                   class="ek-validate-user__saml-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.SAML_LOGO }}">Validate with your SAML account
+                   class="ek-validate-user__saml-btn md-raised md-ink-ripple"><img ng-src="{{:: icons.SAML_LOGO }}">Login with SAML
         </md-button>
     </div>
 </div>

@@ -16,7 +16,7 @@ limitations under the License.
 
 import Directive from 'directive';
 
-class FilechangeDirective extends Directive {
+class OnFileChangeDirective extends Directive {
     constructor() {
         super();
 
@@ -25,11 +25,14 @@ class FilechangeDirective extends Directive {
     }
 
     link($scope, $element, attrs) {
-        const onChangeHandler = $scope.$eval(attrs.ekFileChange);
+        const onChangeHandler = $scope.$eval(attrs.ekOnFileChange);
 
-        $scope.$evalAsync(() => $element.bind('change', onChangeHandler));
+        $element.bind('change', (event) => {
+            $scope.$apply(() => onChangeHandler(event));
+        });
+
         $scope.$on('$destroy', () => $element.unbind('change', onChangeHandler));
     }
 }
 
-export default FilechangeDirective;
+export default OnFileChangeDirective;

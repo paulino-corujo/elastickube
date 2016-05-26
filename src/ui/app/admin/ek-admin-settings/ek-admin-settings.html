@@ -88,7 +88,7 @@
                     <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">Metadata document</div>
 
                     <div layout="row" layout-align="start center" ng-hide="ctrl.auth.saml_data.idp_domain">
-                        <input id="fileMetadata" name="file" type="file" size-limit="10240" ek-file-change="ctrl._readMetadata"
+                        <input id="fileMetadata" name="file" type="file" size-limit="10240" ek-on-file-change="ctrl.readMetadata"
                                ng-hide="true">
                         <md-button id="uploadMetadataButton" class="ek-admin-settings__button--file ek-button"
                                    ng-click="ctrl.uploadMetadata()">Choose file</md-button>
@@ -109,8 +109,8 @@
                                    ng-click="ctrl.uploadMetadata()">Update</md-button>
                     </div>
 
-                    <div class="ek-message-error" ng-show="ctrl.metadata_error">
-                        {{ ctrl.metadata_error }}
+                    <div class="ek-message-error" ng-if="ctrl.metadata_error">
+                        {{:: ctrl.metadata_error }}
                     </div>
 
                 </div>
@@ -145,6 +145,11 @@
             <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                    ng-model="ctrl.mail_data.server" required>
 
+            <div layout="row" layout-align="space-between center">
+                <span class="ek-admin-settings__subtitle">TLS/SSL</span>
+                <md-switch class="md-primary" aria-label="tls/ssl" ng-model="ctrl.mail_data.ssl"></md-switch>
+            </div>
+
             <div class="ek-admin-settings__subtitle">Port</div>
             <input type="text" class="ek-admin-settings__input ek-admin-settings__input--short ek-input"
                    ng-model="ctrl.mail_data.port">
@@ -166,11 +171,6 @@
                 <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle--required">SMTP Password</div>
                 <input type="password" class="ek-admin-settings__input ek-admin-settings__input--long ek-input"
                        ng-model="ctrl.mailAuth_data.password" required>
-            </div>
-
-            <div layout="row" layout-align="space-between center">
-                <span class="ek-admin-settings__subtitle">TLS/SSL</span>
-                <md-switch class="md-primary" aria-label="tls/ssl" ng-model="ctrl.mail_data.ssl"></md-switch>
             </div>
         </div>
     </div>

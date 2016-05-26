@@ -51,7 +51,7 @@ import UsersStoreService from './dataflow/users-store.service.js';
 import humanizeDateFilter from './filters/humanize-date.filter';
 
 import FocusDirective from './directives/focus';
-import FilechangeDirective from './directives/file-change';
+import OnFileChangeDirective from './directives/on-file-change';
 
 import AuthService from './security/auth.service';
 import CheckNamespaceService from './services/check-namespace.service';
@@ -117,6 +117,6 @@ angular
     .service('usersStore', UsersStoreService)
 
     .directive('ekFocus', () => new FocusDirective())
-    .directive('ekFileChange', () => new FilechangeDirective());
+    .directive('ekOnFileChange', () => new OnFileChangeDirective());
 
 export default moduleName;

@@ -69,21 +69,22 @@ class AdminSettingsController {
             settingsStore.removeSettingsChangeListener(onSettingsChange);
         });
 
-        this._readMetadata = (element) => {
+        this.readMetadata = (element) => {
             const file = element.target.files[0];
             const reader = new FileReader();
 
             reader.onload = (e) => {
                 this._$scope.$evalAsync(() => {
                     delete this._settings.authentication.google_oauth;
+
                     if (!this._settings.authentication.saml) {
                         this._settings.authentication.saml = {};
                     }
-                    this._settings.authentication.saml.metadata = e.target.result;
 
+                    this._settings.authentication.saml.metadata = e.target.result;
                     this._settingsActionCreator
                         .update(this._settings)
-                        .then(() => this.metadata_error = _.undefined)
+                        .then(() => delete this.metadata_error)
                         .catch(() => this.metadata_error = 'Unable to parse file. Please upload a valid metadata document.');
                 });
             };
@@ -126,7 +127,7 @@ class AdminSettingsController {
         }
 
         if (this.auth_sso !== 'saml') {
-            this.metadata_error = _.undefined;
+            delete this.metadata_error;
         }
 
         this.gitChartRepo = _.get(this._settings, 'charts.repo_url');
@@ -180,11 +181,7 @@ class AdminSettingsController {
             if (!_.isEqual(this._settings, this._settingsStore.getSettings())) {
                 this._settingsActionCreator
                     .update(this._settings)
-                    .catch((error) => {
-                        this._$log.error(error.body);
-                        this._settingsActionCreator.unsubscribe();
-                        this._settingsActionCreator.subscribe();
-                    });
+                    .catch((error) => this._$log.error(error.body));
             }
         }
     }
