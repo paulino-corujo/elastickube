@@ -57,8 +57,9 @@ if (db.Users.findOne({ 'email': 'operations@elasticbox.com'}) == null) {
         resourceVersion  : new Date()
     },
     password          : {
-        hash: '$6$rounds=40000$xiS1Mf2FHUXk19Or$IF/jxf.DngKpNRukL6kQPFMFoA2vy3TX9/tQpzvJ09SXwsxXB9Ly3fm79BkWjDUDVDXot1WUwBe/L0QshDEju/',
-        salt: 'NQVX38P0C6UGJQSQBDSR0UC00IHUMTBDJGGP6PGEYGTZ84FRM2XERXX5OAPUCM8X'
+        hash: 'xiS1Mf2FHUXk19Or$IF/jxf.DngKpNRukL6kQPFMFoA2vy3TX9/tQpzvJ09SXwsxXB9Ly3fm79BkWjDUDVDXot1WUwBe/L0QshDEju/',
+        salt: 'NQVX38P0C6UGJQSQBDSR0UC00IHUMTBDJGGP6PGEYGTZ84FRM2XERXX5OAPUCM8X',
+        rounds: '$6$rounds=40000$'
     },
     role              : 'administrator',
     schema            : 'http://elasticbox.net/schemas/user',
@@ -78,8 +79,9 @@ if (db.Users.findOne({ 'email': 'engineer@elasticbox.com'}) == null) {
         resourceVersion  : new Date()
     },
     password          : {
-        hash: '$6$rounds=40000$xiS1Mf2FHUXk19Or$IF/jxf.DngKpNRukL6kQPFMFoA2vy3TX9/tQpzvJ09SXwsxXB9Ly3fm79BkWjDUDVDXot1WUwBe/L0QshDEju/',
-        salt: 'NQVX38P0C6UGJQSQBDSR0UC00IHUMTBDJGGP6PGEYGTZ84FRM2XERXX5OAPUCM8X'
+        hash: 'xiS1Mf2FHUXk19Or$IF/jxf.DngKpNRukL6kQPFMFoA2vy3TX9/tQpzvJ09SXwsxXB9Ly3fm79BkWjDUDVDXot1WUwBe/L0QshDEju/',
+        salt: 'NQVX38P0C6UGJQSQBDSR0UC00IHUMTBDJGGP6PGEYGTZ84FRM2XERXX5OAPUCM8X',
+        rounds: '$6$rounds=40000$'
     },
     role              : 'user',
     schema            : 'http://elasticbox.net/schemas/user',
