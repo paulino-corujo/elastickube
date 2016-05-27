@@ -113,6 +113,10 @@
                         {{:: ctrl.metadata_error }}
                     </div>
 
+                    <div class="ek-admin-settings__subtitle ek-admin-settings__subtitle">Redirect URI</div>
+                    <input type="text" class="ek-admin-settings__input ek-admin-settings__input--long ek-admin-settings__input--readonly ek-input"
+                           ng-value="ctrl.hostname + '/api/v1/auth/saml'" ng-readonly="true">
+
                 </div>
             </md-radio-group>
         </div>

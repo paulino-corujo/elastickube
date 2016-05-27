@@ -439,7 +439,9 @@ class Saml2LoginHandler(AuthHandler):
 
         saml_settings = self._get_saml_settings(saml_config, settings)
 
-        raise Return(OneLogin_Saml2_Auth(saml_request, saml_settings))
+        raise Return(
+            (OneLogin_Saml2_Auth(saml_request, saml_settings), "{0}/api/v1/auth/saml".format(settings["hostname"]))
+        )
 
     def _get_attribute(self, attributes, mappings):
         for mapping in mappings:
@@ -452,16 +454,16 @@ class Saml2LoginHandler(AuthHandler):
     @coroutine
     def get(self):
         logging.info("Initiating SAML 2.0 Auth.")
-        auth = yield self._get_saml_auth(self.request)
+        auth, return_to = yield self._get_saml_auth(self.request)
 
         logging.info("Redirecting to SAML for authentication.")
-        self.redirect(auth.login())
+        self.redirect(auth.login(return_to=return_to))
 
     @coroutine
     def post(self):
         logging.info("SAML redirect received.")
 
-        auth = yield self._get_saml_auth(self.request)
+        auth, _ = yield self._get_saml_auth(self.request)
         auth.process_response()
 
         errors = auth.get_errors()

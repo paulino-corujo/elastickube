@@ -48,7 +48,11 @@ class WebsocketClientService extends EventEmitter {
         const defer = this._$q.defer();
 
         if (_.isUndefined(this._websocket) || this._websocket.readyState === WebSocket.CLOSED) {
-            this._websocket = new WebSocket(`ws://${location.hostname}:${location.port}${this._apiPath}`);
+            if (location.protocol === 'https:') {
+                this._websocket = new WebSocket(`wss://${location.hostname}${this._apiPath}`);
+            } else {
+                this._websocket = new WebSocket(`ws://${location.hostname}:${location.port}${this._apiPath}`);
+            }
 
             this._websocket.onopen = () => {
                 const watcherPromises = [];
