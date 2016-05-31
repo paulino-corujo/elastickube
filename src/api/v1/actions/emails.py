@@ -105,7 +105,8 @@ def send_invites(smtp_config, origin_user, info_invites, message, threadpool=Non
 def send_reset_password_email_sync(smtp_config, user_data, settings):
     try:
         email_body = RESET_PASSWORD_EMAIL_TEMPLATE.format(
-            name=cgi.escape(user_data['name']), token=cgi.escape(user_data['token']), endpoint=cgi.escape(settings['hostname']))
+            name=cgi.escape(user_data['name']), token=cgi.escape(user_data['token']),
+            endpoint=cgi.escape(settings['hostname']))
         send(smtp_config, user_data['email'], RESET_PASSWORD_EMAIL_SUBJECT, email_body, HTML_BODY_TYPE)
     except Exception:
         logging.exception("Exception detected sending reset password email")
