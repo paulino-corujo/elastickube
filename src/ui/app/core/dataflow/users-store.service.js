@@ -59,8 +59,8 @@ class UsersStoreService extends AbstractStore {
 
     _decodeUserInfo(user) {
         return Object.assign(user, {
-            firstname: decodeURI(user.firstname),
-            lastname: decodeURI(user.lastname)
+            firstname: user.firstname,
+            lastname: user.lastname
         });
     }
 

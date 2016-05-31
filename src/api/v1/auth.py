@@ -19,7 +19,6 @@ import json
 import logging
 import random
 import string
-import urllib
 from datetime import datetime, timedelta
 
 import jwt
@@ -34,6 +33,7 @@ from data.query import Query
 
 
 ROUNDS = 40000
+
 
 def _generate_hashed_password(password):
     salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
@@ -109,16 +109,16 @@ class SignupHandler(AuthHandler):
     @staticmethod
     def _validate_signup_data(data):
         if "email" not in data:
-            raise HTTPError(400, message="Email is required.")
+            raise HTTPError(400, reason="Email is required.")
 
         if "password" not in data:
-            raise HTTPError(400, message="Password is required.")
+            raise HTTPError(400, reason="Password is required.")
 
         if "firstname" not in data:
-            raise HTTPError(400, message="First name is required.")
+            raise HTTPError(400, reason="First name is required.")
 
         if "lastname" not in data:
-            raise HTTPError(400, message="Last name is required.")
+            raise HTTPError(400, reason="Last name is required.")
 
         return True
 
@@ -176,8 +176,8 @@ class SignupHandler(AuthHandler):
                 email=data["email"],
                 username=data["email"],
                 password=_generate_hashed_password(data["password"]),
-                firstname=urllib.quote(data["firstname"]),
-                lastname=urllib.quote(data["lastname"]),
+                firstname=data["firstname"],
+                lastname=data["lastname"],
                 role="administrator",
                 schema="http://elasticbox.net/schemas/user",
                 email_validated_at=datetime.utcnow().isoformat()
