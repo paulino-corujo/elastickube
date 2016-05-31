@@ -20,7 +20,7 @@
 
     <div class="ek-admin-users__body" flex layout="column">
         <div class="ek-admin-users__body__table-container" layout="column"
-             ng-style="{ height: ctrl.users.length < 5 ? (ctrl.users.length * 50) + 32 + 'px' : '100%'}">
+             ng-class="{'ek-admin-users__body__table-container--expand': ctrl.users.length > 4}">
              <ek-table options="ctrl.tableOptions"
                        status="ctrl.namespacesStatus" flex></ek-table>
         </div>
