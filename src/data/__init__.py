@@ -90,5 +90,3 @@ def migrate(database, settings):
 
         settings["schema_version"] = 3
         database.Settings.update({"_id": settings["_id"]}, settings)
-
-
