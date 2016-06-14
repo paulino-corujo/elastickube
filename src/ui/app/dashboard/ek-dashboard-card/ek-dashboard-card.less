@@ -1,0 +1,41 @@
+@import "../../colors";
+
+.ek-dashboard-card {
+    min-width: 170px;
+    height: 290px;
+    border: 1px solid @grey300;
+    border-radius: 2px;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.06);
+    background-color: @white;
+
+    &__container {
+        height: 100%;
+
+        &__title {
+            border-bottom: 1px solid @grey200;
+            min-height: 50px;
+            font-size: 14px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        &__content {
+            width: 100%;
+            height: 100%;
+            padding-bottom: 14px;
+
+            h1 {
+                font-size: 72px;
+                font-weight: normal;
+                margin: 0;
+            }
+
+            h2 {
+                font-size: 12px;
+                font-weight: normal;
+                color: @grey600;
+                margin: 0;
+            }
+        }
+    }
+}

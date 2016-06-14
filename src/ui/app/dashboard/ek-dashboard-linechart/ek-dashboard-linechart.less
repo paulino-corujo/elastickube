@@ -1,0 +1,71 @@
+@import "../../colors";
+
+.ek-dashboard-linechart {
+    width: 740px;
+    height: 350px;
+    border-radius: 2px;
+    border: 1px solid @grey300;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.06);
+    background-color: @white;
+
+    &__container {
+        height: 100%;
+
+        &__title {
+            border-bottom: 1px solid @grey200;
+            min-height: 50px;
+            font-size: 14px;
+            padding-left: 20px;
+        }
+
+        &__loading {
+            width: 100%;
+            height: 265px;
+        }
+
+        &__svg {
+            width: 100%;
+            height: 265px;
+            overflow: hidden;
+
+            rect {
+                cursor: move;
+            }
+
+            &__plot-area {
+
+                path {
+                    fill: none;
+                    stroke-width: 2px;
+                }
+            }
+
+            &__axes {
+
+                &__y, &__x {
+                    line {
+                        fill: none;
+                        stroke: @grey300;
+                        stroke-width: 1;
+                        shape-rendering: crispEdges;
+                    }
+
+                    .tick {
+                        line {
+                            fill: none;
+                            opacity: 0.4;
+                        }
+                        text{
+
+                        }
+                    }
+
+                    text {
+                        fill: @grey600;
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+}
