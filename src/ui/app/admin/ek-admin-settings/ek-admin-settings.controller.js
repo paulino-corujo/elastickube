@@ -32,7 +32,7 @@ class AdminSettingsController {
         this._settingsStore = settingsStore;
         this._usersActionCreator = usersActionCreator;
         this._usersStore = usersStore;
-        this._sendForm = _.debounce(this._sendForm, 300);
+        this._sendForm = _.debounce(this._sendForm, 2000);
 
         usersStore.addChangeListener(onUsersChange);
         settingsStore.addSettingsChangeListener(onSettingsChange);
@@ -110,7 +110,7 @@ class AdminSettingsController {
     }
 
     _sendForm() {
-        if (this.form.$valid) {
+        if (!this.form || this.form.$valid) {
             this._settings.hostname = this.hostname;
 
             _.set(this._settings, 'charts.repo_url', this.gitChartRepo);
