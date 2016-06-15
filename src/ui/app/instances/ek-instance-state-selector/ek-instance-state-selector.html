@@ -1,22 +1,23 @@
 <div ng-repeat="state in ctrl.states track by $index"
+     class="ek-instance-state-selector__container"
      layout="column" layout-align="start start">
-    <div class="ek-instance-state-selector__state" layout="row" layout-align="space-between center"
+    <div class="ek-instance-state-selector__container__state" layout="row" layout-align="space-between center"
          ek-ink-ripple="dark"
          ng-click="ctrl.selectState(state)"
-         ng-class="{'ek-instance-state-selector__state--selected': ctrl.selectedState.state === state && !ctrl.selectedState.substate}">
-        <span class="ek-instance-state-selector__state__name">{{:: state.display}}</span>
-        <span class="ek-instance-state-selector__state__counter">{{ state.kind === 'all' ? ctrl.instances.length : ctrl.stateValues[state.kind].total || 0 }}</span>
+         ng-class="{'ek-instance-state-selector__container__state--selected': ctrl.selectedState.state === state && !ctrl.selectedState.substate}">
+        <span class="ek-instance-state-selector__container__state__name">{{:: state.display}}</span>
+        <span class="ek-instance-state-selector__container__state__counter">{{ state.kind === 'all' ? ctrl.instances.length : ctrl.stateValues[state.kind].total || 0 }}</span>
     </div>
 
     <div ek-ink-ripple="dark"
-         class="ek-instance-state-selector__substate"
+         class="ek-instance-state-selector__container__substate"
          ng-repeat="substate in state.filters track by $index"
          ng-click="ctrl.selectState(state, substate)"
          ng-if="ctrl.selectedState.state == state"
-         ng-class="{'ek-instance-state-selector__state--selected': ctrl.selectedState.substate === substate }"
+         ng-class="{'ek-instance-state-selector__container__state--selected': ctrl.selectedState.substate === substate }"
          layout="row" layout-align="space-between center">
-        <span class="ek-instance-state-selector__substate__name">{{:: substate.display}}</span>
-        <span class="ek-instance-state-selector__substate__counter">{{ ctrl.stateValues[state.kind].state[substate.state] || 0 }}</span>
+        <span class="ek-instance-state-selector__container__substate__name">{{:: substate.display}}</span>
+        <span class="ek-instance-state-selector__container__substate__counter">{{ ctrl.stateValues[state.kind].state[substate.state] || 0 }}</span>
     </div>
 
 </div>
