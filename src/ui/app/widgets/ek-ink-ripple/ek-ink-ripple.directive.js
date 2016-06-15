@@ -33,7 +33,6 @@ class InkRippleDirective {
         return ($scope, $element, $attrs) => {
             const dark = $attrs.ekInkRipple === 'dark';
             const container = $element.find('.ek-ink-ripple__container');
-            const size = Math.max(container.outerWidth(), container.outerHeight()) * 2;
 
             $scope.inkRipple = (evt) => {
                 const ripple = angular.element('<div class="ek-ink-ripple__container__ripple"></div>');
@@ -49,9 +48,11 @@ class InkRippleDirective {
 
                 container.append(ripple);
 
-                this._$timeout(() => ripple
-                    .css('width', `${size}px`)
-                    .css('height', `${size}px`));
+                this._$timeout(() => {
+                    ripple
+                        .css('width', '50px')
+                        .css('height', '50px');
+                }, 150);
 
                 const removeRipple = () => {
                     ripple.css('opacity', '0');
