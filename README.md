@@ -18,7 +18,7 @@ We designed ElasticKube with the following principles in mind:
 
 ElastiKube runs as a containerized application inside your Kubernetes cluster. To deploy ElasticKube the only requirement is access to a terminal with `kubectl` configured.
 
-To install ElasticKube execute the following command:
+To install ElasticKube you can execute the [build/deploy.sh](../master/build/deploy.sh) deployment script, or execute the following command from the command line:
 
   `curl -s https://elastickube.com | bash`
 
