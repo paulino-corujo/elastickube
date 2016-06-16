@@ -80,10 +80,15 @@ class SyncNamespaces(object):
                 logging.exception(future.exception())
 
                 if isinstance(future.exception(), HTTPError) and future.exception().code == 599:
-                    logging.debug("Reconnecting to kubeclient in SyncNamespaces")
+                    logging.debug("Reconnecting to kubeclient in SyncNamespaces on 599 error code")
                     self.settings["kube"].namespaces.watch(
                         resourceVersion=self.resource_version,
                         on_data=data_callback).add_done_callback(done_callback)
+            else:
+                logging.debug("Reconnecting to kubeclient in SyncNamespaces")
+                self.settings["kube"].namespaces.watch(
+                    resourceVersion=self.resource_version,
+                    on_data=data_callback).add_done_callback(done_callback)
 
         logging.info("start_sync SyncNamespaces")
 

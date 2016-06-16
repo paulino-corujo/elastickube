@@ -28,7 +28,7 @@ from api.v1.auth import AuthProvidersHandler, ChangePasswordHandler, \
     GoogleOAuth2LoginHandler, PasswordHandler, ResetPasswordHandler, Saml2LoginHandler, SignupHandler
 from api.v1.icons import IconGenerator
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 
 def setup_server():
