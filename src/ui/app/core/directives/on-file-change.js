@@ -14,12 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import GOOGLE_G_LOGO from 'images/google-g-logo.svg';
-import SAML_LOGO from 'images/icon-saml.svg';
+import Directive from 'directive';
 
-const icons = {
-    GOOGLE_G_LOGO,
-    SAML_LOGO
-};
+class OnFileChangeDirective extends Directive {
+    constructor() {
+        super();
 
-export default icons;
+        this.scope = false;
+        this.restrict = 'A';
+    }
+
+    link($scope, $element, attrs) {
+        const onChangeHandler = $scope.$eval(attrs.ekOnFileChange);
+
+        $element.bind('change', (event) => {
+            $scope.$apply(() => onChangeHandler(event));
+        });
+
+        $scope.$on('$destroy', () => $element.unbind('change', onChangeHandler));
+    }
+}
+
+export default OnFileChangeDirective;

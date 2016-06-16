@@ -39,10 +39,10 @@ class SignupController {
             .catch((response) => {
                 switch (response.status) {
                     case constants.httpStatusCode.BAD_REQUEST:
-                        this._$log.error(response.statusText);
+                        this._$log.error(response.body);
                         break;
                     case constants.httpStatusCode.FORBIDDEN:
-                        this._$log.warn(response.statusText);
+                        this._$log.warn(response.body);
                         break;
                     default:
                 }

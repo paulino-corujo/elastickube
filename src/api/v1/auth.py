@@ -19,9 +19,15 @@ import json
 import logging
 import random
 import string
+import urllib
+import urlparse
+
 from datetime import datetime, timedelta
 
 import jwt
+from lxml import etree
+from onelogin.saml2.constants import OneLogin_Saml2_Constants
+from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from passlib.hash import sha512_crypt
 from tornado.auth import GoogleOAuth2Mixin
 from tornado.gen import coroutine, Return
@@ -91,6 +97,9 @@ class AuthProvidersHandler(RequestHandler):
 
             if "google_oauth" in settings["authentication"]:
                 providers['google'] = dict(auth_url="/api/v1/auth/google")
+
+            if "saml" in settings["authentication"]:
+                providers['saml'] = dict(auth_url="/api/v1/auth/saml")
 
             if "password" in settings["authentication"]:
                 providers['password'] = dict(regex=settings["authentication"]["password"]["regex"])
@@ -321,11 +330,12 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
         }
 
         code = self.get_argument('code', False)
+        redirect_uri = "{0}/api/v1/auth/google".format(settings["hostname"])
         if code:
             logging.debug("Google redirect received.")
 
             auth_data = yield self.get_authenticated_user(
-                redirect_uri=google_oauth["redirect_uri"],
+                redirect_uri=redirect_uri,
                 code=code)
 
             auth_user = yield self.oauth2_request(
@@ -356,8 +366,134 @@ class GoogleOAuth2LoginHandler(AuthHandler, GoogleOAuth2Mixin):
         else:
             logging.debug("Redirecting to google for authentication.")
             yield self.authorize_redirect(
-                redirect_uri=google_oauth['redirect_uri'],
+                redirect_uri=redirect_uri,
                 client_id=google_oauth['key'],
                 scope=['profile', 'email'],
                 response_type='code',
                 extra_params={'approval_prompt': 'auto'})
+
+
+class Saml2LoginHandler(AuthHandler):
+
+    NS_IDENTITY_CLAIMS = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/'
+    FIRST_NAME_ATTRIBUTES = ['FirstName', 'User.FirstName', NS_IDENTITY_CLAIMS + 'givenname']
+    LAST_NAME_ATTRIBUTES = ['LastName', 'User.LastName', NS_IDENTITY_CLAIMS + 'surname']
+
+    IDP_CERT_PATH = "md:IDPSSODescriptor/md:KeyDescriptor[@use='signing']/ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+    IDP_SSO_PATH = "md:IDPSSODescriptor/md:SingleSignOnService[@Binding='{0}']".format(
+        OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT)
+
+    @staticmethod
+    def get_metadata_info(metadata):
+        metadata_xml = etree.fromstring(str(metadata))
+
+        if metadata_xml.tag.endswith('EntitiesDescriptor'):
+            metadata_xml = metadata_xml.find("md:EntityDescriptor", namespaces=OneLogin_Saml2_Constants.NSMAP)
+
+        idp_entity_id = metadata_xml.attrib['entityID']
+        idp_domain = urlparse.urlparse(idp_entity_id).netloc
+        idp_cert = metadata_xml.find(Saml2LoginHandler.IDP_CERT_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).text
+        idp_sso = metadata_xml.find(
+            Saml2LoginHandler.IDP_SSO_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).attrib['Location']
+
+        return (idp_entity_id, idp_domain, idp_cert, idp_sso)
+
+    def _get_saml_settings(self, saml_config, settings):
+        saml_settings = dict(
+            sp=dict(
+                entityId=settings["hostname"],
+                assertionConsumerService=dict(
+                    url="{0}/api/v1/auth/saml".format(settings["hostname"]),
+                    binding=OneLogin_Saml2_Constants.BINDING_HTTP_POST),
+                NameIDFormat=OneLogin_Saml2_Constants.NAMEID_EMAIL_ADDRESS
+            ),
+            idp=dict(
+                entityId=saml_config['idp_entity_id'],
+                singleSignOnService=dict(
+                    url=saml_config['idp_sso'],
+                    binding=OneLogin_Saml2_Constants.BINDING_HTTP_REDIRECT),
+                x509cert=saml_config['idp_cert']
+            )
+        )
+
+        return saml_settings
+
+    @coroutine
+    def _get_saml_auth(self, request):
+        settings = yield Query(self.settings["database"], "Settings").find_one()
+        saml_config = settings[u'authentication'].get('saml', None)
+        if saml_config is None:
+            raise HTTPError(403, 'Forbidden request')
+
+        netloc = urlparse.urlparse(settings["hostname"]).netloc
+        host, _, port = netloc.partition(':')
+        saml_request = dict(
+            http_host=host,
+            script_name=request.path,
+            get_data={k: v[0] if len(v) == 1 else v for k, v in request.query_arguments.items()},
+            post_data={k: v[0] if len(v) == 1 else v for k, v in request.body_arguments.items()}
+        )
+
+        if port:
+            saml_request['server_port'] = port
+
+        saml_settings = self._get_saml_settings(saml_config, settings)
+
+        raise Return(
+            (OneLogin_Saml2_Auth(saml_request, saml_settings), "{0}/api/v1/auth/saml".format(settings["hostname"]))
+        )
+
+    def _get_attribute(self, attributes, mappings):
+        for mapping in mappings:
+            values = attributes.get(mapping, [])
+            if len(values) > 0:
+                return values[0]
+
+        return ""
+
+    @coroutine
+    def get(self):
+        logging.info("Initiating SAML 2.0 Auth.")
+        auth, return_to = yield self._get_saml_auth(self.request)
+
+        logging.info("Redirecting to SAML for authentication.")
+        self.redirect(auth.login(return_to=return_to))
+
+    @coroutine
+    def post(self):
+        logging.info("SAML redirect received.")
+
+        auth, _ = yield self._get_saml_auth(self.request)
+        auth.process_response()
+
+        errors = auth.get_errors()
+        if len(errors) > 0:
+            logging.info("SAML authentication error: '%s'.", auth.get_last_error_reason())
+            raise HTTPError(401, reason=auth.get_last_error_reason())
+
+        if not auth.is_authenticated():
+            logging.info("SAML user not authenticated.")
+            raise HTTPError(401, reason="SAML user not authenticated.")
+
+        attributes = auth.get_attributes()
+        logging.debug('SAML Attributes received: {0}'.format(attributes))
+        settings = yield Query(self.settings["database"], "Settings").find_one()
+        saml = settings[u'authentication'].get('saml', None)
+
+        user_id = auth.get_nameid()
+        user = yield self.settings["database"].Users.find_one({"email": user_id})
+
+        # Validate user if it signup by SAML
+        if user and 'email_validated_at' not in user:
+            logging.debug('User validated via SAML %s', user_id)
+            first_name = self._get_attribute(attributes, self.FIRST_NAME_ATTRIBUTES)
+            last_name = self._get_attribute(attributes, self.LAST_NAME_ATTRIBUTES)
+            _fill_signup_invitation_request(user, firstname=first_name, lastname=last_name, password=None)
+            user = yield Query(self.settings["database"], 'Users').update(user)
+
+        if user:
+            yield self.authenticate_user(user)
+            self.redirect('/')
+        else:
+            logging.debug("User '%s' not found", user_id)
+            raise HTTPError(400, "Invalid authentication request.")

@@ -18,14 +18,17 @@ const ADMINISTRATOR_ROLE = 'administrator';
 const USER_ROLE = 'user';
 
 class AdminSettingsController {
-    constructor($scope, $element, $location, $stateParams, $timeout, settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
+    constructor($scope, $element, $location, $log, $stateParams, $timeout,
+            settingsActionCreator, settingsStore, usersActionCreator, usersStore) {
         'ngInject';
 
         const onUsersChange = () => this._getAdmins();
         const onSettingsChange = () => this._getSettings();
 
+        this._$scope = $scope;
         this._$element = $element;
         this._$location = $location;
+        this._$log = $log.getInstance(this.constructor.name);
         this._$stateParams = $stateParams;
         this._$timeout = $timeout;
         this._settingsActionCreator = settingsActionCreator;
@@ -65,6 +68,29 @@ class AdminSettingsController {
             usersStore.removeChangeListener(onUsersChange);
             settingsStore.removeSettingsChangeListener(onSettingsChange);
         });
+
+        this.readMetadata = (element) => {
+            const file = element.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this._$scope.$evalAsync(() => {
+                    delete this._settings.authentication.google_oauth;
+
+                    if (!this._settings.authentication.saml) {
+                        this._settings.authentication.saml = {};
+                    }
+
+                    this._settings.authentication.saml.metadata = e.target.result;
+                    this._settingsActionCreator
+                        .update(this._settings)
+                        .then(() => delete this.metadata_error)
+                        .catch(() => this.metadata_error = 'Unable to parse file. Please upload a valid metadata document.');
+                });
+            };
+
+            reader.readAsText(file);
+        };
     }
 
     _getAdmins() {
@@ -77,7 +103,7 @@ class AdminSettingsController {
     _getSettings() {
         const settings = this._settingsStore.getSettings();
         const googleData = angular.copy(settings.authentication && settings.authentication.google_oauth || {});
-        const passwordData = angular.copy(settings.authentication && settings.authentication.password || {});
+        const samlData = angular.copy(settings.authentication && settings.authentication.saml || {});
 
         this._settings = angular.copy(settings);
 
@@ -86,11 +112,23 @@ class AdminSettingsController {
         this.auth = {
             google: settings.authentication && hasValues(googleData),
             google_data: googleData,
+            saml: settings.authentication && hasValues(samlData),
+            saml_data: samlData,
             github: false,
-            password: settings.authentication && hasValues(passwordData),
-            password_data: passwordData,
             ldap: false
         };
+
+        if (this.auth.google && hasValues(this.auth.google_data)) {
+            this.auth_sso = 'google';
+        } else if (this.auth.saml && hasValues(this.auth.saml_data)) {
+            this.auth_sso = 'saml';
+        } else {
+            this.auth_sso = 'off';
+        }
+
+        if (this.auth_sso !== 'saml') {
+            delete this.metadata_error;
+        }
 
         this.gitChartRepo = _.get(this._settings, 'charts.repo_url');
 
@@ -115,16 +153,19 @@ class AdminSettingsController {
 
             _.set(this._settings, 'charts.repo_url', this.gitChartRepo);
 
+            this.auth.google = this.auth_sso === 'google';
+            this.auth.saml = this.auth_sso === 'saml';
+
             if (this.auth.google && hasValues(this.auth.google_data)) {
                 this._settings.authentication.google_oauth = this.auth.google_data;
             } else {
                 delete this._settings.authentication.google_oauth;
             }
 
-            if (this.auth.password && hasValues(this.auth.password_data)) {
-                this._settings.authentication.password = this.auth.password_data;
+            if (this.auth.saml && hasValues(this.auth.saml_data)) {
+                this._settings.authentication.saml = this.auth.saml_data;
             } else {
-                delete this._settings.authentication.password;
+                delete this._settings.authentication.saml;
             }
 
             if (this.mail && hasValues(this.mail_data)) {
@@ -138,19 +179,11 @@ class AdminSettingsController {
             }
 
             if (!_.isEqual(this._settings, this._settingsStore.getSettings())) {
-                this._settingsActionCreator.update(this._settings);
+                this._settingsActionCreator
+                    .update(this._settings)
+                    .catch((error) => this._$log.error(error.body));
             }
         }
-    }
-
-    isAuthDisabled(name) {
-        const enabled = _.chain(this.auth)
-            .pick(['google', 'github', 'password', 'ldap'])
-            .values()
-            .reduce((counter, x) => x ? counter + 1 : counter, 0)
-            .value();
-
-        return this.auth[name] && enabled === 1;
     }
 
     removeAdmin(admin) {
@@ -160,6 +193,10 @@ class AdminSettingsController {
         newUser.role = USER_ROLE;
 
         this._usersActionCreator.update(newUser);
+    }
+
+    uploadMetadata() {
+        angular.element(document.querySelector('#fileMetadata')).click();
     }
 }
 

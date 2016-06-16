@@ -16,6 +16,8 @@ limitations under the License.
 
 import CHARTS from 'images/icon-charts.svg';
 import GOOGLE_G_LOGO from 'images/google-g-logo.svg';
+import SAML_LOGO from 'images/icon-saml.svg';
+import IC_CHECK_CIRCLE_48PX from 'material-design-icons/action/svg/design/ic_check_circle_48px.svg';
 import IC_CLEAR_48PX from 'material-design-icons/content/svg/production/ic_clear_48px.svg';
 import IC_MORE_VERT_48PX from 'material-design-icons/navigation/svg/production/ic_more_vert_48px.svg';
 import IC_NETWORK_CHECK_48PX from 'material-design-icons/notification/svg/production/ic_network_check_48px.svg';
@@ -28,6 +30,8 @@ import INSTANCES from 'images/icon-instances.svg';
 const icons = {
     CHARTS,
     GOOGLE_G_LOGO,
+    SAML_LOGO,
+    IC_CHECK_CIRCLE_48PX,
     IC_CLEAR_48PX,
     IC_MORE_VERT_48PX,
     IC_NETWORK_CHECK_48PX,

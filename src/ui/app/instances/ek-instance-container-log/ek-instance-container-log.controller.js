@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 class InstanceContainerLogController {
-    constructor($scope, $element, $timeout, instanceStore, logActionCreator, logStore, sessionStore) {
+    constructor($scope, $element, $log, $timeout, instanceStore, logActionCreator, logStore, sessionStore) {
         'ngInject';
 
         const scroller = $element.find('.ek-instance-container-log__content');
@@ -25,6 +25,8 @@ class InstanceContainerLogController {
                 this._instanceStore.getInstance().metadata.name,
                 this.container.name);
         };
+
+        this._$log = $log.getInstance(this.constructor.name);
 
         this._instanceStore = instanceStore;
         this._logActionCreator = logActionCreator;
@@ -43,7 +45,8 @@ class InstanceContainerLogController {
                 $timeout(function() {
                     scroller[0].scrollTop = scroller[0].scrollHeight;
                 }, 0, false);
-            });
+            })
+            .catch((error) => this._$log.error(error.body));
 
         $scope.$on('$destroy', () => {
             logStore.removeLogChangeListener(this._sessionStore.getActiveNamespace().metadata.name,
